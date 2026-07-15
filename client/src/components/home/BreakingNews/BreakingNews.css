@@ -1,0 +1,42 @@
+.ticker-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.ticker-content {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: tickerMove 35s linear infinite;
+}
+
+.ticker-container:hover .ticker-content {
+    animation-play-state: paused;
+}
+
+.ticker-item {
+    white-space: nowrap;
+    text-decoration: none;
+    color: #111827;
+    margin-right: 60px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: .3s;
+}
+
+.ticker-item:hover {
+    color: #dc2626;
+}
+
+@keyframes tickerMove {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+
+}
