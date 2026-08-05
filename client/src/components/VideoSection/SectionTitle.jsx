@@ -2,19 +2,15 @@ import { ChevronRight } from "lucide-react";
 
 const SectionTitle = ({ title }) => {
   return (
-    <div className="mb-8">
-      {/* Top Blue Border */}
-      <div className="w-full h-1 bg-sky-500 mb-4"></div>
-
-      {/* Title */}
+    <div className="mb-8 select-none">
+      <div className="w-full h-1 bg-sky-500 mb-4 rounded-full"></div>
       <div className="flex items-center gap-2">
-        <h2 className="text-4xl font-bold text-gray-900">
+        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
           {title}
         </h2>
-
         <ChevronRight
-          size={32}
-          className="text-red-600 mt-1"
+          size={28}
+          className="text-red-600 mt-0.5 animate-pulse"
         />
       </div>
     </div>

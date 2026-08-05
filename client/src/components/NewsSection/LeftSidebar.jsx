@@ -1,42 +1,114 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import SmallNewsCard from "./SmallNewsCard";
 import TextNews from "./TextNews";
 
-const LeftSidebar = ({ news }) => {
-  const featured = news[0];
-  const imageNews = news.slice(1, 3);
-  const textNews = news.slice(3);
+// 1. Sub-component: Featured Story Block
+const SidebarFeatured = ({ featured }) => {
+  if (!featured) return null;
+
+  const { id, title, description, time, publishedAt } = featured;
 
   return (
-    <aside className="space-y-6">
-      {/* Featured News */}
-      <div className="border-b pb-5">
-        <h2 className="text-2xl font-bold leading-snug hover:text-red-700 transition-colors cursor-pointer">
-          {featured.title}
-        </h2>
+    <div className="border-b border-neutral-200/60 pb-6">
+      <Link to={`/news/${id}`} className="group block">
+        <h3
+          className="
+            text-xl 
+            lg:text-2xl 
+            font-bold 
+            leading-snug 
+            tracking-tight 
+            text-neutral-900 
+            transition-colors 
+            duration-300 
+            group-hover:text-red-600 
+            line-clamp-3
+          "
+        >
+          {title}
+        </h3>
 
-        <p className="mt-3 text-gray-600 text-sm leading-6">
-          {featured.description}
-        </p>
+        {description && (
+          <p className="mt-3 text-[15px] leading-relaxed text-neutral-600 line-clamp-3 font-normal">
+            {description}
+          </p>
+        )}
 
-        <p className="mt-3 text-xs text-gray-500">
-          {featured.time}
+        <p className="mt-3 text-xs sm:text-sm font-medium text-neutral-500">
+          {publishedAt || time || "সম্প্রতি"}
         </p>
+      </Link>
+    </div>
+  );
+};
+
+// 2. Sub-component: Image News List Block
+const SidebarImageList = ({ items }) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-2">
+        <span className="w-1 h-4 bg-red-600 rounded-full" />
+        <h4 className="text-sm font-bold tracking-tight text-neutral-900 uppercase">
+          বিশেষ খবর
+        </h4>
       </div>
 
-      {/* Image News */}
-      <div className="space-y-5">
-        {imageNews.map((item) => (
-          <SmallNewsCard key={item.id} news={item} />
+      <div className="divide-y divide-neutral-200/60">
+        {items.map((item) => (
+          <div key={item.id} className="py-4 first:pt-0 last:pb-0">
+            <SmallNewsCard news={item} />
+          </div>
         ))}
       </div>
+    </div>
+  );
+};
 
-      {/* Text News */}
-      <div className="space-y-4">
-        {textNews.map((item) => (
-          <TextNews key={item.id} news={item} />
+// 3. Sub-component: Text News List Block
+const SidebarTextList = ({ items }) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-2">
+        <span className="w-1 h-4 bg-red-600 rounded-full" />
+        <h4 className="text-sm font-bold tracking-tight text-neutral-900 uppercase">
+          আরও শিরোনাম
+        </h4>
+      </div>
+
+      <div className="divide-y divide-neutral-200/60">
+        {items.map((item) => (
+          <div key={item.id} className="py-3.5 first:pt-0 last:pb-0">
+            <TextNews news={item} />
+          </div>
         ))}
       </div>
-    </aside>
+    </div>
+  );
+};
+
+// Main Composition Component
+const LeftSidebar = ({ featured, imageNews = [], textNews = [] }) => {
+  return (
+    <motion.aside
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-8"
+    >
+      {/* 1. Featured Top Story */}
+      <SidebarFeatured featured={featured} />
+
+      {/* 2. Image-based News List with Dividers */}
+      <SidebarImageList items={imageNews} />
+
+      {/* 3. Text-only News List with Dividers */}
+      <SidebarTextList items={textNews} />
+    </motion.aside>
   );
 };
 

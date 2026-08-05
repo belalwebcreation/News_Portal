@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import profile from "../../assets/profile.jpg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import { roleRoutes } from "../../utils/roleRoutes";
+import ProfileAvatar from "../../components/profile/ProfileAvatar"; // adjust path if your folder depth differs
 
 import {
   FiSearch,
@@ -17,10 +17,13 @@ import {
 
 import { IoChevronDown } from "react-icons/io5";
 
-const Header = ({ sidebarOpen, setSidebarOpen }) => {
+// role আসলে না থাকলেও যাতে "NaN" বা "undefinedundefined" না দেখায়
+const formatRole = (role) => (role ? role.charAt(0).toUpperCase() + role.slice(1) : "");
+
+const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
   const navigate = useNavigate();
 
-  const { userInfo, setUserInfo } = useAuth();
+  const { userInfo, logoutUser } = useAuth();
   const user = userInfo;
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -30,7 +33,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
 
   const handleLogout = () => {
     setProfileOpen(false);
-    setUserInfo(null);
+    logoutUser(); // clears token + userInfo from context AND localStorage
     navigate("/login");
   };
 
@@ -43,18 +46,24 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Close dropdown
+  // Close dropdown on outside click / Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
     };
+    const handleEscape = (e) => {
+      if (e.key === "Escape") setProfileOpen(false);
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
-    return () =>
+    return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
   // Greeting
@@ -64,6 +73,12 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
 
   if (hour < 12) greeting = "Good Morning";
   else if (hour < 18) greeting = "Good Afternoon";
+
+  const goTo = (key) => {
+    setProfileOpen(false);
+    const routes = user?.role ? roleRoutes[user.role] : null;
+    if (routes?.[key]) navigate(routes[key]);
+  };
 
   return (
     <header
@@ -92,6 +107,8 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
         {/* Mobile Menu */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+          aria-expanded={sidebarOpen}
           className="lg:hidden w-10 h-10 rounded-xl bg-amber-900 text-white flex items-center justify-center"
         >
           <FiMenu size={20} />
@@ -230,6 +247,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setProfileOpen(!profileOpen)}
+            aria-expanded={profileOpen}
             className="
               flex
               items-center
@@ -244,28 +262,17 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
           >
             <div className="hidden md:block text-right">
               <h3 className="text-sm font-semibold text-gray-800">
-                {user?.name}
+                {user?.name || "User"}
               </h3>
 
-              <p className="text-xs text-gray-500">
-                {user?.role?.charAt(0).toUpperCase() +
-                  user?.role?.slice(1)}
-              </p>
+              <p className="text-xs text-gray-500">{formatRole(user?.role)}</p>
             </div>
 
-            <img
-              src={profile}
-              alt="Profile"
-              className="
-                w-10
-                h-10
-                lg:w-11
-                lg:h-11
-                rounded-full
-                border-2
-                border-amber-900
-                object-cover
-              "
+            <ProfileAvatar
+              src={user?.avatar?.url}
+              alt={user?.name || "Profile"}
+              size="sm"
+              position={user?.avatar?.position}
             />
 
             <IoChevronDown
@@ -291,24 +298,13 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
               "
             >
               <div className="px-5 py-4 border-b">
-                <h3 className="font-semibold text-gray-800">
-                  {user?.name}
-                </h3>
+                <h3 className="font-semibold text-gray-800">{user?.name || "User"}</h3>
 
-                <p className="text-sm text-gray-500">
-                  {user?.role?.charAt(0).toUpperCase() +
-                    user?.role?.slice(1)}
-                </p>
+                <p className="text-sm text-gray-500">{formatRole(user?.role)}</p>
               </div>
 
               <button
-                onClick={() => {
-                  setProfileOpen(false);
-
-                  if (user?.role) {
-                    navigate(roleRoutes[user.role].profile);
-                  }
-                }}
+                onClick={() => goTo("profile")}
                 className="flex items-center gap-3 w-full px-5 py-3 text-sm hover:bg-slate-50 transition"
               >
                 <FiUser size={17} />
@@ -316,13 +312,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
               </button>
 
               <button
-                onClick={() => {
-                  setProfileOpen(false);
-
-                  if (user?.role) {
-                    navigate(roleRoutes[user.role].settings);
-                  }
-                }}
+                onClick={() => goTo("settings")}
                 className="flex items-center gap-3 w-full px-5 py-3 text-sm hover:bg-slate-50 transition"
               >
                 <FiSettings size={17} />

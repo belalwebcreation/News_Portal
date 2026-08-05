@@ -1,0 +1,428 @@
+.reading-progress{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:4px;
+    z-index:9999;
+    background:transparent;
+}
+
+.reading-progress__bar{
+    height:100%;
+    width:0;
+    transition:width .08s linear;
+    background:#2563eb;
+}
+
+
+
+/* Related Article */
+.related-articles{
+    margin-top:80px;
+}
+
+.related-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:24px;
+}
+
+.related-card{
+    overflow:hidden;
+    border-radius:12px;
+    border:1px solid #e5e7eb;
+    transition:.25s;
+}
+
+.related-card:hover{
+    transform:translateY(-4px);
+}
+
+.related-card img{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+}
+
+.related-card h3{
+    padding:16px;
+    font-size:20px;
+}
+
+.related-card p{
+    padding:0 16px 16px;
+    color:#666;
+}
+
+
+.avatar--large { width: 64px; height: 64px; font-size: 22px; }
+
+.author-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 22px;
+  border: 1px solid var(--article-line);
+  border-radius: var(--article-radius);
+  background: var(--article-panel);
+  box-shadow: var(--article-shadow);
+  margin: 40px 0;
+}
+.author-card__avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.author-card__heading { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.author-card__heading h3 { margin: 0; font-size: 15px; color: var(--article-ink); }
+.author-card__role { padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; color: var(--article-accent-dark); background: var(--article-accent-soft); }
+.author-card__bio { margin: 0; color: var(--article-muted); font-size: 13px; line-height: 1.6; }
+
+/* Scroll Top */
+.scroll-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--article-line);
+  border-radius: 50%;
+  color: var(--article-accent-dark);
+  background: var(--article-panel);
+  box-shadow: var(--article-shadow);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease, background .18s ease, border-color .18s ease;
+}
+.scroll-top.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.scroll-top:hover { border-color: #b9d2c4; background: var(--article-accent-soft); }
+.scroll-top:focus-visible { outline: 2px solid var(--article-accent); outline-offset: 2px; }
+
+.scroll-top__ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.scroll-top__ring-track { fill: none; stroke: var(--article-line); stroke-width: 3; }
+.scroll-top__ring-progress { fill: none; stroke: var(--article-accent); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset .15s linear; }
+
+@media (max-width: 700px) {
+  .scroll-top { right: 16px; bottom: 16px; width: 42px; height: 42px; }
+}
+
+
+/* Share Buttons */
+
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 40px 0;
+}
+
+.share-buttons__button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--article-line);
+  border-radius: 50%;
+  color: var(--article-muted);
+  background: var(--article-panel);
+  text-decoration: none;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.share-buttons__button:hover { color: var(--article-accent-dark); border-color: #b9d2c4; background: var(--article-accent-soft); }
+.share-buttons__button:focus-visible { outline: 2px solid var(--article-accent); outline-offset: 2px; }
+.share-buttons__button.is-copied { color: #2e7854; border-color: #bfe3cd; background: #e6f4eb; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Toc */
+
+.toc {
+  margin: 28px 0 40px;
+  padding: 18px 20px;
+  border: 1px solid var(--article-line);
+  border-radius: var(--article-radius);
+  background: var(--article-soft);
+}
+.toc__title { margin: 0 0 10px; color: var(--article-ink); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.toc__list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.toc__item a { display: block; padding: 3px 0; color: var(--article-muted); font-size: 13.5px; line-height: 1.5; text-decoration: none; border-left: 2px solid transparent; padding-left: 10px; transition: color .15s ease, border-color .15s ease; }
+.toc__item a:hover { color: var(--article-accent-dark); }
+.toc__item.is-active a { color: var(--article-accent-dark); border-color: var(--article-accent); font-weight: 600; }
+.toc__item--level-2 a { padding-left: 10px; }
+.toc__item--level-3 a { padding-left: 24px; font-size: 12.5px; }
+
+/* সাইডবার-এ বসাতে চাইলে .toc--sticky ক্লাসটা যোগ করে দিও */
+.toc--sticky { position: sticky; top: 96px; }
+
+/* ---- Cover photo-র উপর corner badge ---- */
+.article-hero-wrap { position: relative; }
+
+.article-hero-wrap__share {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 5;
+}
+
+.share-buttons--on-hero {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+.share-buttons--on-hero .share-buttons__button { color: #fff; }
+
+/* মোবাইলে corner badge বাদ — bottom bar এমনিতেই দ্রুত চলে আসবে */
+@media (max-width: 1023px) {
+  .article-hero-wrap__share { display: none; }
+}
+
+/* ---- Floating rail (scroll করলে ফলো করবে) ---- */
+.floating-share-bar {
+  position: fixed;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.share-buttons--vertical {
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  padding: 10px 8px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+@media (min-width: 1024px) {
+  .floating-share-bar { left: 24px; top: 50%; transform: translate(-12px, -50%); }
+  .floating-share-bar.is-visible { opacity: 1; pointer-events: auto; transform: translate(0, -50%); }
+}
+
+@media (max-width: 1023px) {
+  .floating-share-bar {
+    left: 0; right: 0; bottom: 0;
+    padding: 10px max(12px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    transform: translateY(12px);
+  }
+  .floating-share-bar.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .floating-share-bar .share-buttons--vertical { flex-direction: row; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-share-bar { transition: opacity 0.2s ease; transform: none !important; }
+}
+
+/* src/features/pages/components/FloatingShareBar.css */
+
+@keyframes shareBarHop {
+  0%   { transform: translateX(0) scale(1); }
+  30%  { transform: translateX(3px) scale(1.08); }
+  60%  { transform: translateX(-2px) scale(0.97); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+.share-bar-hop {
+  animation: shareBarHop 320ms ease-out;
+}
+
+/* === Table of contents (Toc.jsx) === */
+
+.toc {
+  /* --- containment guard: কোনো leftover/leaked rule যেন একে
+     normal flow থেকে বের করে viewport edge-এ bleed করাতে না পারে --- */
+  position: static !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  /* --- বাকি স্টাইল আগের মতোই --- */
+  --toc-rail-x: 14px;
+  --toc-bg: #ffffff;
+  --toc-border: #e5e7eb;
+  --toc-muted: #6b7280;
+  --toc-text: #1f2937;
+  --toc-accent: #4f46e5;
+  --toc-hover-bg: #f3f4f6;
+  --toc-rail: #e5e7eb;
+
+  display: block;
+  box-sizing: border-box;
+  margin-top: 0;
+  margin-bottom: 28px;
+  border: 1px solid var(--toc-border);
+  border-radius: 14px;
+  background: var(--toc-bg);
+  overflow: hidden;
+}
+
+
+.toc__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  color: var(--toc-text);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toc__toggle:hover {
+  background: var(--toc-hover-bg);
+}
+
+.toc__toggle:focus-visible {
+  outline: 2px solid var(--toc-accent);
+  outline-offset: -2px;
+}
+
+.toc__icon {
+  flex: none;
+  color: var(--toc-muted);
+}
+
+.toc__title {
+  flex: 1 1 auto;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.toc__chevron {
+  flex: none;
+  color: var(--toc-muted);
+  transition: transform 220ms ease;
+}
+
+.toc:not(.is-collapsed) .toc__chevron {
+  transform: rotate(180deg);
+}
+
+.toc__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 260ms ease;
+}
+
+.toc.is-collapsed .toc__panel {
+  grid-template-rows: 0fr;
+}
+
+.toc__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.toc__scroll {
+  position: relative;
+  overflow-y: auto;
+  padding: 4px 16px 14px calc(var(--toc-rail-x) + 14px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--toc-border) transparent;
+}
+
+.toc__scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toc__scroll::-webkit-scrollbar-thumb {
+  background: var(--toc-border);
+  border-radius: 999px;
+}
+
+.toc__scroll::before {
+  content: "";
+  position: absolute;
+  left: var(--toc-rail-x);
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--toc-rail);
+}
+
+.toc__indicator {
+  position: absolute;
+  left: var(--toc-rail-x);
+  top: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--toc-accent);
+  transition: transform 220ms ease, height 220ms ease;
+}
+
+.toc__list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc__item {
+  margin: 0;
+}
+
+.toc__item--level-2 a {
+  margin-left: 14px;
+}
+
+.toc__item--level-3 a {
+  margin-left: 28px;
+}
+
+.toc__item a {
+  display: block;
+  padding: 7px 10px;
+  color: var(--toc-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.toc__item a:hover {
+  color: var(--toc-text);
+  background: var(--toc-hover-bg);
+}
+
+.toc__item.is-active > a {
+  color: var(--toc-accent);
+  font-weight: 600;
+  background: var(--toc-hover-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc__panel,
+  .toc__chevron,
+  .toc__indicator,
+  .toc__item a {
+    transition: none !important;
+  }
+}

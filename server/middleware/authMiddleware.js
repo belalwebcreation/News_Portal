@@ -1,35 +1,46 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-
 import User from "../models/User.js";
 
-// ======================================
-// Protect Middleware (JWT Authentication)
-// ======================================
-export const protect = asyncHandler(async (req, res, next) => {
-  let token;
+/* ======================================================
+   Protect Middleware
+====================================================== */
 
-  // Check Authorization Header
+export const protect = asyncHandler(async (req, res, next) => {
+  let accessToken;
+
+  // Cookie is the primary path now — the React app relies on this exclusively.
+  if (req.cookies?.accessToken) {
+    accessToken = req.cookies.accessToken;
+  }
+
+  // Bearer header kept only as a fallback for non-browser clients
+  // (Postman, future mobile app) that can't hold cookies.
   if (
+    !accessToken &&
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
   ) {
-    token = req.headers.authorization.split(" ")[1];
+    accessToken = req.headers.authorization.split(" ")[1];
   }
 
-  // If Token Missing
-  if (!token) {
+  if (!accessToken) {
     return res.status(401).json({
       success: false,
-      message: "Access denied. No token provided.",
+      message: "Authentication required.",
     });
   }
 
   try {
-    // Verify JWT Token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-    // Find User by ID
+    if (decoded.type !== "access") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token type.",
+      });
+    }
+
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
@@ -39,7 +50,6 @@ export const protect = asyncHandler(async (req, res, next) => {
       });
     }
 
-    // Check User Status
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
@@ -47,14 +57,83 @@ export const protect = asyncHandler(async (req, res, next) => {
       });
     }
 
-    // Attach User to Request
     req.user = user;
-
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      // Frontend's axios interceptor watches for this exact code to
+      // silently call /api/auth/refresh and retry, instead of logging out.
+      return res.status(401).json({
+        success: false,
+        code: "TOKEN_EXPIRED",
+        message: "Access token expired.",
+      });
+    }
+
     return res.status(401).json({
       success: false,
       message: "Invalid or expired token.",
     });
   }
 });
+
+/* ======================================================
+   Admin / Super Admin Only
+====================================================== */
+
+export const adminOnly = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required.",
+    });
+  }
+
+  if (
+    req.user.role !== "admin" &&
+    req.user.role !== "superadmin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access required.",
+    });
+  }
+
+  next();
+};
+
+/* ======================================================
+   Role Middleware (Hierarchy Aware)
+====================================================== */
+
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const userRole = req.user.role;
+
+    // --------------------------------------------------
+    // Super Admin can access everything
+    // --------------------------------------------------
+    if (userRole === "superadmin") {
+      return next();
+    }
+
+    // --------------------------------------------------
+    // Check allowed roles
+    // --------------------------------------------------
+    if (!roles.includes(userRole)) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have permission to perform this action.",
+      });
+    }
+
+    next();
+  };
+};

@@ -4,6 +4,8 @@ import CMSSection from "../components/contentManagement/CMSSection";
 import CMSModal from "../components/contentManagement/CMSModal";
 import managerComponents from "../components/contentManagement/managers/managerComponents";
 
+import { useSiteSettings } from "../../context/SiteSettingsContext";
+
 class ManagerErrorBoundary extends Component {
   state = { hasError: false };
 
@@ -22,6 +24,7 @@ class ManagerErrorBoundary extends Component {
           <p className="font-semibold text-red-600">
             Something went wrong loading this section.
           </p>
+
           <p className="mt-1 text-sm text-slate-500">
             Close this window and try again.
           </p>
@@ -36,6 +39,8 @@ class ManagerErrorBoundary extends Component {
 const ContentManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const { settings, refreshSettings } = useSiteSettings();
 
   const handleManage = useCallback((item) => {
     setSelectedItem(item);
@@ -52,6 +57,7 @@ const ContentManagement = () => {
 
   return (
     <div className="p-6">
+      {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black">
           Content Management
@@ -62,8 +68,10 @@ const ContentManagement = () => {
         </p>
       </div>
 
+      {/* CMS Sections */}
       <CMSSection onManage={handleManage} />
 
+      {/* Manager Modal */}
       <CMSModal
         open={isModalOpen}
         onClose={closeModal}
@@ -77,6 +85,8 @@ const ContentManagement = () => {
               {...selectedItem}
               item={selectedItem}
               onClose={closeModal}
+              settings={settings}
+              refreshSettings={refreshSettings}
             />
           </ManagerErrorBoundary>
         ) : (

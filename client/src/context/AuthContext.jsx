@@ -3,107 +3,156 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useMemo,
   useState,
 } from "react";
 import axios from "axios";
 
 /**
- * This file is 100% frontend (React) code — no backend imports here.
- * If you ever see something like `import sendEmail from "../utils/sendEmail.js"`
- * at the top of this file, that's leftover backend code that got mixed in
- * by accident during copy-paste — delete it, it doesn't belong here.
+ * Cookie-based auth (access + refresh tokens, both HttpOnly) — the backend
+ * sets and reads these directly; this file never sees a raw token string.
  *
- * What this file does:
- * - Restores the session from localStorage on app load (only if the JWT
- *   isn't expired yet).
- * - Attaches the token to every axios request automatically.
- * - Auto-logs-out if the backend ever responds 401 to any request.
- * - Keeps login/logout in sync across browser tabs.
- * - Exposes updateUser() so profile edits update both React state AND
- *   localStorage together (never use setUserInfo directly — it doesn't
- *   exist as a public value here on purpose).
- *
- * Known tradeoff: the token lives in localStorage, which any script on the
- * page can read — a real risk only if the site is vulnerable to XSS
- * somewhere else. The safer pattern is an httpOnly cookie set by the
- * backend (JS can't read it at all), but that needs backend + CORS changes
- * (credentials: true), so it's not done here.
+ * What changed from the localStorage version:
+ * - No token in localStorage anymore — HttpOnly cookies can't be read by
+ *   JS at all, so an XSS bug elsewhere on the site can no longer steal
+ *   the session by reading storage.
+ * - Session is restored by asking the backend "who am I" (GET /api/auth/me)
+ *   instead of decoding a JWT locally, since we no longer have one to decode.
+ * - A 401 with code "TOKEN_EXPIRED" triggers one silent
+ *   POST /api/auth/refresh + retry instead of an immediate logout — access
+ *   tokens are short-lived (15m) on purpose, so this is routine, not just
+ *   an end-of-session event.
+ * - userInfo is still cached in localStorage, but only as a "paint
+ *   something before the network reply lands" hint. It's never trusted for
+ *   auth decisions — only the cookie + backend response decide that.
  */
 
 const AuthContext = createContext(null);
 
-// JWTs are base64url, not plain base64 — "-"/"_" need remapping before atob.
-const decodeTokenExpiry = (token) => {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64.padEnd(
-      base64.length + ((4 - (base64.length % 4)) % 4),
-      "="
-    );
-    const payload = JSON.parse(atob(padded));
-    return payload.exp ? payload.exp * 1000 : null; // ms
-  } catch {
-    return null;
-  }
-};
+axios.defaults.withCredentials = true; // send/receive the auth cookies on every request
 
-const isTokenExpired = (token) => {
-  const expiryMs = decodeTokenExpiry(token);
-  // Can't read an expiry (e.g. non-JWT format)? Don't force a logout over
-  // a decode quirk — the 401 interceptor below is the real safety net.
-  if (!expiryMs) return false;
-  return Date.now() >= expiryMs;
+let refreshPromise = null; // de-dupes concurrent refresh calls from parallel requests
+
+const refreshAccessToken = () => {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post("/api/auth/refresh")
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
 };
 
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const hasCheckedSession = useRef(false);
 
-  // Restore session on app load, but only if it's actually still valid.
-  useEffect(() => {
+  const applyUser = useCallback((user) => {
+    setUserInfo(user);
     try {
-      const storedToken = localStorage.getItem("token");
-      const storedUser = localStorage.getItem("userInfo");
-
-      if (storedToken && storedUser && !isTokenExpired(storedToken)) {
-        setToken(storedToken);
-        setUserInfo(JSON.parse(storedUser));
-      } else if (storedToken || storedUser) {
-        localStorage.removeItem("token");
+      if (user) {
+        localStorage.setItem("userInfo", JSON.stringify(user));
+      } else {
         localStorage.removeItem("userInfo");
       }
     } catch (err) {
-      console.error("Failed to restore session:", err);
-      localStorage.removeItem("token");
-      localStorage.removeItem("userInfo");
-    } finally {
-      setLoading(false);
+      console.error("Failed to cache user info:", err);
     }
   }, []);
 
-  const loginUser = useCallback((newToken, user) => {
+  // Paint a guess immediately from cache — actual auth state is confirmed
+  // by fetchMe() below once the interceptor is registered.
+  useEffect(() => {
     try {
-      localStorage.setItem("token", newToken);
-      localStorage.setItem("userInfo", JSON.stringify(user));
-    } catch (err) {
-      console.error("Failed to persist session:", err);
+      const cached = localStorage.getItem("userInfo");
+      if (cached) setUserInfo(JSON.parse(cached));
+    } catch {
+      localStorage.removeItem("userInfo");
     }
-    setToken(newToken);
-    setUserInfo(user);
   }, []);
 
-  const logoutUser = useCallback(() => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userInfo");
-    setToken(null);
-    setUserInfo(null);
-  }, []);
+  // Silent-refresh-then-retry on an expired access token; hard logout only
+  // on a refresh failure or any other 401 (e.g. a revoked/invalid session).
+  // Declared before the fetchMe effect below so it's registered first —
+  // effects run in declaration order, and fetchMe's very first request
+  // needs this interceptor already in place to self-heal correctly.
+  useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const original = error.config;
 
-  // Use this after e.g. a profile update instead of touching state
-  // directly — keeps React state and localStorage from drifting apart.
+        const isExpiredAccessToken =
+          error.response?.status === 401 &&
+          error.response?.data?.code === "TOKEN_EXPIRED" &&
+          !original?._retried &&
+          !original?.url?.includes("/api/auth/refresh"); // never retry-refresh the refresh call itself
+
+        if (isExpiredAccessToken) {
+          original._retried = true;
+          try {
+            await refreshAccessToken();
+            return axios(original);
+          } catch {
+            applyUser(null);
+            return Promise.reject(error);
+          }
+        }
+
+        if (error.response?.status === 401) {
+          applyUser(null);
+        }
+
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptorId);
+  }, [applyUser]);
+
+  const fetchMe = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/auth/me");
+      applyUser(data.user);
+    } catch {
+      // By the time this catch runs, the interceptor above has already
+      // tried a silent refresh once if it was a TOKEN_EXPIRED case — so a
+      // failure here means there's genuinely no valid session.
+      applyUser(null);
+    }
+  }, [applyUser]);
+
+  // Runs once per app load (guarded against React StrictMode's dev double-invoke).
+  useEffect(() => {
+    if (hasCheckedSession.current) return;
+    hasCheckedSession.current = true;
+    fetchMe().finally(() => setLoading(false));
+  }, [fetchMe]);
+
+  // Cookies are already set by the backend's Set-Cookie header on the
+  // login/googleLogin response — this just syncs React state to match.
+  const loginUser = useCallback(
+    (user) => {
+      applyUser(user);
+      localStorage.setItem("authEvent", `login:${Date.now()}`); // cross-tab ping
+    },
+    [applyUser]
+  );
+
+  const logoutUser = useCallback(async () => {
+    try {
+      await axios.post("/api/auth/logout");
+    } catch (err) {
+      console.error("Logout request failed:", err);
+      // Clear local state regardless — the UI shouldn't stay "logged in"
+      // just because this one network call failed.
+    }
+    applyUser(null);
+    localStorage.setItem("authEvent", `logout:${Date.now()}`); // cross-tab ping
+  }, [applyUser]);
+
   const updateUser = useCallback((updatedFields) => {
     setUserInfo((prev) => {
       if (!prev) return prev;
@@ -122,64 +171,28 @@ export const AuthProvider = ({ children }) => {
     [userInfo]
   );
 
-  // Keep every axios request authenticated automatically.
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common.Authorization;
-    }
-  }, [token]);
-
-  // Self-heal on a rejected/expired/invalid token instead of leaving the
-  // user stuck in a "logged in" UI where every request quietly fails.
-  useEffect(() => {
-    const interceptorId = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          logoutUser();
-        }
-        return Promise.reject(error);
-      }
-    );
-    return () => axios.interceptors.response.eject(interceptorId);
-  }, [logoutUser]);
-
-  // Logging out in one tab should log out every open tab of the site.
+  // A login/logout in one tab should reflect in every other open tab.
   useEffect(() => {
     const syncAcrossTabs = (event) => {
-      if (event.key === "token" && !event.newValue) {
-        setToken(null);
-        setUserInfo(null);
-      }
-      if (event.key === "userInfo") {
-        try {
-          setUserInfo(event.newValue ? JSON.parse(event.newValue) : null);
-        } catch {
-          setUserInfo(null);
-        }
-      }
+      if (event.key === "authEvent") fetchMe();
     };
     window.addEventListener("storage", syncAcrossTabs);
     return () => window.removeEventListener("storage", syncAcrossTabs);
-  }, []);
+  }, [fetchMe]);
 
   const value = useMemo(
     () => ({
       userInfo,
-      token,
       loading,
-      isLoggedIn: !!userInfo && !!token,
+      isLoggedIn: !!userInfo,
       isAdmin: userInfo?.role === "admin",
-      // Treat admin as able to do everything a writer can.
       isWriter: userInfo?.role === "writer" || userInfo?.role === "admin",
       hasRole,
       loginUser,
       logoutUser,
       updateUser,
     }),
-    [userInfo, token, loading, hasRole, loginUser, logoutUser, updateUser]
+    [userInfo, loading, hasRole, loginUser, logoutUser, updateUser]
   );
 
   return (

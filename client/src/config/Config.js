@@ -6,31 +6,54 @@
 // =============================
 // Backend API Base URL
 // =============================
-// Development
-export const baseUrl = "http://localhost:5000";
+export const baseUrl =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // =============================
 // API Endpoints
 // =============================
 export const api = {
+  // =============================
+  // Authentication
+  // =============================
   login: "/api/login",
   logout: "/api/logout",
 
+  // =============================
+  // Profile
+  // =============================
   profile: "/api/profile",
   updateProfile: "/api/profile/update",
 
-  createNews: "/api/news/create",
-  getNews: "/api/news",
-  updateNews: "/api/news/update",
-  deleteNews: "/api/news/delete",
+  publicProfile: "/api/public-profile",
 
-  uploadImage: "/api/upload",
+  // =============================
+  // News
+  // =============================
+  news: "/api/news",
+  uploadNewsImage: "/api/news/image",
+  users: "/api/users",
 
-  category: "/api/category",
+  // =============================
+  // Category
+  // =============================
+  category: "/api/categories",
 
+  // =============================
+  // Writers
+  // =============================
   writers: "/api/writers",
 
+  // =============================
+  // Dashboard
+  // =============================
   dashboard: "/api/dashboard",
+
+  // =============================
+  // Mentions
+  // =============================
+  mentions: "/api/mentions/users",
+
 };
 
 // =============================
@@ -50,8 +73,3 @@ export const appInfo = {
   appName: "Rajshahi College News Portal",
   version: "1.0.0",
 };
-
-// ======================================================
-// Production Example
-// ======================================================
-// export const baseUrl = "https://api.yourdomain.com";

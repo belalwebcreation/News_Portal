@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const ProtectRole = ({ role }) => {
+const ProtectRole = ({ role, roles }) => {
   const { userInfo } = useAuth();
 
-  if (userInfo?.role === role) {
+  const allowed = roles ?? (role ? [role] : []);
+
+  if (allowed.includes(userInfo?.role)) {
     return <Outlet />;
   }
 

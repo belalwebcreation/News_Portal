@@ -1,63 +1,65 @@
-import { useState } from "react";
+import { useReducedMotion, AnimatePresence, motion } from "framer-motion";
+import { useVideoSlider } from "../../hooks/useVideoSlider";
 import VideoGrid from "./VideoGrid";
 import PaginationDots from "./PaginationDots";
-import { AnimatePresence, motion } from "framer-motion";
 
-const VideoSlider = ({ videos }) => {
-  const cardsPerPage = 5;
+const VideoSlider = ({ videos = [] }) => {
+  const prefersReducedMotion = useReducedMotion();
+  const {
+    currentPage,
+    direction,
+    totalPages,
+    currentVideos,
+    handlePageChange,
+    handleMouseEnter,
+    handleMouseLeave
+  } = useVideoSlider(videos);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [direction, setDirection] = useState(1);
-
-  const totalPages = Math.ceil(videos.length / cardsPerPage);
-
-  const startIndex = currentPage * cardsPerPage;
-
-  const currentVideos = videos.slice(
-    startIndex,
-    startIndex + cardsPerPage
-  );
+  // Subtle slide distance (40px) & reduced motion handling
+  const slideOffset = prefersReducedMotion ? 0 : 40;
 
   return (
-    <div>
-      <AnimatePresence mode="wait" custom={direction}>
-  <motion.div
-    key={currentPage}
-    custom={direction}
-    variants={{
-      enter: (direction) => ({
-        x: direction > 0 ? 120 : -120,
-        opacity: 0,
-      }),
-      center: {
-        x: 0,
-        opacity: 1,
-      },
-      exit: (direction) => ({
-        x: direction > 0 ? -120 : 120,
-        opacity: 0,
-      }),
-    }}
-    initial="enter"
-    animate="center"
-    exit="exit"
-    transition={{
-      duration: 0.45,
-      ease: "easeInOut",
-    }}
-  >
-    <VideoGrid videos={currentVideos} />
-  </motion.div>
-</AnimatePresence>
+    <div className="w-full">
+      <div className="overflow-hidden min-h-[260px] md:min-h-[320px] lg:min-h-[360px]">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentPage}
+            custom={direction}
+            variants={{
+              enter: (dir) => ({
+                x: dir > 0 ? slideOffset : -slideOffset,
+                opacity: 0
+              }),
+              center: { x: 0, opacity: 1 },
+              exit: (dir) => ({
+                x: dir > 0 ? -slideOffset : slideOffset,
+                opacity: 0
+              })
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 28,
+              mass: 0.8
+            }}
+          >
+            <VideoGrid
+              videos={currentVideos}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       <PaginationDots
-  totalPages={totalPages}
-  currentPage={currentPage}
-  onPageChange={(page) => {
-    setDirection(page > currentPage ? 1 : -1);
-    setCurrentPage(page);
-  }}
-/>
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

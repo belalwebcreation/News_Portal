@@ -1,161 +1,30 @@
 export const videoSectionData = {
   topics: [
-    { id: 1, name: "গিজা" },
-    { id: 2, name: "অর্থনীতি" },
-    { id: 3, name: "খুন" },
-    { id: 4, name: "পুলিশ" },
-    { id: 5, name: "বাজেট" },
-    { id: 6, name: "বিশ্বকাপ ফুটবল ২০২৬" },
-    { id: 7, name: "বিশ্বকাপ ক্রিকেট ২০২৬" },
-    { id: 8, name: "রাজশাহী কলেজ" },
-    { id: 9, name: "ভর্তি" },
-    { id: 10, name: "চট্টগ্রাম বিভাগ" },
-    { id: 11, name: "আরও" },
+    { id: "all", name: "সব ভিডিও" },
+    { id: "politics", name: "রাজনীতি" },
+    { id: "sports", name: "খেলা" },
+    { id: "world", name: "বিশ্ব" },
+    { id: "economy", name: "অর্থনীতি" },
+    { id: "crime", name: "অপরাধ" },
+    { id: "education", name: "শিক্ষা" },
+    { id: "technology", name: "প্রযুক্তি" },
+    { id: "health", name: "স্বাস্থ্য" },
+    { id: "travel", name: "ভ্রমণ" },
+    { id: "lifestyle", name: "লাইফস্টাইল" },
+    { id: "opinion", name: "মতামত" },
+    { id: "campus", name: "ক্যাম্পাস" }
   ],
-
-  videos: [
-    {
-      id: 1,
-      title: "স্পেনে ভয়াবহ দাবানলে নিহত ১২, নিখোঁজ ২৩",
-      description:
-        "স্পেনের দক্ষিণাঞ্চলে ভয়াবহ দাবানল দ্রুত ছড়িয়ে পড়ছে।",
-      image:
-        "https://images.unsplash.com/photo-1473773508845-188df298d2d1?w=800",
-      time: "২ ঘণ্টা আগে",
-      videoUrl: "#",
-    },
-
-    {
-      id: 2,
-      title: "দেশে সন্তান জন্মদানের হার কমছে",
-      description:
-        "বিশেষজ্ঞদের মতে নতুন প্রজন্মে জন্মহার কমে যাচ্ছে।",
-      image:
-        "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800",
-      time: "৩ ঘণ্টা আগে",
-      videoUrl: "#",
-    },
-
-    {
-      id: 3,
-      title: "বেলজিয়ামকে হারিয়ে সেমিফাইনালে স্পেন",
-      description:
-        "রোমাঞ্চকর ম্যাচ শেষে জয় নিশ্চিত করেছে স্পেন।",
-      image:
-        "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800",
-      time: "৩ ঘণ্টা আগে",
-      videoUrl: "#",
-    },
-
-    {
-      id: 4,
-      title: "পৃথিবীর শীতলতম লাইব্রেরি",
-      description:
-        "অসাধারণ এই লাইব্রেরি এখন পর্যটকদের আকর্ষণ।",
-      image:
-        "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800",
-      time: "৮ ঘণ্টা আগে",
-      videoUrl: "#",
-    },
-
-    {
-      id: 5,
-      title: "১০ হাজার মানুষের পাশে একজন চিকিৎসক",
-      description:
-        "দীর্ঘদিন ধরে গ্রামের মানুষের চিকিৎসা দিয়ে যাচ্ছেন।",
-      image:
-        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800",
-      time: "১ দিন আগে",
-      videoUrl: "#",
-    },
-    {
-  id: 6,
-  title: "রাজশাহী কলেজে নতুন একাডেমিক ভবনের উদ্বোধন",
-  description: "নতুন ভবন উদ্বোধনের মাধ্যমে শিক্ষা কার্যক্রম আরও সম্প্রসারিত হলো।",
-  image: "https://picsum.photos/400/250?random=6",
-  time: "৪ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 7,
-  title: "বন্যাদুর্গতদের সহায়তায় শিক্ষার্থীদের উদ্যোগ",
-  description: "ত্রাণ সংগ্রহ ও বিতরণ কার্যক্রমে অংশ নিচ্ছেন শতাধিক শিক্ষার্থী।",
-  image: "https://picsum.photos/400/250?random=7",
-  time: "৫ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 8,
-  title: "বাংলাদেশের ঐতিহাসিক স্থাপনা নিয়ে বিশেষ প্রতিবেদন",
-  description: "দেশের গুরুত্বপূর্ণ ঐতিহাসিক স্থাপনাগুলো ঘুরে দেখা হয়েছে।",
-  image: "https://picsum.photos/400/250?random=8",
-  time: "৬ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 9,
-  title: "ক্যাম্পাসে প্রযুক্তি উৎসব শুরু",
-  description: "বিভিন্ন প্রযুক্তি প্রতিষ্ঠানের অংশগ্রহণে তিন দিনব্যাপী আয়োজন।",
-  image: "https://picsum.photos/400/250?random=9",
-  time: "৭ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 10,
-  title: "ফুটবল টুর্নামেন্টে দুর্দান্ত জয়",
-  description: "রোমাঞ্চকর ফাইনালে জয় তুলে নিল কলেজ দল।",
-  image: "https://picsum.photos/400/250?random=10",
-  time: "৮ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 11,
-  title: "নতুন গবেষণায় গুরুত্বপূর্ণ তথ্য প্রকাশ",
-  description: "গবেষণার ফলাফল আন্তর্জাতিক জার্নালে প্রকাশিত হয়েছে।",
-  image: "https://picsum.photos/400/250?random=11",
-  time: "৯ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 12,
-  title: "শীতকালীন সাংস্কৃতিক অনুষ্ঠান অনুষ্ঠিত",
-  description: "নাচ, গান ও নাটকের মাধ্যমে জমে উঠেছিল অনুষ্ঠান।",
-  image: "https://picsum.photos/400/250?random=12",
-  time: "১০ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 13,
-  title: "শিক্ষার্থীদের জন্য নতুন বৃত্তির ঘোষণা",
-  description: "মেধাবী ও অসচ্ছল শিক্ষার্থীদের জন্য বিশেষ বৃত্তি প্রদান করা হবে।",
-  image: "https://picsum.photos/400/250?random=13",
-  time: "১১ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 14,
-  title: "রাজশাহীতে আন্তর্জাতিক সেমিনার অনুষ্ঠিত",
-  description: "দেশ-বিদেশের গবেষকরা বিভিন্ন বিষয়ে মতবিনিময় করেছেন।",
-  image: "https://picsum.photos/400/250?random=14",
-  time: "১২ ঘণ্টা আগে",
-  videoUrl: "#",
-},
-
-{
-  id: 15,
-  title: "শিক্ষার্থীদের উদ্ভাবনী প্রকল্প প্রদর্শনী",
-  description: "উদ্ভাবনী ধারণা নিয়ে আয়োজিত প্রদর্শনীতে ব্যাপক সাড়া মিলেছে।",
-  image: "https://picsum.photos/400/250?random=15",
-  time: "১ দিন আগে",
-  videoUrl: "#",
-}
-  ],
+  layout: {
+    featuredVideoId: "v1",
+    sliderVideoIds: ["v2", "v3", "v4", "v5", "v6", "v7"]
+  },
+  videos: {
+    v1: { id: "v1", category: "politics", title: "রাজশাহী কলেজের নতুন ছাত্র সংসদ নির্বাচন আগামী মাসে", description: "দীর্ঘদিন পর ক্যাম্পাস রাজনীতি সচল করতে...", thumbnail: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=800", duration: "03:45", views: "12K", time: "২ ঘণ্টা আগে" },
+    v2: { id: "v2", category: "sports", title: "বার্ষিক ক্রীড়া প্রতিযোগিতায় চ্যাম্পিয়ন ইসলামের ইতিহাস বিভাগ", description: "টানা তিনবার ফাইনালে জিতে রেকর্ড...", thumbnail: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800", duration: "02:15", views: "5.4K", time: "৪ ঘণ্টা আগে" },
+    v3: { id: "v3", category: "technology", title: "আইসিটি ল্যাবে নতুন ৫জি সার্ভার প্যানেল স্থাপন", description: "শিক্ষার্থীদের উচ্চতর গবেষণার সুবিধার্থে...", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800", duration: "05:20", views: "8.1K", time: "১ দিন আগে" },
+    v4: { id: "v4", category: "campus", title: "ক্যাম্পাস পরিচ্ছন্নতা অভিযানে সাধারণ শিক্ষার্থীরা", description: "স্বেচ্ছাসেবী সংগঠনের উদ্যোগে পুরো ক্যাম্পাস...", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800", duration: "01:50", views: "3.2K", time: "৩ দিন আগে" },
+    v5: { id: "v5", category: "politics", title: "ছাত্রনেতাদের সাথে উপাধ্যক্ষের মতবিনিময় সভা সম্পন্ন", description: "ক্যাম্পাসের সার্বিক শৃঙ্খলা বজায় রাখার লক্ষ্যে...", thumbnail: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800", duration: "04:10", views: "6.7K", time: "৪ দিন আগে" },
+    v6: { id: "v6", category: "sports", title: "আন্তঃকলেজ ক্রিকেট টুর্নামেন্টের প্রস্তুতি ম্যাচ শুরু", description: "বিভাগীয় স্টেডিয়ামে জোর কদমে চলছে প্র্যাকটিস...", thumbnail: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800", duration: "02:40", views: "4.2K", time: "৫ দিন আগে" },
+    v7: { id: "v7", category: "technology", title: "রোবোটিক্স ক্লাবের তৈরি নতুন এগ্রি-বট প্রদর্শনী", description: "কৃষিকাজে সহায়তার জন্য কৃত্রিম বুদ্ধিমত্তাসম্পন্ন রোবট...", thumbnail: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800", duration: "06:15", views: "9.5K", time: "১ সপ্তাহ আগে" }
+  }
 };

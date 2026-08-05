@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 
 // প্রতিটা রিকোয়েস্টের সাথে auth token পাঠানো (JWT ব্যবহার করলে)
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

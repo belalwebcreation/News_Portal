@@ -10,6 +10,9 @@ import {
   resetPassword,
   verifyEmail,
   resendVerificationEmail,
+  googleLogin,
+  facebookLogin,
+  refreshAccessToken,
 } from "../server/controllers/authController.js";
 import { protect } from "../server/middleware/authMiddleware.js";
 import { authorizeRoles } from "../server/middleware/roleMiddleware.js";
@@ -21,6 +24,15 @@ router.post("/register", registerUser);
 
 // Login
 router.post("/login", loginUser);
+
+// Google Login
+router.post("/google", googleLogin);
+
+// Facebook Login
+router.post("/facebook", facebookLogin);
+
+// Refresh Access Token
+router.post("/refresh", refreshAccessToken);
 
 // Current Logged In User
 router.get("/me", protect, getMe);

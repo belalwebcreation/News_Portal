@@ -9,6 +9,8 @@ import {
   Inbox,
 } from "lucide-react";
 
+import TopHeadlineImage from "./TopHeadlineImage";
+
 import {
   getTopHeadline,
   updateTopHeadline,
@@ -17,65 +19,53 @@ import {
   toggleHeadlineVisibility,
 } from "../../../../services/topHeadlineService";
 
-const emptyHeadline = {
-  label: "",
-  date: "",
-  speed: 40,
-  items: [],
-};
-
-// `onSaved` is optional — pass it in if this component is rendered inside
-// a modal/popup and you want that popup to close itself after a
-// successful save, e.g. <TopHeadlineManager onSaved={() => setOpen(false)} />
-const TopHeadlineManager = ({ onSaved } = {}) => {
+const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
+  // -----------------------------------------
+  // Loading States
+  // -----------------------------------------
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [busyId, setBusyId] = useState(null); // item currently being deleted/toggled
+  const [busyId, setBusyId] = useState(null);
 
-  const [label, setLabel] = useState("");
-  const [date, setDate] = useState("");
-  const [speed, setSpeed] = useState(40);
+  // -----------------------------------------
+  // Headlines
+  // -----------------------------------------
   const [items, setItems] = useState([]);
-  const [initial, setInitial] = useState(emptyHeadline); // last-synced snapshot, used for dirty check
+  const [initialItems, setInitialItems] = useState([]);
 
+  // -----------------------------------------
+  // Messages
+  // -----------------------------------------
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [actionError, setActionError] = useState("");
 
   /*
-  ------------------------------------------
-  Load Headline
-  ------------------------------------------
+  ==========================================
+  Load Headlines
+  ==========================================
   */
-
   const fetchHeadline = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const { headline } = await getTopHeadline();
+      const res = await getTopHeadline();
+      const headline = res.headline || {};
 
-      const nextLabel = headline.label || "";
-      const nextDate = headline.date || "";
-      const nextSpeed = headline.speed ?? 40;
-      const nextItems = headline.items || [];
+      const nextItems = (headline.items || []).map((item) => ({
+        ...item,
+        image: item.image || "",
+        imagePublicId: item.imagePublicId || "",
+        visible: item.visible ?? true,
+      }));
 
-      setLabel(nextLabel);
-      setDate(nextDate);
-      setSpeed(nextSpeed);
-    
       setItems(nextItems);
-
-      setInitial({
-        label: nextLabel,
-        date: nextDate,
-        speed: nextSpeed,
-        items: nextItems,
-      });
+      setInitialItems(nextItems);
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to load Top Headline."
+        err.response?.data?.message || "Failed to load Top Headlines."
       );
     } finally {
       setLoading(false);
@@ -86,7 +76,11 @@ const TopHeadlineManager = ({ onSaved } = {}) => {
     fetchHeadline();
   }, []);
 
-  // Auto-dismiss transient banners so they don't sit on screen forever
+  /*
+  ==========================================
+  Auto Hide Alerts
+  ==========================================
+  */
   useEffect(() => {
     if (!success) return;
     const timer = setTimeout(() => setSuccess(""), 3000);
@@ -99,55 +93,106 @@ const TopHeadlineManager = ({ onSaved } = {}) => {
     return () => clearTimeout(timer);
   }, [actionError]);
 
-  // Tracks whether label/date/speed/items differ from the last saved snapshot
-  const isDirty = useMemo(() => {
-    return (
-      label !== initial.label ||
-      date !== initial.date ||
-      speed !== initial.speed ||
-      JSON.stringify(items) !== JSON.stringify(initial.items)
-    );
-  }, [label, date, speed, items, initial]);
+  /*
+  ==========================================
+  Dirty Checker
+  ==========================================
+  */
+  const isDirty = useMemo(
+    () => JSON.stringify(items) !== JSON.stringify(initialItems),
+    [items, initialItems]
+  );
+
+  const limitReached = items.length >= maxHeadlines;
 
   /*
-  ------------------------------------------
+  ==========================================
   Update Local Item
-  ------------------------------------------
+  ==========================================
   */
-
   const updateItem = (id, field, value) => {
     setItems((prev) =>
       prev.map((item) =>
+        item._id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  /*
+  ==========================================
+  Image Uploaded (Cloudinary)
+  ==========================================
+  */
+  const handleImageUploaded = (id, imageUrl, publicId) => {
+    setItems((prev) =>
+      prev.map((item) =>
         item._id === id
-          ? {
-              ...item,
-              [field]: value,
-            }
+          ? { ...item, image: imageUrl, imagePublicId: publicId }
           : item
       )
     );
   };
 
   /*
-  ------------------------------------------
-  Delete Headline
-  ------------------------------------------
+  ==========================================
+  Image Deleted
+  ==========================================
   */
+  const handleImageDeleted = (id) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item._id === id ? { ...item, image: "", imagePublicId: "" } : item
+      )
+    );
+  };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this headline? This cannot be undone.")) {
+  /*
+  ==========================================
+  Add Headline
+  ==========================================
+  */
+  const handleAdd = async () => {
+    if (limitReached) {
+      setActionError(`You can add up to ${maxHeadlines} headlines only.`);
       return;
     }
 
-    const snapshot = items;
-    setBusyId(id);
-    setActionError("");
-    setItems((prev) => prev.filter((item) => item._id !== id)); // optimistic
+    try {
+      setAdding(true);
+
+      await addHeadline({
+        title: "New Headline",
+        slug: "/news/new-headline",
+        image: "",
+        imagePublicId: "",
+        visible: true,
+      });
+
+      await fetchHeadline();
+      setSuccess("Headline added successfully.");
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || "Failed to add headline."
+      );
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  /*
+  ==========================================
+  Delete Headline
+  ==========================================
+  */
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this headline?")) return;
 
     try {
+      setBusyId(id);
       await deleteHeadline(id);
+      setItems((prev) => prev.filter((item) => item._id !== id));
+      setSuccess("Headline deleted successfully.");
     } catch (err) {
-      setItems(snapshot); // rollback on failure
       setActionError(
         err.response?.data?.message || "Failed to delete headline."
       );
@@ -157,25 +202,20 @@ const TopHeadlineManager = ({ onSaved } = {}) => {
   };
 
   /*
-  ------------------------------------------
+  ==========================================
   Toggle Visibility
-  ------------------------------------------
+  ==========================================
   */
-
   const handleToggle = async (id) => {
-    const snapshot = items;
-    setBusyId(id);
-    setActionError("");
-    setItems((prev) =>
-      prev.map((item) =>
-        item._id === id ? { ...item, visible: !item.visible } : item
-      )
-    ); // optimistic
-
     try {
+      setBusyId(id);
       await toggleHeadlineVisibility(id);
+      setItems((prev) =>
+        prev.map((item) =>
+          item._id === id ? { ...item, visible: !item.visible } : item
+        )
+      );
     } catch (err) {
-      setItems(snapshot); // rollback on failure
       setActionError(
         err.response?.data?.message || "Failed to update visibility."
       );
@@ -185,53 +225,17 @@ const TopHeadlineManager = ({ onSaved } = {}) => {
   };
 
   /*
-  ------------------------------------------
-  Add Headline
-  ------------------------------------------
-  */
-
- /*
-------------------------------------------
-Add Headline
-------------------------------------------
-*/
-
-const handleAdd = async () => {
-  try {
-    await addHeadline({
-      title: "New Headline",
-      slug: "/news/new-headline",
-      visible: true,
-    });
-
-    fetchHeadline();
-  } catch (err) {
-    alert(
-      err.response?.data?.message ||
-      "Failed to add headline."
-    );
-  }
-};
-
-  /*
-  ------------------------------------------
+  ==========================================
   Save All Changes
-  ------------------------------------------
+  ==========================================
   */
-
   const handleSave = async () => {
-    const trimmedLabel = label.trim();
     const invalidItem = items.find(
       (item) => !item.title?.trim() || !item.slug?.trim()
     );
 
-    if (!trimmedLabel) {
-      setError("Label cannot be empty.");
-      return;
-    }
-
     if (invalidItem) {
-      setError("Every headline needs both a title and a link.");
+      setError("Every headline must have both a title and a news link.");
       return;
     }
 
@@ -241,57 +245,51 @@ const handleAdd = async () => {
       setSuccess("");
 
       const payload = {
-        label: trimmedLabel,
-        date,
-        speed,
         items: items.map((item) => ({
-          ...item,
+          _id: item._id,
           title: item.title.trim(),
           slug: item.slug.trim(),
+          image: item.image || "",
+          imagePublicId: item.imagePublicId || "",
+          visible: item.visible,
         })),
       };
 
       await updateTopHeadline(payload);
 
-      setLabel(payload.label);
-      setItems(payload.items);
-      setInitial({
-        label: payload.label,
-        date,
-        speed,
-        items: payload.items,
-      });
-      setSuccess("Top Headline updated successfully.");
+      setInitialItems(payload.items);
+      setSuccess("Top Headlines updated successfully.");
 
-      // Let the success message flash briefly before the parent
-      // (e.g. a popup/modal) closes itself.
       if (onSaved) {
         setTimeout(() => onSaved(), 700);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Failed to save changes."
-      );
+      setError(err.response?.data?.message || "Failed to save changes.");
     } finally {
       setSaving(false);
     }
   };
 
+  /*
+  ==========================================
+  Cancel Changes
+  ==========================================
+  */
   const handleCancel = () => {
-    if (isDirty && !window.confirm("Discard unsaved changes?")) return;
+    if (isDirty && !window.confirm("Discard all unsaved changes?")) return;
     fetchHeadline();
   };
 
   /*
-  ------------------------------------------
+  ==========================================
   Loading Screen
-  ------------------------------------------
+  ==========================================
   */
-
   if (loading) {
     return (
-      <div className="py-20 flex justify-center">
-        <Loader2 size={40} className="animate-spin text-amber-700" />
+      <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
+        <Loader2 size={38} className="animate-spin text-amber-700" />
+        <p className="text-sm font-medium">Loading top headlines...</p>
       </div>
     );
   }
@@ -303,171 +301,179 @@ const handleAdd = async () => {
         <h2 className="text-3xl font-black text-slate-800">
           Top Headline Manager
         </h2>
-        <p className="mt-2 text-slate-500">Manage scrolling headlines.</p>
+        <p className="mt-2 text-slate-500">
+          Manage the headlines, links and images shown at the top of your site.
+        </p>
       </div>
 
       {/* Messages */}
       {error && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-red-600">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600"
+        >
           {error}
         </div>
       )}
 
       {success && (
-        <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-green-700">
+        <div
+          role="status"
+          className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-700"
+        >
           {success}
         </div>
       )}
 
       {actionError && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-red-600">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600"
+        >
           {actionError}
         </div>
       )}
 
-      {/* General Settings */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="text-xl font-bold">General Settings</h3>
+      {/* Section Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-xl font-bold text-slate-800">Headlines</h3>
+          <span className="inline-flex h-6 min-w-fit items-center justify-center rounded-full bg-amber-100 px-2 text-xs font-bold text-amber-800">
+            {items.length}/{maxHeadlines}
+          </span>
+        </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 mt-6">
-          <div>
-            <label
-              htmlFor="headline-label"
-              className="block mb-2 font-semibold"
-            >
-              Label
-            </label>
-            <input
-              id="headline-label"
-              type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-amber-700"
-            />
-          </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={adding || limitReached}
+            title={limitReached ? `Maximum of ${maxHeadlines} headlines reached` : undefined}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {adding ? (
+              <>
+                <Loader2 size={17} className="animate-spin" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <Plus size={17} />
+                Add Headline
+              </>
+            )}
+          </button>
 
-          <div>
-            <label
-              htmlFor="headline-date"
-              className="block mb-2 font-semibold"
-            >
-              Date
-            </label>
-            <input
-              id="headline-date"
-              type="text"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-amber-700"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="headline-speed"
-              className="block mb-2 font-semibold"
-            >
-              Scroll Speed
-            </label>
-
-            <input
-              id="headline-speed"
-              type="number"
-              min="10"
-              max="200"
-              value={speed}
-              onChange={(e) => setSpeed(Number(e.target.value))}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-amber-700"
-            />
-
-            <p className="mt-2 text-sm text-slate-500">
-              Lower = Faster • Higher = Slower
+          {limitReached && (
+            <p className="text-xs text-slate-400">
+              Maximum of {maxHeadlines} reached — delete one to add another.
             </p>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Headlines */}
+      {/* Headlines List */}
       <div className="space-y-6">
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-            <Inbox size={32} className="mx-auto text-slate-400" />
-            <p className="mt-3 text-slate-500">
-              No headlines yet. Add your first one below.
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-14 text-center">
+            <Inbox size={34} className="mx-auto text-slate-400" />
+            <p className="mt-4 font-medium text-slate-600">No headlines yet</p>
+            <p className="mt-1 text-sm text-slate-400">
+              Add your first headline to feature it on the site.
             </p>
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={adding || limitReached}
+              className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-50"
+            >
+              <Plus size={17} />
+              Add Headline
+            </button>
           </div>
         ) : (
           items.map((item, index) => (
             <div
               key={item._id}
-              className="rounded-2xl border border-slate-200 bg-white p-6"
+              className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:shadow-sm"
             >
               {/* Card Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-slate-800">
-                  Headline {index + 1}
-                </h3>
+              <div className="flex items-center justify-between mb-6 gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-100 bg-amber-50 text-sm font-bold text-amber-800">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h4 className="truncate text-lg font-bold text-slate-800">
+                    {item.title?.trim() || "Untitled headline"}
+                  </h4>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => handleDelete(item._id)}
                   disabled={busyId === item._id}
-                  aria-label={`Delete headline ${index + 1}`}
-                  className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Delete headline"
+                  className="shrink-0 rounded-lg p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
                 >
                   {busyId === item._id ? (
-                    <Loader2 size={20} className="animate-spin" />
+                    <Loader2 size={18} className="animate-spin" />
                   ) : (
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                   )}
                 </button>
               </div>
 
-              {/* Title */}
-              <div className="mb-5">
-                <label
-                  htmlFor={`title-${item._id}`}
-                  className="block text-sm font-semibold text-slate-700 mb-2"
-                >
-                  Headline Title
-                </label>
-                <input
-                  id={`title-${item._id}`}
-                  type="text"
-                  value={item.title}
-                  onChange={(e) =>
-                    updateItem(item._id, "title", e.target.value)
+              {/* Cloudinary Image */}
+              <div className="mb-6">
+                <TopHeadlineImage
+                  headlineId={item._id}
+                  image={item.image}
+                  publicId={item.imagePublicId}
+                  onUpload={({ image, imagePublicId }) =>
+                    handleImageUploaded(item._id, image, imagePublicId)
                   }
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-amber-700"
+                  onDelete={() => handleImageDeleted(item._id)}
                 />
               </div>
 
-              {/* Link */}
-              <div className="mb-5">
-                <label
-                  htmlFor={`slug-${item._id}`}
-                  className="block text-sm font-semibold text-slate-700 mb-2"
-                >
-                  News Link
-                </label>
-                <input
-                  id={`slug-${item._id}`}
-                  type="text"
-                  value={item.slug}
-                  onChange={(e) =>
-                    updateItem(item._id, "slug", e.target.value)
-                  }
-                  placeholder="/news/example-news"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-amber-700"
-                />
+              {/* Title + Link */}
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block font-semibold text-slate-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={item.title}
+                    onChange={(e) => updateItem(item._id, "title", e.target.value)}
+                    placeholder="e.g. PM announces new education policy"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block font-semibold text-slate-700">
+                    News Link
+                  </label>
+                  <input
+                    type="text"
+                    value={item.slug}
+                    onChange={(e) => updateItem(item._id, "slug", e.target.value)}
+                    placeholder="/news/article-slug"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600"
+                  />
+                  <p className="mt-2 text-sm text-slate-400">
+                    Where this headline links to on your site.
+                  </p>
+                </div>
               </div>
 
               {/* Visibility */}
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 p-5">
+              <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 p-5">
                 <div>
                   <h4 className="font-semibold text-slate-800">Visibility</h4>
                   <p className="text-sm text-slate-500">
-                    Show or hide this headline.
+                    Show or hide this headline on the site.
                   </p>
                 </div>
 
@@ -475,7 +481,7 @@ const handleAdd = async () => {
                   type="button"
                   onClick={() => handleToggle(item._id)}
                   disabled={busyId === item._id}
-                  className={`h-11 px-6 rounded-xl text-white flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`h-11 px-6 rounded-xl text-white flex items-center gap-2 transition disabled:opacity-50 ${
                     item.visible
                       ? "bg-green-600 hover:bg-green-700"
                       : "bg-red-600 hover:bg-red-700"
@@ -501,24 +507,17 @@ const handleAdd = async () => {
         )}
       </div>
 
-      {/* Bottom Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Add */}
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={adding}
-          className="h-12 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {adding ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Plus size={18} />
+      {/* Sticky Save Bar */}
+      <div className="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white/95 px-6 py-4 backdrop-blur">
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          {isDirty && (
+            <>
+              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+              Unsaved changes
+            </>
           )}
-          Add Headline
-        </button>
+        </div>
 
-        {/* Right Buttons */}
         <div className="flex gap-4">
           <button
             type="button"

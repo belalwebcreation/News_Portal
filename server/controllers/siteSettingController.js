@@ -1,61 +1,49 @@
 import SiteSetting from "../models/SiteSetting.js";
-import cloudinary from "../config/cloudinary.js"; // path প্রজেক্ট অনুযায়ী ঠিক করে নিও
-import streamifier from "streamifier";
-// ======================================================
-// Helpers
-// ======================================================
+
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "../utils/cloudinary.js";
+
+/* ======================================================
+   Helpers
+====================================================== */
 
 const getOrCreateSettings = async () => {
   let settings = await SiteSetting.findOne();
 
   if (!settings) {
-    settings = await SiteSetting.create({});
+    settings = await SiteSetting.create({
+      logo: "",
+      logoPublicId: "",
+      logoVisible: true,
+    });
   }
 
   return settings;
 };
 
 const buildSettingsResponse = (settings) => ({
-  logo: settings.logo || "", // এখন এটা সরাসরি Cloudinary secure_url, তাই আর prefix বসাতে হচ্ছে না
+  logo: settings.logo || "",
   logoVisible: settings.logoVisible,
+  navbar: [...(settings.navbar || [])].sort(
+    (a, b) => a.order - b.order
+  ),
 });
 
-// Cloudinary থেকে safely ডিলিট — public_id না থাকলে বা destroy fail করলেও
-// পুরো রিকোয়েস্ট crash না করে শুধু লগ করে এগিয়ে যায়
-const destroyCloudinaryAsset = async (publicId) => {
-  if (!publicId) return;
-
-  try {
-    await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
-    console.error("Cloudinary Delete Error:", error);
-  }
-};
-
-const uploadToCloudinary = (buffer) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "site-settings/logo",
-        resource_type: "image",
-      },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }
-    );
-
-    streamifier.createReadStream(buffer).pipe(stream);
-  });
-};
-
-// ======================================================
-// Get Site Settings
-// ======================================================
+/* ======================================================
+   Get Site Settings
+====================================================== */
 
 export const getSiteSettings = async (req, res) => {
   try {
     const settings = await getOrCreateSettings();
+
+    // ক্যাটাগরির name এবং slug পপুলেট করা হলো
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
 
     return res.status(200).json({
       success: true,
@@ -66,14 +54,14 @@ export const getSiteSettings = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Failed to load site settings.",
     });
   }
 };
 
-// ======================================================
-// Update General Site Settings
-// ======================================================
+/* ======================================================
+   Update General Site Settings
+====================================================== */
 
 export const updateSiteSettings = async (req, res) => {
   try {
@@ -87,6 +75,12 @@ export const updateSiteSettings = async (req, res) => {
 
     await settings.save();
 
+    // সেভ করার পর রেসপন্স পাঠানোর আগে পপুলেট করা হলো
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
+
     return res.status(200).json({
       success: true,
       message: "Site settings updated successfully.",
@@ -97,15 +91,14 @@ export const updateSiteSettings = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Failed to update site settings.",
     });
   }
 };
 
-// ======================================================
-// Upload / Change Logo
-// ======================================================
-
+/* ======================================================
+   Upload / Change Logo
+====================================================== */
 export const uploadLogo = async (req, res) => {
   try {
     if (!req.file) {
@@ -117,16 +110,27 @@ export const uploadLogo = async (req, res) => {
 
     const settings = await getOrCreateSettings();
 
-   
-    await destroyCloudinaryAsset(settings.logoPublicId);
+    // Delete previous logo from Cloudinary
+    if (settings.logoPublicId) {
+      await deleteFromCloudinary(settings.logoPublicId);
+    }
 
-  
-   const result = await uploadToCloudinary(req.file.buffer);
+    // Upload new logo
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      "site-settings/logo"
+    );
 
-      settings.logo = result.secure_url;
-      settings.logoPublicId = result.public_id;
+    settings.logo = result.secure_url;
+    settings.logoPublicId = result.public_id;
 
     await settings.save();
+
+    // লোগো আপলোডের পর রেসপন্স ডাটা পপুলেট করা হলো
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
 
     return res.status(200).json({
       success: true,
@@ -138,32 +142,40 @@ export const uploadLogo = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Failed to upload logo.",
     });
   }
 };
 
-// ======================================================
-// Delete Logo
-// ======================================================
+/* ======================================================
+   Delete Logo
+====================================================== */
 
 export const deleteLogo = async (req, res) => {
   try {
     const settings = await getOrCreateSettings();
 
     if (!settings.logo) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
-        message: "No logo found.",
+        message: "Logo not found.",
       });
     }
 
-    await destroyCloudinaryAsset(settings.logoPublicId);
+    if (settings.logoPublicId) {
+      await deleteFromCloudinary(settings.logoPublicId);
+    }
 
     settings.logo = "";
     settings.logoPublicId = "";
 
     await settings.save();
+
+    // লোগো ডিলিটের পর রেসপন্স ডাটা পপুলেট করা হলো
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
 
     return res.status(200).json({
       success: true,
@@ -175,14 +187,14 @@ export const deleteLogo = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Failed to delete logo.",
     });
   }
 };
 
-// ======================================================
-// Show / Hide Logo
-// ======================================================
+/* ======================================================
+   Update Logo Visibility
+====================================================== */
 
 export const updateLogoVisibility = async (req, res) => {
   try {
@@ -194,6 +206,12 @@ export const updateLogoVisibility = async (req, res) => {
 
     await settings.save();
 
+    // ভিজিবিলিটি চেঞ্জের পরও যেন নেভবার ডাটা পপুলেটেড থাকে
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
+
     return res.status(200).json({
       success: true,
       message: "Logo visibility updated successfully.",
@@ -204,7 +222,8 @@ export const updateLogoVisibility = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message:
+        error.message || "Failed to update logo visibility.",
     });
   }
 };

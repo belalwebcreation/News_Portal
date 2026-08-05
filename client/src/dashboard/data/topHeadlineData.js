@@ -1,4 +1,4 @@
-export const defaultTopHeadline = {
+export const defaultBreakingNews = {
   label: "সর্বশেষ",
 
   date: "১১ জুলাই ২০২৬",

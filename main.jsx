@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import App from "./App";
 import { store } from "./app/store";
@@ -8,7 +10,15 @@ import { store } from "./app/store";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <App />
-  </Provider>
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <GoogleOAuthProvider
+          clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+        >
+          <App />
+        </GoogleOAuthProvider>
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>
 );

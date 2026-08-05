@@ -1,11 +1,11 @@
 import LogoManager from "./LogoManager";
-import TopHeaderManager from "./TopHeaderManager";
+import BreakingNewsManager from "./BreakingNewsManager";
 import TopHeadlineManager from "./TopHeadlineManager";
 import NavbarManager from "./NavbarManager";
 
 const managerComponents = {
   LogoManager,
-  TopHeaderManager,
+  BreakingNewsManager,
   TopHeadlineManager,
   NavbarManager,
 };

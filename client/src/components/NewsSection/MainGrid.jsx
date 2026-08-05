@@ -2,28 +2,30 @@ import FeaturedNews from "./FeaturedNews";
 import NewsCard from "./NewsCard";
 import TextNews from "./TextNews";
 
-const MainGrid = ({ featured, news }) => {
-  const cardNews = news.slice(0, 4);
-  const textNews = news.slice(4);
-
+// featured-এর জন্য null এবং অ্যারেগুলোর জন্য empty array ডিফল্ট করা হলো
+const MainGrid = ({ featured = null, cardNews = [], textNews = [] }) => {
   return (
     <section className="space-y-8">
-      {/* Featured */}
-      <FeaturedNews news={featured} />
+      {/* Center Featured */}
+      {featured && <FeaturedNews news={featured} />}
 
-      {/* News Grid */}
-      <div className="grid grid-cols-2 gap-6">
-        {cardNews.map((item) => (
-          <NewsCard key={item.id} news={item} />
-        ))}
-      </div>
+      {/* Card News Grid */}
+      {cardNews.length > 0 && (
+        <div className="grid grid-cols-2 gap-6">
+          {cardNews.map((item) => (
+            <NewsCard key={item.id} news={item} />
+          ))}
+        </div>
+      )}
 
-      {/* Text News */}
-      <div className="grid grid-cols-2 gap-6">
-        {textNews.map((item) => (
-          <TextNews key={item.id} news={item} />
-        ))}
-      </div>
+      {/* Text News Grid */}
+      {textNews.length > 0 && (
+        <div className="grid grid-cols-2 gap-6">
+          {textNews.map((item) => (
+            <TextNews key={item.id} news={item} />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

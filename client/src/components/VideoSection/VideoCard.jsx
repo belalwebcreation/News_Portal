@@ -1,35 +1,102 @@
+import { memo } from "react";
+import { Link } from "react-router-dom";
+import { Eye } from "lucide-react";
+import { motion } from "framer-motion";
+
 import PlayButton from "./PlayButton";
 
-const VideoCard = ({ video }) => {
+const VideoCard = memo(({ video, setPaused }) => {
+  if (!video) return null;
+
   return (
-    <article className="group cursor-pointer">
-      {/* Image */}
-      <div className="relative overflow-hidden">
-        <img
-          src={video.image}
-          alt={video.title}
-          className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+    <motion.div
+      whileHover={{
+        y: -4,
+        scale: 1.015,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 320,
+        damping: 24,
+      }}
+      onMouseEnter={() => setPaused?.(true)}
+      onMouseLeave={() => setPaused?.(false)}
+      className="h-full"
+    >
+      <Link
+        to={`/news/${video.slug}`}
+        aria-label={video.title}
+        className="
+          group
+          flex
+          h-full
+          flex-col
+          overflow-hidden
+          rounded-2xl
+          border
+          border-neutral-100
+          bg-white
+          shadow-sm
+          transition-shadow
+          duration-300
+          hover:shadow-lg
+        "
+      >
+        <div className="relative aspect-video overflow-hidden bg-neutral-900">
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            loading="lazy"
+            decoding="async"
+            className="
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-500
+              ease-out
+              group-hover:scale-105
+            "
+          />
 
-        <PlayButton />
-      </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
 
-      {/* Title */}
-      <h3 className="mt-4 text-lg font-bold leading-7 transition-colors group-hover:text-red-700">
-        {video.title}
-      </h3>
+          <PlayButton size="md" />
 
-      {/* Description */}
-      <p className="mt-2 text-sm leading-6 text-gray-600">
-        {video.description}
-      </p>
+          {video.duration && (
+            <span className="absolute bottom-3 right-3 z-20 rounded bg-black/80 px-2 py-0.5 text-[10px] font-medium text-white">
+              {video.duration}
+            </span>
+          )}
+        </div>
 
-      {/* Time */}
-      <p className="mt-3 text-xs text-gray-500">
-        {video.time}
-      </p>
-    </article>
+        <div className="flex flex-1 flex-col justify-between p-4">
+          <div>
+            <h3 className="line-clamp-2 text-[15px] font-extrabold leading-snug text-neutral-900 transition-colors duration-200 group-hover:text-red-600">
+              {video.title}
+            </h3>
+
+            <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-neutral-500">
+              {video.description}
+            </p>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3 text-[11px] text-neutral-400">
+            {video.views != null && (
+              <span className="flex items-center gap-1">
+                <Eye size={12} />
+                {video.views}
+              </span>
+            )}
+
+            <span>{video.time}</span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
-};
+});
+
+VideoCard.displayName = "VideoCard";
 
 export default VideoCard;

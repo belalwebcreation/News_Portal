@@ -1,51 +1,29 @@
-import { Link } from "react-router-dom";
-import { heroNews } from "../data";
+import HeroSmallCard from "./HeroSmallCard";
 
-const HeroLeft = () => {
-  const news = heroNews.left;
+const HeroLeft = ({ newsList = [] }) => {
+  if (newsList.length === 0) return null;
 
   return (
-    <aside className="h-full">
+    <aside className="h-full space-y-5">
 
-      <article className="border-b border-gray-200 pb-6">
+      {newsList.map((news, index) => (
 
-        <Link to={`/news/${news.id}`}>
-
-          <h2
-            className="
-              text-3xl
-              font-bold
-              leading-tight
-              text-gray-900
-              hover:text-red-700
-              duration-300
-            "
-          >
-            {news.title}
-          </h2>
-
-        </Link>
-
-        <p
-          className="
-            mt-4
-            text-gray-600
-            leading-8
-            text-lg
-          "
+        <div
+          key={news.id}
+          className={`
+            ${
+              index !== newsList.length - 1
+                ? "border-b border-gray-200 pb-5"
+                : ""
+            }
+          `}
         >
-          {news.description}
-        </p>
 
-        <div className="mt-5 flex items-center gap-2 text-sm text-gray-500">
-
-          <span>🕒</span>
-
-          <span>{news.time}</span>
+          <HeroSmallCard news={news} />
 
         </div>
 
-      </article>
+      ))}
 
     </aside>
   );

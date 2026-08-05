@@ -1,17 +1,18 @@
-import { heroNews } from "../data";
 import HeroSmallCard from "./HeroSmallCard";
 
-const HeroRight = () => {
+const HeroRight = ({ newsList = [] }) => {
+  if (newsList.length === 0) return null;
+
   return (
     <aside className="space-y-5">
 
-      {heroNews.right.map((news, index) => (
+      {newsList.map((news, index) => (
 
         <div
           key={news.id}
           className={`
             ${
-              index !== heroNews.right.length - 1
+              index !== newsList.length - 1
                 ? "border-b border-gray-200 pb-5"
                 : ""
             }

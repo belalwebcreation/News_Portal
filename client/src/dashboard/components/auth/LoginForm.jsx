@@ -8,6 +8,7 @@ import SocialLogin from "./SocialLogin";
 
 import { useAuth } from "../../../context/AuthContext";
 import { baseUrl } from "../../../config/Config";
+import { getRoleHomePath } from "../../../constants/roles";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -91,23 +92,20 @@ const LoginForm = () => {
         formData
       );
 
-            // ===========================
-      // Save Token
+      // ===========================
+      // Save Session
       // ===========================
 
-      loginUser(data.token, data.user);
+      loginUser(data.user);
 
       // ===========================
       // Redirect By Role
       // ===========================
 
-      if (data.user.role === "admin") {
-        navigate("/dashboard/admin");
-      } else if (data.user.role === "writer") {
-        navigate("/dashboard/writer");
-      } else {
-        navigate("/dashboard/reader");
-      }
+      console.log("Backend theke asha role:", data.user.role); // ✅ ekbar check kore verify kore nin, tarpor line ta mucha felben
+
+      const homePath = getRoleHomePath(data.user.role);
+      navigate(`/dashboard/${homePath}`);
     } catch (error) {
       setServerError(
         error.response?.data?.message ||
@@ -120,55 +118,35 @@ const LoginForm = () => {
 
   return (
     <div className="mt-10 rounded-3xl bg-white shadow-2xl border border-slate-200 p-8">
-
       <div className="mb-8">
-
         <h2 className="text-3xl font-black text-slate-900">
-
           Sign In
-
         </h2>
-
         <p className="mt-2 text-slate-500">
-
           Login to access your dashboard.
-
         </p>
-
       </div>
 
       {serverError && (
-
         <div className="mb-6 rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-3">
-
           {serverError}
-
         </div>
-
       )}
 
       <form
         onSubmit={handleSubmit}
         className="space-y-6"
       >
-
         {/* Email */}
-
         <div>
-
           <label className="block text-sm font-semibold mb-2">
-
             Email Address
-
           </label>
-
           <div className="relative">
-
             <Mail
               size={18}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
             />
-
             <input
               type="email"
               name="email"
@@ -181,23 +159,15 @@ const LoginForm = () => {
                   : "border-slate-300 focus:border-amber-700"
               }`}
             />
-
           </div>
-
           {errors.email && (
-
             <p className="text-red-500 text-sm mt-2">
-
               {errors.email}
-
             </p>
-
           )}
-
         </div>
 
         {/* Password */}
-
         <PasswordInput
           value={formData.password}
           onChange={handleChange}
@@ -205,11 +175,8 @@ const LoginForm = () => {
         />
 
         {/* Remember */}
-
         <div className="flex items-center justify-between">
-
           <label className="flex items-center gap-2">
-
             <input
               type="checkbox"
               checked={rememberMe}
@@ -218,27 +185,20 @@ const LoginForm = () => {
               }
               className="accent-amber-700"
             />
-
             <span className="text-sm text-slate-600">
-
               Remember Me
-
             </span>
-
           </label>
 
           <Link
             to="/forgot-password"
             className="text-sm font-semibold text-amber-700 hover:underline"
           >
-
             Forgot Password?
-
           </Link>
-
         </div>
-                {/* Login Button */}
 
+        {/* Login Button */}
         <button
           type="submit"
           disabled={loading}
@@ -276,21 +236,15 @@ const LoginForm = () => {
             </>
           )}
         </button>
-
       </form>
 
       {/* Social Login */}
-
       <SocialLogin />
 
       {/* Register */}
-
       <div className="mt-8 text-center">
-
         <p className="text-slate-600">
-
           Don't have an account?{" "}
-
           <Link
             to="/register"
             className="
@@ -301,11 +255,8 @@ const LoginForm = () => {
           >
             Create Account
           </Link>
-
         </p>
-
       </div>
-
     </div>
   );
 };
