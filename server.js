@@ -173,12 +173,14 @@ app.get("/articles/:slug", async (req, res, next) => {
 });
 
 // ২. Frontend Static Files (dist) সার্ভ করা
-app.use(express.static(path.join(process.cwd(), "dist")));
+app.use(express.static(path.join(process.cwd(), "client", "dist")));
 
-// ৩. সাধারণ ইউজারদের জন্য SPA Fallback
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith("/api")) return next();
-  res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+
+  res.sendFile(
+    path.join(process.cwd(), "client", "dist", "index.html")
+  );
 });
 
 // ===============================
