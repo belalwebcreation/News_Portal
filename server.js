@@ -34,6 +34,9 @@ import errorHandler from "./server/middleware/errorMiddleware.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Required for Render / Reverse Proxy (১. trust proxy যোগ করা হয়েছে)
+app.set("trust proxy", 1);
+
 // ===============================
 // Helpers for Social Media Bot Handling
 // ===============================
@@ -65,12 +68,14 @@ const getArticleBySlug = async (slug) => {
 };
 
 // ===============================
-// Debug (Remove in Production)
+// Debug Log (২. Production চেক সহ আপডেট করা হয়েছে)
 // ===============================
-console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
-console.log("Cloud API Key:", process.env.CLOUDINARY_API_KEY);
-console.log("EMAIL_HOST:", process.env.EMAIL_HOST);
-console.log("EMAIL_PORT:", process.env.EMAIL_PORT);
+if (process.env.NODE_ENV !== "production") {
+  console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
+  console.log("Cloud API Key:", process.env.CLOUDINARY_API_KEY);
+  console.log("EMAIL_HOST:", process.env.EMAIL_HOST);
+  console.log("EMAIL_PORT:", process.env.EMAIL_PORT);
+}
 
 // ===============================
 // Database Connection
@@ -84,10 +89,22 @@ dbConnect();
 // 1. Cookie Parser Middleware
 app.use(cookieParser());
 
-// 2. Dynamic CORS Configuration (env URL & credentials enabled)
+// 2. Dynamic CORS Configuration (৩. Multiple Origins & Non-browser request সাপোর্ট সহ)
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // exact origin handling
+    origin(origin, callback) {
+      // Allow requests without origin (Postman, health checks, server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS: Origin not allowed"));
+    },
     credentials: true, // required for http-only cookies
   })
 );

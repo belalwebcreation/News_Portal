@@ -26,11 +26,23 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (!error.response) {
+      return Promise.reject({
+        ...error,
+        message:
+          "Network error. Please check your internet connection.",
+      });
+    }
+
     const message =
-      error?.response?.data?.message ||
-      error?.message ||
+      error.response.data?.message ||
+      error.message ||
       "কিছু একটা ভুল হয়েছে। আবার চেষ্টা করো।";
-    return Promise.reject({ ...error, message });
+
+    return Promise.reject({
+      ...error,
+      message,
+    });
   }
 );
 
