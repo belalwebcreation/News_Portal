@@ -42,7 +42,7 @@ import ContentManagement from "./dashboard/pages/ContentManagement";
 import CategoryManagement from "./features/category/CategoryManagement";
 
 // Writer & Reader
-import WriterSectionManagement from "./dashboard/pages/WriterSectionManagement";
+import WriterDashboard from "./dashboard/components/WriterDashboard";
 import CreateNewsHub from "./features/article/CreateNewsHub";
 import ArticleEditorRoute from "./features/article/ArticleEditorRoute";
 import ManageNews from "./features/article/ManageNews";
@@ -192,7 +192,7 @@ function AppRoutes() {
 
           {/* WRITER (admin ও superadmin ও পূর্ণ writer access পাবে) */}
           <Route element={<ProtectRole roles={["writer", "admin", "superadmin"]} />}>
-            <Route path="writer" element={<WriterSectionManagement />} />
+            <Route path="writer" element={<WriterDashboard />} /> {/* ✅ NEW — Writer Dashboard (stats + my news) */}
             <Route path="writer/add-news" element={<CreateNewsHub />} />
             <Route
               path="writer/add-news/editor"

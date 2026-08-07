@@ -1,16 +1,18 @@
 export const roleRoutes = {
   admin: {
-    profile: "/admin/profile",
-    settings: "/admin/settings",
+    profile: "/dashboard/admin/profile",
+    settings: "/dashboard/account-settings", // অথবা admin/site-settings, যেটা ইচ্ছা
   },
-
+  superadmin: {
+    profile: "/dashboard/admin/profile",   // admin এর same page reuse
+    settings: "/dashboard/account-settings",
+  },
   writer: {
-    profile: "/writer/profile",
-    settings: "/writer/settings",
+    profile: "/dashboard/writer/profile",
+    settings: "/dashboard/account-settings",
   },
-
   reader: {
-    profile: "/reader/profile",
-    settings: "/reader/settings",
+    profile: "/dashboard/reader/profile",
+    settings: "/dashboard/reader/settings",
   },
 };

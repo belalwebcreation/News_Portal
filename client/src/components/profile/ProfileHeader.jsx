@@ -516,7 +516,7 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
       </div>
 
       {/* Main Glass Profile Card */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 sm:-mt-20 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-16 lg:-mt-20 relative z-20">
         <div className="rounded-3xl border border-base-100/60 bg-base-100/90 dark:bg-base-100/95 p-5 sm:p-8 shadow-2xl backdrop-blur-xl">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 sm:gap-6">
             
@@ -524,7 +524,7 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
             <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
               
               {/* Profile Avatar Component */}
-              <div className="-mt-16 sm:-mt-22 shrink-0 relative">
+              <div className="-mt-10 sm:-mt-16 lg:-mt-20 shrink-0 relative">
                 <ProfileAvatar
                   src={avatarUrl}
                   alt={name || "Avatar"}

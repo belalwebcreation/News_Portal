@@ -39,7 +39,7 @@ const adminMenuItems = [
     superadmin: adminMenuItems,
     writer: [
   {
-    title: "Section Management",
+    title: "Dashboard", // ✅ NEW — writer এর নিজের stats + news list এখন এখানে
     path: "/dashboard/writer",
     icon: <LuLayoutDashboard size={20} />,
   },

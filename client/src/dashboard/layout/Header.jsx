@@ -2,14 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import { roleRoutes } from "../../utils/roleRoutes";
 import ProfileAvatar from "../../components/profile/ProfileAvatar"; // adjust path if your folder depth differs
 
 import {
   FiSearch,
   FiBell,
   FiMessageSquare,
-  FiSettings,
   FiLogOut,
   FiUser,
   FiMenu,
@@ -35,6 +33,11 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
     setProfileOpen(false);
     logoutUser(); // clears token + userInfo from context AND localStorage
     navigate("/login");
+  };
+
+  const goToProfile = () => {
+    setProfileOpen(false);
+    navigate("/profile");
   };
 
   // Live Clock
@@ -73,12 +76,6 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
 
   if (hour < 12) greeting = "Good Morning";
   else if (hour < 18) greeting = "Good Afternoon";
-
-  const goTo = (key) => {
-    setProfileOpen(false);
-    const routes = user?.role ? roleRoutes[user.role] : null;
-    if (routes?.[key]) navigate(routes[key]);
-  };
 
   return (
     <header
@@ -304,19 +301,11 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
               </div>
 
               <button
-                onClick={() => goTo("profile")}
+                onClick={goToProfile}
                 className="flex items-center gap-3 w-full px-5 py-3 text-sm hover:bg-slate-50 transition"
               >
                 <FiUser size={17} />
                 My Profile
-              </button>
-
-              <button
-                onClick={() => goTo("settings")}
-                className="flex items-center gap-3 w-full px-5 py-3 text-sm hover:bg-slate-50 transition"
-              >
-                <FiSettings size={17} />
-                Settings
               </button>
 
               <div className="border-t" />

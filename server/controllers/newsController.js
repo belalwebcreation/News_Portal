@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'; // ✅ NEW — writer-stats aggregation এ ObjectId cast করার জন্য
 import News from '../models/News.js';
 import Media from '../models/mediaModel.js';
 import Category from '../models/categoryModel.js';
@@ -356,6 +357,67 @@ export const getVideoNews = async (req, res, next) => {
       success: true,
       data: newsList,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc Get aggregated stats for the logged-in writer (used by Writer Dashboard)
+ * @route GET /api/news/writer-stats
+ */
+export const getWriterStats = async (req, res, next) => { // ✅ NEW
+  try {
+    const authorId = new mongoose.Types.ObjectId(req.user._id);
+
+    const [stats] = await News.aggregate([
+      { $match: { author: authorId } },
+      {
+        $group: {
+          _id: null,
+          totalPosts: { $sum: 1 },
+          totalViews: { $sum: '$views' },
+          totalComments: { $sum: '$commentsCount' },
+          totalShares: { $sum: '$sharesCount' },
+          totalBookmarks: { $sum: '$bookmarksCount' },
+          draftCount: {
+            $sum: { $cond: [{ $eq: ['$status', 'draft'] }, 1, 0] },
+          },
+          publishedCount: {
+            $sum: { $cond: [{ $eq: ['$status', 'published'] }, 1, 0] },
+          },
+          featuredCount: {
+            $sum: { $cond: ['$isFeatured', 1, 0] },
+          },
+        },
+      },
+    ]);
+
+    const defaults = {
+      totalPosts: 0,
+      totalViews: 0,
+      totalComments: 0,
+      totalShares: 0,
+      totalBookmarks: 0,
+      draftCount: 0,
+      publishedCount: 0,
+      featuredCount: 0,
+    };
+
+    const data = stats
+      ? {
+          totalPosts: stats.totalPosts,
+          totalViews: stats.totalViews,
+          totalComments: stats.totalComments,
+          totalShares: stats.totalShares,
+          totalBookmarks: stats.totalBookmarks,
+          draftCount: stats.draftCount,
+          publishedCount: stats.publishedCount,
+          featuredCount: stats.featuredCount,
+        }
+      : defaults;
+
+    return res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }

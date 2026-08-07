@@ -50,6 +50,8 @@ const useProfile = () => {
         profileService.getReadingHistory(),
       ]);
 
+      console.log("PROFILE DATA FROM API:", profileData);
+
       // Database থেকে logged-in user's profile
       setProfile(profileData);
 

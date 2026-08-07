@@ -7,6 +7,7 @@ import {
   getSingleNews, 
   deleteNews,
   getVideoNews, // ✅ NEW
+  getWriterStats, // ✅ NEW
 } from '../controllers/newsController.js';
 
 import { incrementView } from '../controllers/newsView.controller.js';
@@ -41,6 +42,12 @@ router.post('/image', protect, authorize('writer', 'admin', 'superadmin'), uploa
 router.get('/trending', getTrending);
 router.get('/section-layout', getNewsSectionLayout);
 router.get('/videos', getVideoNews); // ✅ NEW — homepage Video Gallery
+router.get(
+  '/writer-stats',
+  protect,
+  authorize('writer', 'admin', 'superadmin'),
+  getWriterStats
+); // ✅ NEW — logged-in writer এর নিজের totals (Writer Dashboard stat cards)
 router.post('/:id/view', viewRateLimiter, incrementView);
 
 router.route('/')
