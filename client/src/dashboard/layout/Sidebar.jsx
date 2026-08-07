@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import fallbackLogo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext";
+import { useSiteSettings } from "../../context/SiteSettingsContext"; // 🔗 Logo.jsx এর মতোই same context
 
 // Icons grouped cleanly by packages
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -20,48 +21,48 @@ import {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const { pathname } = useLocation();
   const { userInfo } = useAuth();
+  const { settings, loading: settingsLoading } = useSiteSettings(); // 🔗 dynamic logo data
   const role = userInfo?.role;
 
   // 👑 Admin ও Superadmin — দুজনেরই একই মেনু (superadmin এর extra ক্ষমতা page এর ভেতরেই handle হয়, যেমন Users.jsx এ demote বাটন)
   // এখানে "Create News" যোগ করা হলো যাতে admin/superadmin সরাসরি sidebar থেকে writer এর news লেখার পেজে যেতে পারে
-const adminMenuItems = [
-  { title: "Dashboard", path: "/dashboard/admin", icon: <LuLayoutDashboard size={20} /> },
-  { title: "Content Management", path: "/dashboard/admin/content-management", icon: <FiGrid size={20} /> },
-  { title: "Category Management", path: "/dashboard/admin/categories", icon: <MdOutlineCategory size={20} /> },
-  { title: "News Master List", path: "/dashboard/admin/news", icon: <MdOutlineArticle size={20} /> },
-  { title: "User List", path: "/dashboard/admin/users", icon: <FaRegUser size={18} /> },
-  { title: "Create News", path: "/dashboard/writer/add-news", icon: <MdOutlinePostAdd size={20} /> },
-];
+  const adminMenuItems = [
+    { title: "Dashboard", path: "/dashboard/admin", icon: <LuLayoutDashboard size={20} /> },
+    { title: "Content Management", path: "/dashboard/admin/content-management", icon: <FiGrid size={20} /> },
+    { title: "Category Management", path: "/dashboard/admin/categories", icon: <MdOutlineCategory size={20} /> },
+    { title: "News Master List", path: "/dashboard/admin/news", icon: <MdOutlineArticle size={20} /> },
+    { title: "User List", path: "/dashboard/admin/users", icon: <FaRegUser size={18} /> },
+    { title: "Create News", path: "/dashboard/writer/add-news", icon: <MdOutlinePostAdd size={20} /> },
+  ];
 
   // 📝 Industry-Level Data Structure: সহজে নতুন মেনু যোগ বা পরিবর্তন করার জন্য
   const menuConfig = {
     admin: adminMenuItems,
     superadmin: adminMenuItems,
     writer: [
-  {
-    title: "Dashboard", // ✅ NEW — writer এর নিজের stats + news list এখন এখানে
-    path: "/dashboard/writer",
-    icon: <LuLayoutDashboard size={20} />,
-  },
-  {
-    title: "Create News",
-    path: "/dashboard/writer/add-news",
-    icon: <MdOutlinePostAdd size={20} />,
-  },
-],
+      {
+        title: "Dashboard",
+        path: "/dashboard/writer",
+        icon: <LuLayoutDashboard size={20} />,
+      },
+      {
+        title: "Create News",
+        path: "/dashboard/writer/add-news",
+        icon: <MdOutlinePostAdd size={20} />,
+      },
+    ],
     reader: [
-  {
-    title: "Dashboard",
-    path: "/dashboard/reader",
-    icon: <LuLayoutDashboard size={20} />,
-  },
-  {
-    title: "Bookmarks",
-    path: "/dashboard/reader/bookmarks",
-    icon: <FiBookmark size={20} />,
-  },
- 
-],
+      {
+        title: "Dashboard",
+        path: "/dashboard/reader",
+        icon: <LuLayoutDashboard size={20} />,
+      },
+      {
+        title: "Bookmarks",
+        path: "/dashboard/reader/bookmarks",
+        icon: <FiBookmark size={20} />,
+      },
+    ],
   };
 
   // বর্তমান ইউজারের রোল অনুযায়ী নির্দিষ্ট মেনু ফিল্টার
@@ -73,6 +74,10 @@ const adminMenuItems = [
         ? "bg-amber-900 text-white shadow-md"
         : "text-slate-700 hover:bg-amber-900 hover:text-white"
     }`;
+
+  // 🔗 Home page er logo er ekই logic — settings theke src o visibility
+  const logoSrc = settings?.logo?.trim() ? settings.logo : fallbackLogo;
+  const logoVisible = settings?.logoVisible ?? true;
 
   return (
     <>
@@ -93,7 +98,22 @@ const adminMenuItems = [
         {/* Header Block: Logo & Close Button */}
         <div className="h-20 flex items-center justify-between border-b px-5">
           <Link to="/" onClick={() => setSidebarOpen(false)}>
-            <img src={logo} alt="Portal Logo" className="w-44 object-contain" />
+            {settingsLoading ? (
+              <div className="w-44 h-10 rounded bg-gray-200 animate-pulse" />
+            ) : (
+              logoVisible && (
+                <img
+                  src={logoSrc}
+                  alt="Portal Logo"
+                  className="w-44 object-contain select-none"
+                  draggable={false}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = fallbackLogo;
+                  }}
+                />
+              )
+            )}
           </Link>
 
           <button

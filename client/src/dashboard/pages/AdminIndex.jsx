@@ -5,7 +5,7 @@ import { newsService } from "../../features/news/services/newsService";
 import axiosInstance from "../../utils/axiosInstance"; // ⚠️ ADJUST: WriterDashboard-e eivabei ache, path thik kore nin
 import { useAuth } from "../../context/AuthContext"; // ⚠️ ADJUST: path onujayi thik kore nin
 import ProfileAvatar from "../../components/profile/ProfileAvatar";
-import { ArrowRight, Loader2, Award, Users, Eye, ImageOff } from "lucide-react";
+import { ArrowRight, Award, Users, Eye, ImageOff, Calendar } from "lucide-react";
 
 import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlinePostAdd, MdOutlineArticle } from "react-icons/md";
@@ -37,27 +37,55 @@ const STATUS_TABS = [
   { key: "draft", label: "Draft" },
 ];
 
+// Softer, unified tint tokens — reads as one coherent scoreboard instead of
+// eight mismatched card colors.
 const STAT_CARDS = [
-  { key: "totalPosts", label: "Total Posts", icon: MdOutlineArticle, color: "bg-slate-100 text-slate-700" },
-  { key: "publishedCount", label: "Published", icon: FiFileText, color: "bg-emerald-100 text-emerald-700" },
-  { key: "draftCount", label: "Drafts", icon: FiEdit2, color: "bg-amber-100 text-amber-800" },
-  { key: "featuredCount", label: "Featured", icon: FiStar, color: "bg-purple-100 text-purple-700" },
-  { key: "totalViews", label: "Total Views", icon: FiEye, color: "bg-blue-100 text-blue-700" },
-  { key: "totalComments", label: "Comments", icon: FiMessageSquare, color: "bg-indigo-100 text-indigo-700" },
-  { key: "totalShares", label: "Shares", icon: FiShare2, color: "bg-teal-100 text-teal-700" },
-  { key: "totalBookmarks", label: "Bookmarks", icon: FiBookmark, color: "bg-rose-100 text-rose-700" },
+  { key: "totalPosts", label: "Total Posts", icon: MdOutlineArticle, color: "bg-slate-100 text-slate-600" },
+  { key: "publishedCount", label: "Published", icon: FiFileText, color: "bg-emerald-50 text-emerald-600" },
+  { key: "draftCount", label: "Drafts", icon: FiEdit2, color: "bg-amber-50 text-amber-700" },
+  { key: "featuredCount", label: "Featured", icon: FiStar, color: "bg-purple-50 text-purple-600" },
+  { key: "totalViews", label: "Total Views", icon: FiEye, color: "bg-blue-50 text-blue-600" },
+  { key: "totalComments", label: "Comments", icon: FiMessageSquare, color: "bg-indigo-50 text-indigo-600" },
+  { key: "totalShares", label: "Shares", icon: FiShare2, color: "bg-teal-50 text-teal-600" },
+  { key: "totalBookmarks", label: "Bookmarks", icon: FiBookmark, color: "bg-rose-50 text-rose-600" },
 ];
 
-const StatusBadge = ({ status }) => (
-  <span
-    className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
-      status === "published"
-        ? "bg-emerald-100 text-emerald-700"
-        : "bg-amber-100 text-amber-800"
-    }`}
-  >
-    {status}
-  </span>
+// Small shared primitives -----------------------------------------------
+
+const Skeleton = ({ className = "" }) => (
+  <div className={`animate-pulse rounded-md bg-slate-100 ${className}`} />
+);
+
+const StatusBadge = ({ status }) => {
+  const isPublished = status === "published";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset ${
+        isPublished
+          ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
+          : "bg-amber-50 text-amber-800 ring-amber-600/20"
+      }`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${isPublished ? "bg-emerald-500" : "bg-amber-500"}`} />
+      {status}
+    </span>
+  );
+};
+
+const LeaderboardSkeleton = () => (
+  <div className="space-y-4">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex items-center gap-3 p-2 sm:gap-4">
+        <div className="h-7 w-7 shrink-0 animate-pulse rounded-full bg-slate-100" />
+        <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-slate-100" />
+        <div className="flex-1 space-y-2">
+          <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+          <div className="h-1.5 w-full animate-pulse rounded-full bg-slate-100" />
+        </div>
+        <div className="h-3 w-8 shrink-0 animate-pulse rounded bg-slate-100" />
+      </div>
+    ))}
+  </div>
 );
 
 const AdminIndex = () => {
@@ -224,6 +252,38 @@ const AdminIndex = () => {
 
   return (
     <div className="mt-3 space-y-6">
+      {/* ───────────────── Masthead — the one bold moment on the page ───────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950 via-amber-900 to-amber-800 px-6 py-7 shadow-sm sm:px-8 sm:py-8">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
+
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300/80">
+              নিউজরুম ড্যাশবোর্ড
+            </p>
+            <h1 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              স্বাগতম, {userInfo?.name || userInfo?.username || "Admin"}
+            </h1>
+            <p className="mt-1.5 text-sm text-amber-100/70">
+              আজকের কনটেন্ট পারফরম্যান্স ও আপনার লেখা এক নজরে দেখুন
+            </p>
+          </div>
+
+          <div className="flex w-fit items-center gap-2 rounded-xl bg-white/10 px-3.5 py-2 text-amber-50 ring-1 ring-inset ring-white/10 backdrop-blur-sm">
+            <Calendar className="h-4 w-4 text-amber-300" />
+            <span className="text-xs font-medium tabular-nums">
+              {new Date().toLocaleDateString("en-GB", {
+                weekday: "short",
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Stat cards — (Unchanged placeholder/integration) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {/* ... Stat Cards Content ... */}
@@ -234,18 +294,20 @@ const AdminIndex = () => {
         {/* ... Recent News Table/List Content ... */}
       </div>
 
-      {/* ✅ NEW — "My Articles" section: admin/superadmin nijerao article likhte pare,
+      {/* ✅ NEW — "My Articles" panel: admin/superadmin nijerao article likhte pare,
           tai Writer Dashboard-er pura flow (create button + stat cards + tabbed
-          list + search + pagination + edit/delete) ekhane hubohu merge kora holo. */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-6 space-y-6">
+          list + search + pagination + edit/delete) ekhane hubohu merge kora holo.
+          Redesigned as ONE unified panel divided by hairlines instead of nested
+          cards-in-cards, to match a real editorial admin console. */}
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-amber-900 text-white flex items-center justify-center">
-              <LuLayoutDashboard size={22} />
+        <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-900 text-white shadow-sm shadow-amber-900/20">
+              <LuLayoutDashboard size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-800">আপনার লেখা নিউজ</h2>
+              <h2 className="font-serif text-lg font-semibold text-slate-900">আপনার লেখা নিউজ</h2>
               <p className="text-sm text-slate-500">
                 স্বাগতম, {userInfo?.name || userInfo?.username || "Admin"} 👋 — নিজের লেখা article এখান থেকে ম্যানেজ করুন
               </p>
@@ -254,206 +316,208 @@ const AdminIndex = () => {
 
           <Link
             to="/dashboard/writer/add-news" // ⚠️ ADJUST: admin/superadmin er actual "create news" route
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-900 text-white font-medium shadow-md hover:bg-amber-800 transition-all duration-300"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-amber-900/20 transition-all duration-200 hover:bg-amber-800 hover:shadow-md hover:shadow-amber-900/25 active:scale-[0.98]"
           >
-            <MdOutlinePostAdd size={20} />
+            <MdOutlinePostAdd size={18} />
             Create News
           </Link>
         </div>
 
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {/* Scoreboard strip — signature element: a unified stat ticker instead of 8 loose cards */}
+        <div className="grid grid-cols-2 divide-x divide-y divide-slate-100 border-b border-slate-100 sm:grid-cols-4 sm:divide-y-0 lg:grid-cols-8">
           {STAT_CARDS.map(({ key, label, icon: Icon, color }) => (
-            <div
-              key={key}
-              className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3"
-            >
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
-                <Icon size={18} />
+            <div key={key} className="group flex flex-col gap-2 p-4 transition-colors hover:bg-slate-50/70 sm:p-5">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${color}`}>
+                <Icon size={15} />
               </div>
-              <div>
-                <p className="text-lg font-bold text-slate-800 leading-none">
-                  {statsLoading ? "…" : (stats?.[key] ?? 0).toLocaleString()}
+              {statsLoading ? (
+                <Skeleton className="h-6 w-14" />
+              ) : (
+                <p className="font-serif text-xl font-semibold tabular-nums text-slate-900 sm:text-2xl">
+                  {(stats?.[key] ?? 0).toLocaleString()}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">{label}</p>
-              </div>
+              )}
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</p>
             </div>
           ))}
         </div>
 
-        {/* News List */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-          {/* Toolbar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              {STATUS_TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => handleTabChange(tab.key)}
-                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    activeTab === tab.key
-                      ? "bg-amber-900 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-amber-50"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative w-full sm:w-64">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Title দিয়ে খুঁজুন..."
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-900/30"
-              />
-            </div>
+        {/* Toolbar */}
+        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="inline-flex w-fit items-center gap-1 rounded-full bg-slate-100 p-1">
+            {STATUS_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => handleTabChange(tab.key)}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? "bg-white text-amber-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-slate-500 border-b border-gray-100">
-                  <th className="px-4 py-3 font-medium">Title</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Views</th>
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listLoading &&
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <tr key={i} className="border-b border-gray-50 animate-pulse">
-                      <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-48" /></td>
-                      <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-16" /></td>
-                      <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-10" /></td>
-                      <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-20" /></td>
-                      <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-16 ml-auto" /></td>
-                    </tr>
-                  ))}
-
-                {!listLoading && listError && (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-red-500">
-                      {listError}
-                    </td>
-                  </tr>
-                )}
-
-                {!listLoading && !listError && myNewsList.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-12 text-center">
-                      <p className="text-slate-500 mb-3">
-                        {search || activeTab !== "all"
-                          ? "এই ফিল্টারে কোনো news পাওয়া যায়নি।"
-                          : "এখনো কোনো news লেখা হয়নি।"}
-                      </p>
-                      <Link
-                        to="/dashboard/writer/add-news"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-900 text-white text-sm font-medium hover:bg-amber-800 transition-colors"
-                      >
-                        <MdOutlinePostAdd size={16} /> প্রথম News লিখুন
-                      </Link>
-                    </td>
-                  </tr>
-                )}
-
-                {!listLoading &&
-                  !listError &&
-                  myNewsList.map((item) => (
-                    <tr key={item._id} className="border-b border-gray-50 hover:bg-amber-50/40 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800 line-clamp-1 max-w-xs">{item.title}</p>
-                        <p className="text-xs text-slate-400">{item.category?.name}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge status={item.status} />
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">{(item.views ?? 0).toLocaleString()}</td>
-                      <td className="px-4 py-3 text-slate-500">
-                        {new Date(item.publishedAt || item.createdAt).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            to={editPath(item._id)}
-                            className="p-2 rounded-lg text-slate-500 hover:bg-amber-900 hover:text-white transition-colors"
-                            title="Edit"
-                          >
-                            <FiEdit2 size={15} />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(item._id, item.title)}
-                            disabled={deletingId === item._id}
-                            className="p-2 rounded-lg text-slate-500 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
-                            title="Delete"
-                          >
-                            <FiTrash2 size={15} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+          <div className="relative w-full sm:w-72">
+            <FiSearch className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Title দিয়ে খুঁজুন..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 transition-colors focus:border-amber-900/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-900/10"
+            />
           </div>
-
-          {/* Pagination */}
-          {!listLoading && meta.pages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-              <p className="text-xs text-slate-500">
-                মোট {meta.total} টি — পাতা {page} / {meta.pages}
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="p-2 rounded-lg border border-gray-200 text-slate-600 disabled:opacity-40 hover:bg-amber-50"
-                >
-                  <FiChevronLeft size={16} />
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(meta.pages, p + 1))}
-                  disabled={page >= meta.pages}
-                  className="p-2 rounded-lg border border-gray-200 text-slate-600 disabled:opacity-40 hover:bg-amber-50"
-                >
-                  <FiChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/60 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3">Title</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">Views</th>
+                <th className="px-5 py-3">Date</th>
+                <th className="px-5 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {listLoading &&
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-5 py-4"><Skeleton className="h-4 w-48" /></td>
+                    <td className="px-5 py-4"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                    <td className="px-5 py-4"><Skeleton className="h-4 w-10" /></td>
+                    <td className="px-5 py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="px-5 py-4"><Skeleton className="ml-auto h-4 w-16" /></td>
+                  </tr>
+                ))}
+
+              {!listLoading && listError && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-14 text-center">
+                    <p className="text-sm font-medium text-rose-500">{listError}</p>
+                  </td>
+                </tr>
+              )}
+
+              {!listLoading && !listError && myNewsList.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-16 text-center">
+                    <p className="mb-4 text-sm text-slate-500">
+                      {search || activeTab !== "all"
+                        ? "এই ফিল্টারে কোনো news পাওয়া যায়নি।"
+                        : "এখনো কোনো news লেখা হয়নি।"}
+                    </p>
+                    <Link
+                      to="/dashboard/writer/add-news"
+                      className="inline-flex items-center gap-2 rounded-xl bg-amber-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-800"
+                    >
+                      <MdOutlinePostAdd size={16} /> প্রথম News লিখুন
+                    </Link>
+                  </td>
+                </tr>
+              )}
+
+              {!listLoading &&
+                !listError &&
+                myNewsList.map((item) => (
+                  <tr key={item._id} className="group transition-colors hover:bg-amber-50/30">
+                    <td className="px-5 py-4">
+                      <p className="max-w-xs truncate font-serif text-[15px] font-medium text-slate-800 group-hover:text-amber-900">
+                        {item.title}
+                      </p>
+                      {item.category?.name && (
+                        <p className="mt-0.5 text-xs text-slate-400">{item.category.name}</p>
+                      )}
+                    </td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={item.status} />
+                    </td>
+                    <td className="px-5 py-4 tabular-nums text-slate-600">{(item.views ?? 0).toLocaleString()}</td>
+                    <td className="px-5 py-4 tabular-nums text-slate-500">
+                      {new Date(item.publishedAt || item.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center justify-end gap-1.5 opacity-80 transition-opacity group-hover:opacity-100">
+                        <Link
+                          to={editPath(item._id)}
+                          className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-amber-900 hover:text-white"
+                          title="Edit"
+                        >
+                          <FiEdit2 size={15} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(item._id, item.title)}
+                          disabled={deletingId === item._id}
+                          className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-50"
+                          title="Delete"
+                        >
+                          <FiTrash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {!listLoading && meta.pages > 1 && (
+          <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
+            <p className="text-xs text-slate-500">
+              মোট <span className="font-semibold text-slate-700">{meta.total}</span> টি — পাতা{" "}
+              <span className="font-semibold text-slate-700">{page}</span> / {meta.pages}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="rounded-lg border border-slate-200 p-2 text-slate-600 transition-colors hover:border-amber-900/30 hover:bg-amber-50 disabled:pointer-events-none disabled:opacity-40"
+              >
+                <FiChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(meta.pages, p + 1))}
+                disabled={page >= meta.pages}
+                className="rounded-lg border border-slate-200 p-2 text-slate-600 transition-colors hover:border-amber-900/30 hover:bg-amber-50 disabled:pointer-events-none disabled:opacity-40"
+              >
+                <FiChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Top Writers + Top Views News — side by side on large screens */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         {/* Top Writers Section — Production Grade UI */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 transition-all">
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-200" />
+
+          <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-3.5">
             <div>
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-amber-600" />
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                <h2 className="font-serif text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
                   Top Writers
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
                 Ranked dynamically by total published article views
               </p>
             </div>
             <Link
               to="/admin/writers"
-              className="group inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors"
+              className="group inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 transition-colors hover:text-amber-700 sm:text-sm"
             >
               <span>View all</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -462,17 +526,14 @@ const AdminIndex = () => {
 
           <div className="space-y-4">
             {writersLoading ? (
-              <div className="flex items-center justify-center gap-2 text-sm text-slate-400 py-8">
-                <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
-                <span>রাইটার লিস্ট লোড হচ্ছে...</span>
-              </div>
+              <LeaderboardSkeleton />
             ) : writersError ? (
-              <div className="rounded-xl bg-rose-50 border border-rose-100 p-4 text-center">
-                <p className="text-xs sm:text-sm font-medium text-rose-600">{writersError}</p>
+              <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-center">
+                <p className="text-xs font-medium text-rose-600 sm:text-sm">{writersError}</p>
               </div>
             ) : topWriters.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
-                <Users className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              <div className="py-8 text-center text-slate-400">
+                <Users className="mx-auto mb-2 h-8 w-8 opacity-40" />
                 <p className="text-sm font-medium">এখনো কোনো লেখক ডাটা পাওয়া যায়নি</p>
               </div>
             ) : (
@@ -484,10 +545,10 @@ const AdminIndex = () => {
                 return (
                   <div
                     key={writer._id || index}
-                    className="flex items-center gap-3 sm:gap-4 p-2 rounded-xl hover:bg-slate-50/80 transition-colors group"
+                    className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-50/80 sm:gap-4"
                   >
                     <span
-                      className={`flex-shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-transform group-hover:scale-105 ${
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-105 ${
                         rankBadgeStyles[rank] || 'bg-slate-100 text-slate-600'
                       }`}
                     >
@@ -503,25 +564,25 @@ const AdminIndex = () => {
                       />
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate group-hover:text-amber-700 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center justify-between">
+                        <p className="truncate text-xs font-semibold text-slate-900 transition-colors group-hover:text-amber-700 sm:text-sm">
                           {writer.name || "Unknown Author"}
                         </p>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                         <div
-                          className="h-full bg-amber-500 rounded-full transition-all duration-500 ease-out"
+                          className="h-full rounded-full bg-amber-500 transition-all duration-500 ease-out"
                           style={{ width: `${widthPct}%` }}
                         />
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <span className="text-xs sm:text-sm font-bold text-slate-800">
+                    <div className="shrink-0 text-right">
+                      <span className="text-xs font-bold tabular-nums text-slate-800 sm:text-sm">
                         {views.toLocaleString()}
                       </span>
-                      <span className="block text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                      <span className="block text-[10px] font-medium uppercase tracking-wider text-slate-400">
                         Views
                       </span>
                     </div>
@@ -533,22 +594,24 @@ const AdminIndex = () => {
         </div>
 
         {/* Top Views News Section */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 transition-all">
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-200" />
+
+          <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-3.5">
             <div>
               <div className="flex items-center gap-2">
                 <Eye className="h-5 w-5 text-blue-600" />
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                <h2 className="font-serif text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
                   Top Views News
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
                 Ranked by all-time total views (published only)
               </p>
             </div>
             <Link
               to="/admin/news" // ⚠️ ADJUST: admin news master list-er actual route
-              className="group inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              className="group inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 sm:text-sm"
             >
               <span>View all</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -557,17 +620,14 @@ const AdminIndex = () => {
 
           <div className="space-y-4">
             {newsLoading ? (
-              <div className="flex items-center justify-center gap-2 text-sm text-slate-400 py-8">
-                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                <span>নিউজ লিস্ট লোড হচ্ছে...</span>
-              </div>
+              <LeaderboardSkeleton />
             ) : newsError ? (
-              <div className="rounded-xl bg-rose-50 border border-rose-100 p-4 text-center">
-                <p className="text-xs sm:text-sm font-medium text-rose-600">{newsError}</p>
+              <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-center">
+                <p className="text-xs font-medium text-rose-600 sm:text-sm">{newsError}</p>
               </div>
             ) : topNews.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
-                <Eye className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              <div className="py-8 text-center text-slate-400">
+                <Eye className="mx-auto mb-2 h-8 w-8 opacity-40" />
                 <p className="text-sm font-medium">এখনো কোনো নিউজ ডাটা পাওয়া যায়নি</p>
               </div>
             ) : (
@@ -580,52 +640,48 @@ const AdminIndex = () => {
                 return (
                   <div
                     key={item._id || index}
-                    className="flex items-center gap-3 sm:gap-4 p-2 rounded-xl hover:bg-slate-50/80 transition-colors group"
+                    className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-50/80 sm:gap-4"
                   >
                     <span
-                      className={`flex-shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-transform group-hover:scale-105 ${
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-105 ${
                         rankBadgeStyles[rank] || 'bg-slate-100 text-slate-600'
                       }`}
                     >
                       {rank}
                     </span>
 
-                    <div className="shrink-0 h-9 w-9 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                       {thumbUrl ? (
-                        <img
-                          src={thumbUrl}
-                          alt={item.title}
-                          className="h-full w-full object-cover"
-                        />
+                        <img src={thumbUrl} alt={item.title} className="h-full w-full object-cover" />
                       ) : (
                         <ImageOff className="h-4 w-4 text-slate-300" />
                       )}
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1 gap-2">
-                        <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center justify-between gap-2">
+                        <p className="truncate text-xs font-semibold text-slate-900 transition-colors group-hover:text-blue-700 sm:text-sm">
                           {item.title}
                         </p>
                         {item.category?.name && (
-                          <span className="shrink-0 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
                             {item.category.name}
                           </span>
                         )}
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                         <div
-                          className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+                          className="h-full rounded-full bg-blue-500 transition-all duration-500 ease-out"
                           style={{ width: `${widthPct}%` }}
                         />
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <span className="text-xs sm:text-sm font-bold text-slate-800">
+                    <div className="shrink-0 text-right">
+                      <span className="text-xs font-bold tabular-nums text-slate-800 sm:text-sm">
                         {views.toLocaleString()}
                       </span>
-                      <span className="block text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                      <span className="block text-[10px] font-medium uppercase tracking-wider text-slate-400">
                         Views
                       </span>
                     </div>
@@ -635,7 +691,6 @@ const AdminIndex = () => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
