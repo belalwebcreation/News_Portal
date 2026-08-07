@@ -423,6 +423,36 @@ export const getWriterStats = async (req, res, next) => { // ✅ NEW
   }
 };
 
+
+/**
+ * @desc Get top viewed published news (used by Admin Dashboard "Top Views News" panel)
+ * @route GET /api/news/top-viewed
+ * @access Private (admin, superadmin)
+ */
+export const getTopViewedNews = async (req, res, next) => { // ✅ NEW
+  try {
+    const limit = parseInt(req.query.limit, 10) || 5;
+
+    const newsList = await News.find({ status: 'published' })
+      .select('title slug views category author thumbnail publishedAt createdAt')
+      .populate('category', 'name slug')
+      .populate({
+        path: 'author',
+        select: 'name username avatar',
+      })
+      .populate('thumbnail.media', 'url alt')
+      .sort({ views: -1 }) // ✅ existing { status: 1, views: -1 } index ব্যবহার করবে
+      .limit(limit);
+
+    return res.status(200).json({
+      success: true,
+      data: newsList,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * @desc Delete News
  * @route DELETE /api/news/:id

@@ -4,8 +4,6 @@ import {
   MapPin,
   Phone,
   Mail,
-  Send,
-  Check,
   ChevronRight,
 } from "lucide-react";
 import ScrollTop from "../../features/article/pages/components/ScrollTop";
@@ -109,10 +107,7 @@ function Footer({
   phone = "+৮৮০ ১৭০০-০০০০০০",
   email = "news@example.com",
   categories = DEFAULT_CATEGORIES,
-  onSubscribe,
 }) {
-  const [emailInput, setEmailInput] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
   // 🔻 FIX: age ekhane ekta scroll listener + showScrollTop state chilo,
@@ -130,15 +125,6 @@ function Footer({
     timeStyle: "short",
   }).format(now);
 
-  const handleSubscribe = (event) => {
-    event.preventDefault();
-    if (!emailInput.trim()) return;
-    onSubscribe?.(emailInput.trim());
-    setSubscribed(true);
-    setEmailInput("");
-    window.setTimeout(() => setSubscribed(false), 4000);
-  };
-
   return (
     <footer style={bodyFont} className="relative bg-slate-50 text-slate-700 border-t border-slate-200">
       <style>{FONT_IMPORT}</style>
@@ -148,59 +134,12 @@ function Footer({
 
       {/* Main Container */}
       <div className="mx-auto max-w-[1440px] px-4 pt-12 pb-8 sm:px-6 lg:px-8">
-        
-        {/* ===================================================
-            1. Newsletter Card Section (Matches Hero/Card Style)
-            =================================================== */}
-        <div className="mb-12 rounded-2xl bg-white p-6 shadow-sm border border-slate-200/80 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-600">
-                <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
-                নিউজলেটার
-              </div>
-              <h3 style={displayFont} className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">
-                দিনের গুরুত্বপূর্ণ খবর পান সরাসরি ইনবক্সে
-              </h3>
-              <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-                প্রতিদিন সকালে প্রধান খবর ও বিশ্লেষণের বস্তুনিষ্ঠ সারসংক্ষেপ পৌঁছে যাবে আপনার ইমেইলে।
-              </p>
-            </div>
-
-            {subscribed ? (
-              <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 border border-emerald-200">
-                <Check size={18} className="text-emerald-600" /> সাবস্ক্রাইব করার জন্য ধন্যবাদ!
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex w-full max-w-md items-center gap-2">
-                <label htmlFor="footer-newsletter-email" className="sr-only">
-                  ইমেইল ঠিকানা
-                </label>
-                <input
-                  id="footer-newsletter-email"
-                  type="email"
-                  required
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="আপনার ইমেইল লিখুন"
-                  className="w-full min-w-0 rounded-xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-red-600 focus:bg-white focus:ring-2 focus:ring-red-600/20"
-                />
-                <button
-                  type="submit"
-                  className="flex shrink-0 items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-red-700 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/40"
-                >
-                  সাবস্ক্রাইব <Send size={15} />
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
 
         {/* ===================================================
-            2. Main Footer Grid
+            1. Main Footer Grid
             =================================================== */}
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 pb-12 border-b border-slate-200">
-          
+
           {/* Col 1: Brand Info & Socials */}
           <div className="sm:col-span-2 lg:col-span-4">
             <Link to="/" className="inline-block">
@@ -264,12 +203,12 @@ function Footer({
               {COMPANY_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
-  to={link.href}
-  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-  className="text-slate-600 transition-colors hover:text-red-600 hover:underline"
->
-  {link.name}
-</Link>
+                    to={link.href}
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    className="text-slate-600 transition-colors hover:text-red-600 hover:underline"
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               ))}
               {POLICY_LINKS.map((link) => (
@@ -316,7 +255,7 @@ function Footer({
         </div>
 
         {/* ===================================================
-            3. Bottom Bar / Colophon (Newspaper Masthead Style)
+            2. Bottom Bar / Colophon (Newspaper Masthead Style)
             =================================================== */}
         <div className="pt-6 flex flex-col gap-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">

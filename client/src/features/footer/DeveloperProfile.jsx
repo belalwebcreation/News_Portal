@@ -83,11 +83,11 @@ const DEVELOPER_DATA = {
     {
       title: "Online News Portal Platform",
       roleTag: "Client Project",
-      desc: "সম্পূর্ণ রেসপন্সিভ এবং রিয়েল-টাইম আর্টিকেলিং সিস্টেমসহ উচ্চ গতিসম্পন্ন নিউজ পোর্টাল। ব্যাকএন্ডে রোল-বেসড অ্যাক্সেস ও ডায়নামিক অ্যাডমিন ড্যাশবোর্ড অন্তর্ভুক্ত।",
+      desc: "সম্পূর্ণ রেসপন্সিভ এবং রিয়েল-টাইম আর্টিকেলিং সিস্টেমসহ উচ্চ গতিসম্পন্ন নিউজ পোর্টাল। ব্যাকএন্ডে রোল-বেসড অ্যাক্সেস ও ডায়নামিক অ্যাডমিন ড্যাশবোর্ড অন্তর্ভুক্ত।",
       tags: ["React", "Node.js", "Express", "MongoDB", "Tailwind"],
       image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80",
-      liveLink: "https://newspaper-demo.com",
-      githubLink: "https://github.com/BelalHossain/news-portal",
+      liveLink: "https://news-portal-90ij.onrender.com/",
+      githubLink: "https://github.com/belalwebcreation/News_Portal",
     },
     {
       title: "E-Commerce Management Platform",

@@ -61,7 +61,7 @@ const WriterDashboard = () => {
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState(null);
 
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("published");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);

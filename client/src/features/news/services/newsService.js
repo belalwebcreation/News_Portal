@@ -60,6 +60,25 @@ export const newsService = {
   },
 
   // ==========================
+  // Get Top Viewed News (NEW - Admin Dashboard "Top Views News" panel)
+  // ==========================
+  async getTopViewedNews(limit = 5) {
+    try {
+      const { data } = await apiClient.get(`${api.news}/top-viewed`, {
+        params: { limit },
+      });
+
+      return data.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          "টপ ভিউড নিউজ লোড করতে সমস্যা হয়েছে।",
+        { cause: error }
+      );
+    }
+  },
+
+  // ==========================
   // Increment View Count (NEW - Anti-Spam)
   // ==========================
   async incrementView(id) {

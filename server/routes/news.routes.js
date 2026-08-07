@@ -6,8 +6,9 @@ import {
   getAllNews, 
   getSingleNews, 
   deleteNews,
-  getVideoNews, // ✅ NEW
-  getWriterStats, // ✅ NEW
+  getVideoNews,
+  getWriterStats,
+  getTopViewedNews, // ✅ NEW
 } from '../controllers/newsController.js';
 
 import { incrementView } from '../controllers/newsView.controller.js';
@@ -41,13 +42,19 @@ router.post('/image', protect, authorize('writer', 'admin', 'superadmin'), uploa
 // ===============================
 router.get('/trending', getTrending);
 router.get('/section-layout', getNewsSectionLayout);
-router.get('/videos', getVideoNews); // ✅ NEW — homepage Video Gallery
+router.get('/videos', getVideoNews);
 router.get(
   '/writer-stats',
   protect,
   authorize('writer', 'admin', 'superadmin'),
   getWriterStats
-); // ✅ NEW — logged-in writer এর নিজের totals (Writer Dashboard stat cards)
+);
+router.get(
+  '/top-viewed',
+  protect,
+  authorize('admin', 'superadmin'),
+  getTopViewedNews
+); // ✅ NEW — Admin Dashboard "Top Views News" panel (all-time top viewed published news)
 router.post('/:id/view', viewRateLimiter, incrementView);
 
 router.route('/')
