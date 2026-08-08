@@ -70,6 +70,32 @@ const siteSettingSchema = new mongoose.Schema(
     },
 
     // ==========================
+    // Hero Banner
+    // ==========================
+    heroBannerImage: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    heroBannerPublicId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    heroBannerLink: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    heroBannerVisible: {
+      type: Boolean,
+      default: true,
+    },
+
+    // ==========================
     // Navbar
     // ==========================
     navbar: {

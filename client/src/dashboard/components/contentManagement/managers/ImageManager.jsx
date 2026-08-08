@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Upload, Trash2, Eye, EyeOff } from "lucide-react";
+import { Upload, Trash2, Eye, EyeOff, Link as LinkIcon } from "lucide-react";
 import { baseUrl } from "../../../../config/Config";
+import ConfirmModal from "../../../../dashboard/pages/ConfirmModal";
 
 const ImageManager = ({
   title,
@@ -10,15 +11,29 @@ const ImageManager = ({
   currentVisibility = true,
   uploadUrl,
   fieldName,
+  settingsKey,
+  visibilityKey,
   recommendedSize,
   maxFileSize = 2,
   allowHide = true,
   allowDelete = true,
+  allowLink = false,
+  currentLink = "",
+  linkKey,
+  linkLabel = "Link URL",
+  linkPlaceholder = "https://example.com",
   onSaveSuccess,
+  onClose,              // 🆕 CMSModal close korar function (ContentManagement.jsx theke ashbe)
+  autoCloseDelay = 900,  // 🆕 save success dekhanor por koto ms por modal close hobe
 }) => {
+  const resolvedSettingsKey = settingsKey || fieldName;
+  const resolvedVisibilityKey = visibilityKey || `${fieldName}Visible`;
+  const resolvedLinkKey = linkKey || `${fieldName}Link`;
+
   const [image, setImage] = useState(currentImage || "");
   const [preview, setPreview] = useState(currentImage || "");
   const [visible, setVisible] = useState(currentVisibility);
+  const [link, setLink] = useState(currentLink || "");
 
   const [file, setFile] = useState(null);
 
@@ -26,6 +41,9 @@ const ImageManager = ({
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [error, setError] = useState("");
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [successInfo, setSuccessInfo] = useState(null); // { title, message } | null
 
   useEffect(() => {
     setImage(currentImage || "");
@@ -35,6 +53,10 @@ const ImageManager = ({
   useEffect(() => {
     setVisible(currentVisibility);
   }, [currentVisibility]);
+
+  useEffect(() => {
+    setLink(currentLink || "");
+  }, [currentLink]);
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -71,9 +93,10 @@ const ImageManager = ({
       }
     );
 
-    return data.settings.logo;
+    return data.settings[resolvedSettingsKey];
   };
-    // ==========================================
+
+  // ==========================================
   // Save
   // ==========================================
 
@@ -82,32 +105,45 @@ const ImageManager = ({
       setLoading(true);
       setError("");
 
-      let logoUrl = image;
+      let imageUrl = image;
 
       if (file) {
-        logoUrl = await uploadImage();
-        setImage(logoUrl);
+        imageUrl = await uploadImage();
+        setImage(imageUrl);
+      }
+
+      const body = {
+        [resolvedVisibilityKey]: visible,
+      };
+
+      if (allowLink) {
+        body[resolvedLinkKey] = link.trim();
       }
 
       await axios.put(
         `${baseUrl}/api/site-settings`,
-        {
-          logoVisible: visible,
-        },
+        body,
         {
           withCredentials: true,
         }
       );
 
-      setImage(logoUrl);
-      setPreview(logoUrl);
+      setImage(imageUrl);
+      setPreview(imageUrl);
       setFile(null);
 
       if (onSaveSuccess) {
         await onSaveSuccess();
       }
 
-      alert("Saved successfully.");
+      setSuccessInfo({ title: "Saved", message: "Changes saved successfully." });
+
+      // 🆕 success message dekhano hoye gele CMSModal auto-close
+      setTimeout(() => {
+        setSuccessInfo(null);
+        onClose?.();
+      }, autoCloseDelay);
+
     } catch (err) {
       console.error(err);
 
@@ -124,9 +160,9 @@ const ImageManager = ({
   // Delete
   // ==========================================
 
-  const handleDelete = async () => {
-    if (!window.confirm("Delete this image?")) return;
+  const requestDelete = () => setShowDeleteConfirm(true);
 
+  const handleDelete = async () => {
     try {
       setDeleteLoading(true);
 
@@ -145,10 +181,13 @@ const ImageManager = ({
         await onSaveSuccess();
       }
 
-      alert("Image deleted.");
+      setShowDeleteConfirm(false);
+      setSuccessInfo({ title: "Deleted", message: "Image deleted successfully." });
+      // Delete-e auto-close chao na chao, eta pending decision — ekhon modal open thakbe
     } catch (err) {
       console.error(err);
 
+      setShowDeleteConfirm(false);
       setError(
         err?.response?.data?.message ||
           "Failed to delete image."
@@ -191,11 +230,12 @@ const ImageManager = ({
           "Failed to update visibility."
       );
     }
-  };  return (
+  };
+
+  return (
     <div className="space-y-6">
 
       {/* Title */}
-
       <div>
         <h2 className="text-xl font-bold">{title}</h2>
 
@@ -207,9 +247,7 @@ const ImageManager = ({
       </div>
 
       {/* Preview */}
-
       <div className="border rounded-xl p-6 flex justify-center bg-slate-50">
-
         {preview ? (
           <img
             src={preview}
@@ -221,34 +259,42 @@ const ImageManager = ({
             No Image Selected
           </div>
         )}
-
       </div>
 
       {/* Upload */}
-
       <div>
-
         <label className="cursor-pointer inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-lg">
-
           <Upload size={18} />
-
           {uploadText}
-
           <input
             hidden
             type="file"
             accept="image/*"
             onChange={handleFileChange}
           />
-
         </label>
-
       </div>
 
+      {/* Link Input */}
+      {allowLink && (
+        <div>
+          <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <LinkIcon size={16} />
+            {linkLabel}
+          </label>
+
+          <input
+            type="url"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            placeholder={linkPlaceholder}
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
+          />
+        </div>
+      )}
+
       {/* Visibility */}
-
       {allowHide && (
-
         <button
           type="button"
           onClick={handleVisibility}
@@ -258,7 +304,6 @@ const ImageManager = ({
               : "bg-slate-300"
           }`}
         >
-
           {visible ? (
             <>
               <Eye size={18} />
@@ -270,13 +315,10 @@ const ImageManager = ({
               Hidden
             </>
           )}
-
         </button>
-
       )}
 
       {/* Error */}
-
       {error && (
         <div className="text-red-600 text-sm">
           {error}
@@ -284,9 +326,7 @@ const ImageManager = ({
       )}
 
       {/* Buttons */}
-
       <div className="flex gap-3">
-
         <button
           onClick={handleSave}
           disabled={loading}
@@ -296,24 +336,38 @@ const ImageManager = ({
         </button>
 
         {allowDelete && image && (
-
           <button
-            onClick={handleDelete}
+            onClick={requestDelete}
             disabled={deleteLoading}
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 disabled:opacity-60"
           >
-
             <Trash2 size={18} />
-
-            {deleteLoading
-              ? "Deleting..."
-              : "Delete"}
-
+            {deleteLoading ? "Deleting..." : "Delete"}
           </button>
-
         )}
-
       </div>
+
+      {/* Delete confirm modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        type="delete"
+        title="Delete Image"
+        message="আপনি কি নিশ্চিত এই image টি delete করতে চান? এই action ফেরানো যাবে না।"
+        isLoading={deleteLoading}
+      />
+
+      {/* Success info modal (replaces alert()) */}
+      <ConfirmModal
+        isOpen={!!successInfo}
+        onClose={() => setSuccessInfo(null)}
+        type="success"
+        hideCancel
+        confirmText="OK"
+        title={successInfo?.title}
+        message={successInfo?.message}
+      />
 
     </div>
   );

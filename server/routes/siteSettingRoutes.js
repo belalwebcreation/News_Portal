@@ -1,5 +1,5 @@
 import express from "express";
-import uploadLogo from "../middleware/uploadLogo.js";
+import uploadImage from "../middleware/uploadLogo.js"; // generic multer instance — কোনো field-name-এর সাথে bound না, তাই logo ও banner দুটোতেই reuse করা যায়
 
 import {
   getSiteSettings,
@@ -7,6 +7,9 @@ import {
   uploadLogo as uploadLogoController,
   deleteLogo,
   updateLogoVisibility,
+  uploadBanner as uploadBannerController,
+  deleteBanner,
+  updateBannerVisibility,
 } from "../controllers/siteSettingController.js";
 
 const router = express.Router();
@@ -26,7 +29,7 @@ router.put("/", updateSiteSettings);
 // ===============================
 router.put(
   "/logo",
-  uploadLogo.single("logo"),
+  uploadImage.single("logo"),
   uploadLogoController
 );
 
@@ -39,5 +42,24 @@ router.delete("/logo", deleteLogo);
 // Show / Hide Logo
 // ===============================
 router.put("/logo/visibility", updateLogoVisibility);
+
+// ===============================
+// Upload / Change Hero Banner
+// ===============================
+router.put(
+  "/banner",
+  uploadImage.single("banner"),
+  uploadBannerController
+);
+
+// ===============================
+// Delete Hero Banner
+// ===============================
+router.delete("/banner", deleteBanner);
+
+// ===============================
+// Show / Hide Hero Banner
+// ===============================
+router.put("/banner/visibility", updateBannerVisibility);
 
 export default router;

@@ -7,8 +7,8 @@ import { useCategoryManager } from './hooks/useCategoryManager';
 
 function EmptyState({ hasFilters, onAdd, onClearFilters }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 px-5 py-14 text-center sm:px-8">
-      <h2 className="text-sm font-bold text-slate-200">
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-14 text-center sm:px-8">
+      <h2 className="text-sm font-bold text-slate-800">
         {hasFilters ? 'কোনো ফলাফল পাওয়া যায়নি' : 'এখনও কোনো ক্যাটাগরি নেই'}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-slate-500">
@@ -19,7 +19,7 @@ function EmptyState({ hasFilters, onAdd, onClearFilters }) {
       <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
         {hasFilters ? (
           <button
-            className="rounded-xl border border-slate-700 px-4 py-2.5 text-xs font-bold text-slate-300 transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300"
+            className="rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
             onClick={onClearFilters}
             type="button"
           >
@@ -85,18 +85,18 @@ export default function CategoryManagement() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 p-4 text-slate-100 antialiased sm:p-6 lg:p-8">
+    <main className="min-h-screen bg-slate-50 p-4 text-slate-900 antialiased sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
-        <header className="flex flex-col gap-4 border-b border-slate-800 pb-6 sm:flex-row sm:items-start sm:justify-between">
+        <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-400">Content settings</p>
-            <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">ক্যাটাগরি কন্ট্রোল সেন্টার</h1>
-            <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-400">পোর্টালের মেনুবার ও নিউজ ফিল্টারিংয়ের ক্যাটাগরি কনফিগার করুন।</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Content settings</p>
+            <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">ক্যাটাগরি কন্ট্রোল সেন্টার</h1>
+            <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">পোর্টালের মেনুবার ও নিউজ ফিল্টারিংয়ের ক্যাটাগরি কনফিগার করুন।</p>
           </div>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             <button
               aria-label="ক্যাটাগরি তালিকা রিফ্রেশ করুন"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-3.5 py-2.5 text-xs font-bold text-slate-300 transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isFetching || isMutating}
               onClick={() => refreshCategories().catch(() => undefined)}
               type="button"
@@ -104,7 +104,7 @@ export default function CategoryManagement() {
               <RefreshCw aria-hidden="true" className={isFetching ? 'animate-spin' : ''} size={15} /> রিফ্রেশ
             </button>
             <button
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-950/50 transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isMutating}
               onClick={openCreateModal}
               type="button"
@@ -115,22 +115,22 @@ export default function CategoryManagement() {
         </header>
 
         <section aria-label="ক্যাটাগরি সারাংশ" className="mt-5 grid grid-cols-2 gap-3 sm:max-w-md">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">সর্বমোট</p>
-            <p className="mt-1 text-xl font-black text-white">{totalCount}</p>
+            <p className="mt-1 text-xl font-black text-slate-900">{totalCount}</p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">সক্রিয়</p>
-            <p className="mt-1 text-xl font-black text-emerald-300">{activeCount}</p>
+            <p className="mt-1 text-xl font-black text-emerald-600">{activeCount}</p>
           </div>
         </section>
 
         <section aria-label="সার্চ ও ফিল্টার" className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="relative md:col-span-2">
-            <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+            <Search aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               aria-label="ক্যাটাগরি সার্চ"
-              className="w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 pl-10 pr-10 text-sm text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="ক্যাটাগরি নাম বা স্লাগ লিখে খুঁজুন..."
               type="search"
@@ -139,7 +139,7 @@ export default function CategoryManagement() {
             {searchTerm && (
               <button
                 aria-label="সার্চ মুছুন"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-500 transition hover:bg-slate-800 hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
                 onClick={() => setSearchTerm('')}
                 type="button"
               >
@@ -148,10 +148,10 @@ export default function CategoryManagement() {
             )}
           </div>
           <div className="relative">
-            <Filter aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
+            <Filter aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
             <label className="sr-only" htmlFor="category-status-filter">ক্যাটাগরি স্ট্যাটাস ফিল্টার</label>
             <select
-              className="w-full cursor-pointer appearance-none rounded-xl border border-slate-800 bg-slate-900 py-2.5 pl-10 pr-4 text-sm text-slate-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full cursor-pointer appearance-none rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               id="category-status-filter"
               onChange={(event) => setStatusFilter(event.target.value)}
               value={statusFilter}
@@ -164,14 +164,14 @@ export default function CategoryManagement() {
         </section>
 
         {error && (
-          <div className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs leading-5 text-rose-200" role="alert">
+          <div className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs leading-5 text-rose-700" role="alert">
             <span className="flex gap-2">
               <AlertCircle aria-hidden="true" className="mt-0.5 shrink-0" size={17} />
               {error}
             </span>
             <button
               aria-label="ত্রুটির বার্তা বন্ধ করুন"
-              className="rounded p-0.5 text-rose-200/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-300"
+              className="rounded p-0.5 text-rose-500 hover:text-rose-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-400"
               onClick={clearError}
               type="button"
             >
@@ -182,8 +182,8 @@ export default function CategoryManagement() {
 
         <section aria-live="polite" className="mt-6">
           {initialLoading ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/40 py-20 text-slate-400">
-              <Loader2 aria-hidden="true" className="animate-spin text-indigo-400" size={30} />
+            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white py-20 text-slate-500">
+              <Loader2 aria-hidden="true" className="animate-spin text-indigo-500" size={30} />
               <p className="text-xs">ক্যাটাগরি লোড হচ্ছে...</p>
             </div>
           ) : categories.length === 0 ? (
@@ -198,7 +198,7 @@ export default function CategoryManagement() {
                   </p>
                 )}
               </div>
-              <div className="hidden overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl shadow-black/10 lg:block">
+              <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:block">
                 <CategoryTable
                   categories={categories}
                   disabled={isMutating}

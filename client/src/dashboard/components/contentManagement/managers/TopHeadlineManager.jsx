@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import TopHeadlineImage from "./TopHeadlineImage";
+import ConfirmModal from "../../../../dashboard/pages/ConfirmModal";
 
 import {
   getTopHeadline,
@@ -19,7 +20,12 @@ import {
   toggleHeadlineVisibility,
 } from "../../../../services/topHeadlineService";
 
-const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
+const TopHeadlineManager = ({
+  onSaved,
+  onClose,               // 🆕 CMSModal close korar function (ContentManagement.jsx theke ashe)
+  maxHeadlines = 3,
+  autoCloseDelay = 900,   // 🆕 success dekhanor por koto ms por action complete hobe
+} = {}) => {
   // -----------------------------------------
   // Loading States
   // -----------------------------------------
@@ -40,6 +46,13 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [actionError, setActionError] = useState("");
+
+  // -----------------------------------------
+  // 🆕 Modal states (window.confirm replace + success confirm modal)
+  // -----------------------------------------
+  const [successInfo, setSuccessInfo] = useState(null);          // { title, message } | null
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);  // delete confirm-e ase headline _id
+  const [pendingCancel, setPendingCancel] = useState(false);     // discard-changes confirm
 
   /*
   ==========================================
@@ -184,13 +197,22 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
   Delete Headline
   ==========================================
   */
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this headline?")) return;
+  // Delete button -> ekhon shudhu confirm modal khulbe (window.confirm noy)
+  const requestDelete = (id) => setPendingDeleteId(id);
+
+  // Asol delete logic — ConfirmModal-e "Confirm" chaple cholbe
+  const handleDelete = async () => {
+    const id = pendingDeleteId;
+    if (!id) return;
 
     try {
       setBusyId(id);
+
       await deleteHeadline(id);
+
       setItems((prev) => prev.filter((item) => item._id !== id));
+      setInitialItems((prev) => prev.filter((item) => item._id !== id));
+
       setSuccess("Headline deleted successfully.");
     } catch (err) {
       setActionError(
@@ -198,6 +220,7 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
       );
     } finally {
       setBusyId(null);
+      setPendingDeleteId(null);
     }
   };
 
@@ -209,12 +232,25 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
   const handleToggle = async (id) => {
     try {
       setBusyId(id);
+
       await toggleHeadlineVisibility(id);
-      setItems((prev) =>
-        prev.map((item) =>
-          item._id === id ? { ...item, visible: !item.visible } : item
-        )
+
+      const next = items.map((item) =>
+        item._id === id ? { ...item, visible: !item.visible } : item
       );
+
+      setItems(next);
+
+      // 🆕 toggle already server-e persisted, tai initialItems-eo sync korlam —
+      // na hole "Unsaved changes" pill vul kore theke jeto
+      setInitialItems(next);
+
+      setSuccessInfo({
+        title: "Updated",
+        message: "Visibility updated successfully.",
+      });
+
+      setTimeout(() => setSuccessInfo(null), autoCloseDelay);
     } catch (err) {
       setActionError(
         err.response?.data?.message || "Failed to update visibility."
@@ -242,7 +278,6 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
     try {
       setSaving(true);
       setError("");
-      setSuccess("");
 
       const payload = {
         items: items.map((item) => ({
@@ -258,11 +293,18 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
       await updateTopHeadline(payload);
 
       setInitialItems(payload.items);
-      setSuccess("Top Headlines updated successfully.");
 
-      if (onSaved) {
-        setTimeout(() => onSaved(), 700);
-      }
+      setSuccessInfo({
+        title: "Saved",
+        message: "Top Headlines updated successfully.",
+      });
+
+      // 🆕 success dekhano hoye gele CMSModal auto-close
+      setTimeout(() => {
+        setSuccessInfo(null);
+        onSaved?.();
+        onClose?.();
+      }, autoCloseDelay);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save changes.");
     } finally {
@@ -275,8 +317,16 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
   Cancel Changes
   ==========================================
   */
+  const requestCancel = () => {
+    if (!isDirty) {
+      fetchHeadline();
+      return;
+    }
+    setPendingCancel(true);
+  };
+
   const handleCancel = () => {
-    if (isDirty && !window.confirm("Discard all unsaved changes?")) return;
+    setPendingCancel(false);
     fetchHeadline();
   };
 
@@ -410,7 +460,7 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
 
                 <button
                   type="button"
-                  onClick={() => handleDelete(item._id)}
+                  onClick={() => requestDelete(item._id)}
                   disabled={busyId === item._id}
                   aria-label="Delete headline"
                   className="shrink-0 rounded-lg p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
@@ -521,7 +571,7 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
         <div className="flex gap-4">
           <button
             type="button"
-            onClick={handleCancel}
+            onClick={requestCancel}
             disabled={saving}
             className="h-12 px-6 rounded-xl border border-slate-300 hover:bg-slate-100 transition disabled:opacity-50"
           >
@@ -552,6 +602,38 @@ const TopHeadlineManager = ({ onSaved, maxHeadlines = 3 } = {}) => {
           </button>
         </div>
       </div>
+
+      {/* Delete confirm modal (age window.confirm chilo) */}
+      <ConfirmModal
+        isOpen={!!pendingDeleteId}
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={handleDelete}
+        type="delete"
+        title="Delete Headline"
+        message="আপনি কি নিশ্চিত এই headline টি delete করতে চান? এই action ফেরানো যাবে না।"
+        isLoading={busyId === pendingDeleteId}
+      />
+
+      {/* Discard changes confirm modal (age window.confirm chilo) */}
+      <ConfirmModal
+        isOpen={pendingCancel}
+        onClose={() => setPendingCancel(false)}
+        onConfirm={handleCancel}
+        type="default"
+        title="Discard Changes"
+        message="আপনার unsaved changes আছে। আপনি কি সেগুলো discard করতে চান?"
+      />
+
+      {/* Success confirm modal (toggle visibility + save changes) */}
+      <ConfirmModal
+        isOpen={!!successInfo}
+        onClose={() => setSuccessInfo(null)}
+        type="success"
+        hideCancel
+        confirmText="OK"
+        title={successInfo?.title}
+        message={successInfo?.message}
+      />
     </div>
   );
 };

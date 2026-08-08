@@ -17,6 +17,10 @@ const getOrCreateSettings = async () => {
       logo: "",
       logoPublicId: "",
       logoVisible: true,
+      heroBannerImage: "",
+      heroBannerPublicId: "",
+      heroBannerLink: "",
+      heroBannerVisible: true,
     });
   }
 
@@ -26,6 +30,9 @@ const getOrCreateSettings = async () => {
 const buildSettingsResponse = (settings) => ({
   logo: settings.logo || "",
   logoVisible: settings.logoVisible,
+  heroBannerImage: settings.heroBannerImage || "",
+  heroBannerLink: settings.heroBannerLink || "",
+  heroBannerVisible: settings.heroBannerVisible,
   navbar: [...(settings.navbar || [])].sort(
     (a, b) => a.order - b.order
   ),
@@ -39,7 +46,6 @@ export const getSiteSettings = async (req, res) => {
   try {
     const settings = await getOrCreateSettings();
 
-    // ক্যাটাগরির name এবং slug পপুলেট করা হলো
     await settings.populate({
       path: "navbar.category",
       select: "name slug",
@@ -67,15 +73,22 @@ export const updateSiteSettings = async (req, res) => {
   try {
     const settings = await getOrCreateSettings();
 
-    const { logoVisible } = req.body;
+    const { logoVisible, heroBannerVisible, heroBannerLink } = req.body;
 
     if (logoVisible !== undefined) {
       settings.logoVisible = Boolean(logoVisible);
     }
 
+    if (heroBannerVisible !== undefined) {
+      settings.heroBannerVisible = Boolean(heroBannerVisible);
+    }
+
+    if (heroBannerLink !== undefined) {
+      settings.heroBannerLink = String(heroBannerLink).trim();
+    }
+
     await settings.save();
 
-    // সেভ করার পর রেসপন্স পাঠানোর আগে পপুলেট করা হলো
     await settings.populate({
       path: "navbar.category",
       select: "name slug",
@@ -110,12 +123,10 @@ export const uploadLogo = async (req, res) => {
 
     const settings = await getOrCreateSettings();
 
-    // Delete previous logo from Cloudinary
     if (settings.logoPublicId) {
       await deleteFromCloudinary(settings.logoPublicId);
     }
 
-    // Upload new logo
     const result = await uploadToCloudinary(
       req.file.buffer,
       "site-settings/logo"
@@ -126,7 +137,6 @@ export const uploadLogo = async (req, res) => {
 
     await settings.save();
 
-    // লোগো আপলোডের পর রেসপন্স ডাটা পপুলেট করা হলো
     await settings.populate({
       path: "navbar.category",
       select: "name slug",
@@ -171,7 +181,6 @@ export const deleteLogo = async (req, res) => {
 
     await settings.save();
 
-    // লোগো ডিলিটের পর রেসপন্স ডাটা পপুলেট করা হলো
     await settings.populate({
       path: "navbar.category",
       select: "name slug",
@@ -206,7 +215,6 @@ export const updateLogoVisibility = async (req, res) => {
 
     await settings.save();
 
-    // ভিজিবিলিটি চেঞ্জের পরও যেন নেভবার ডাটা পপুলেটেড থাকে
     await settings.populate({
       path: "navbar.category",
       select: "name slug",
@@ -224,6 +232,133 @@ export const updateLogoVisibility = async (req, res) => {
       success: false,
       message:
         error.message || "Failed to update logo visibility.",
+    });
+  }
+};
+
+/* ======================================================
+   Upload / Change Hero Banner
+====================================================== */
+export const uploadBanner = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a banner image.",
+      });
+    }
+
+    const settings = await getOrCreateSettings();
+
+    if (settings.heroBannerPublicId) {
+      await deleteFromCloudinary(settings.heroBannerPublicId);
+    }
+
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      "site-settings/banner"
+    );
+
+    settings.heroBannerImage = result.secure_url;
+    settings.heroBannerPublicId = result.public_id;
+
+    await settings.save();
+
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Banner uploaded successfully.",
+      settings: buildSettingsResponse(settings),
+    });
+  } catch (error) {
+    console.error("Upload Banner Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to upload banner.",
+    });
+  }
+};
+
+/* ======================================================
+   Delete Hero Banner
+====================================================== */
+
+export const deleteBanner = async (req, res) => {
+  try {
+    const settings = await getOrCreateSettings();
+
+    if (!settings.heroBannerImage) {
+      return res.status(404).json({
+        success: false,
+        message: "Banner not found.",
+      });
+    }
+
+    if (settings.heroBannerPublicId) {
+      await deleteFromCloudinary(settings.heroBannerPublicId);
+    }
+
+    settings.heroBannerImage = "";
+    settings.heroBannerPublicId = "";
+
+    await settings.save();
+
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Banner deleted successfully.",
+      settings: buildSettingsResponse(settings),
+    });
+  } catch (error) {
+    console.error("Delete Banner Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete banner.",
+    });
+  }
+};
+
+/* ======================================================
+   Update Hero Banner Visibility
+====================================================== */
+
+export const updateBannerVisibility = async (req, res) => {
+  try {
+    const settings = await getOrCreateSettings();
+
+    const { visible } = req.body;
+
+    settings.heroBannerVisible = Boolean(visible);
+
+    await settings.save();
+
+    await settings.populate({
+      path: "navbar.category",
+      select: "name slug",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Banner visibility updated successfully.",
+      settings: buildSettingsResponse(settings),
+    });
+  } catch (error) {
+    console.error("Update Banner Visibility Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message || "Failed to update banner visibility.",
     });
   }
 };

@@ -104,6 +104,7 @@ const cmsSections = [
   },
 
   // ==================================================
+// ==================================================
   // HOMEPAGE
   // ==================================================
 
@@ -114,100 +115,16 @@ const cmsSections = [
 
     items: [
       {
-        id: "heroSlider",
-        title: "Hero Slider",
-        description: "Homepage hero slider",
+        id: "banner",
+        title: "Banner",
+        description: "Homepage top banner image, link o visibility",
 
-        manager: "HeroSliderManager",
+        manager: "banner",
 
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "heroSlider",
+        type: CMS_ITEM_TYPES.IMAGE,
+        collection: "siteSettings",
 
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "featuredNews",
-        title: "Featured News",
-        description: "Featured news section",
-
-        manager: "FeaturedNewsManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "featuredNews",
-
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "latestNews",
-        title: "Latest News",
-        description: "Latest news section",
-
-        manager: "LatestNewsManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "latestNews",
-
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "categorySection",
-        title: "Category Section",
-        description: "Homepage categories",
-
-        manager: "CategorySectionManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "categorySection",
-
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "gallery",
-        title: "Gallery",
-        description: "Homepage gallery",
-
-        manager: "GalleryManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "gallery",
-
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "advertisement",
-        title: "Advertisement",
-        description: "Homepage advertisements",
-
-        manager: "AdvertisementManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "advertisement",
-
-        multiple: true,
-        visible: true,
-      },
-
-      {
-        id: "notice",
-        title: "Notice Board",
-        description: "Homepage notice",
-
-        manager: "NoticeManager",
-
-        type: CMS_ITEM_TYPES.LIST,
-        collection: "notice",
-
-        multiple: true,
+        multiple: false,
         visible: true,
       },
     ],

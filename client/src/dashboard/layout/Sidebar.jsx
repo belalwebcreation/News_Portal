@@ -16,6 +16,7 @@ import {
   FiX,
   FiBookmark,
   FiGrid,
+  FiLayout,
 } from "react-icons/fi";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -26,6 +27,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   // 👑 Admin ও Superadmin — দুজনেরই একই মেনু (superadmin এর extra ক্ষমতা page এর ভেতরেই handle হয়, যেমন Users.jsx এ demote বাটন)
   // এখানে "Create News" যোগ করা হলো যাতে admin/superadmin সরাসরি sidebar থেকে writer এর news লেখার পেজে যেতে পারে
+  // 🆕 "Section Management" যোগ করা হলো — হোমপেজের হিরো/ব্যানার সেকশন ম্যানেজ করার পেজ (WriterSectionManagement মডিউল)
   const adminMenuItems = [
     { title: "Dashboard", path: "/dashboard/admin", icon: <LuLayoutDashboard size={20} /> },
     { title: "Content Management", path: "/dashboard/admin/content-management", icon: <FiGrid size={20} /> },
@@ -33,6 +35,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { title: "News Master List", path: "/dashboard/admin/news", icon: <MdOutlineArticle size={20} /> },
     { title: "User List", path: "/dashboard/admin/users", icon: <FaRegUser size={18} /> },
     { title: "Create News", path: "/dashboard/writer/add-news", icon: <MdOutlinePostAdd size={20} /> },
+  
   ];
 
   // 📝 Industry-Level Data Structure: সহজে নতুন মেনু যোগ বা পরিবর্তন করার জন্য
@@ -49,6 +52,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         title: "Create News",
         path: "/dashboard/writer/add-news",
         icon: <MdOutlinePostAdd size={20} />,
+      },
+      {
+        title: "Section Management",
+        path: "/dashboard/writer/section-management",
+        icon: <FiLayout size={20} />,
       },
     ],
     reader: [

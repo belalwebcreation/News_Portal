@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { baseUrl } from "../../../../config/Config";
+import ConfirmModal from "../../../../dashboard/pages/ConfirmModal";
 
 const TopHeadlineImage = ({
   headlineId,
@@ -24,6 +25,9 @@ const TopHeadlineImage = ({
   const [deleting, setDeleting] = useState(false);
 
   const [error, setError] = useState("");
+
+  // 🆕 window.confirm replace korar jonno
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -89,13 +93,14 @@ const TopHeadlineImage = ({
     }
   };
 
-  const handleDelete = async () => {
+  // Delete button -> ekhon shudhu confirm modal khulbe
+  const requestDelete = () => {
     if (!publicId) return;
+    setShowDeleteConfirm(true);
+  };
 
-    if (!window.confirm("Delete this image?")) {
-      return;
-    }
-
+  // Asol delete logic — ConfirmModal-e "Confirm" chaple cholbe
+  const handleDelete = async () => {
     try {
       setDeleting(true);
       setError("");
@@ -121,8 +126,11 @@ const TopHeadlineImage = ({
       );
     } finally {
       setDeleting(false);
+      setShowDeleteConfirm(false);
     }
-  };  return (
+  };
+
+  return (
     <div className="space-y-4">
       {/* Preview */}
       <div className="w-full h-40 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden">
@@ -177,7 +185,7 @@ const TopHeadlineImage = ({
         {preview && (
           <button
             type="button"
-            onClick={handleDelete}
+            onClick={requestDelete}
             disabled={deleting}
             className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 disabled:opacity-60"
           >
@@ -204,6 +212,17 @@ const TopHeadlineImage = ({
           {error}
         </p>
       )}
+
+      {/* Delete confirm modal (age window.confirm chilo) */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        type="delete"
+        title="Delete Image"
+        message="আপনি কি নিশ্চিত এই headline image টি delete করতে চান? এই action ফেরানো যাবে না।"
+        isLoading={deleting}
+      />
     </div>
   );
 };

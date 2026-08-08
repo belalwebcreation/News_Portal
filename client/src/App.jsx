@@ -22,6 +22,13 @@ import ArticleDetails from "./features/article/pages/ArticleDetails";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import About from "./features/footer/About";
 import DeveloperProfile from "./features/footer/DeveloperProfile";
+import EditorialStandards from "./features/footer/EditorialStandards"; 
+import Careers from "./features/footer/Careers";
+import Advertise from "./features/footer/Advertise";
+import Privacy from "./features/footer/Privacy";
+import Terms from "./features/footer/Terms";
+import Corrections from "./features/footer/Corrections";
+import Cookies from "./features/footer/Cookies";
 
 // Auth
 import Login from "./dashboard/pages/Login";
@@ -152,16 +159,14 @@ function AppRoutes() {
         {/* FOOTER PAGES — Footer.jsx এর COMPANY_LINKS / POLICY_LINKS এর সাথে মিল রেখে */}
         <Route path="/about" element={<About />} />
         <Route path="/developer" element={<DeveloperProfile />} />
-        {/* 👇 TODO: বাকি footer routes — পেজ কম্পোনেন্ট বানানোর সাথে সাথে এখানে
-            একই প্যাটার্নে <Route path="..." element={<... />} /> যোগ করবে।
-            কমেন্ট করা প্রতিটা লাইনের path Footer.jsx-এর href-এর সাথে হুবহু মিলবে। */}
-        {/* <Route path="/editorial-standards" element={<EditorialStandards />} />  সাংবাদিকতার নীতিমালা */}
-        {/* <Route path="/careers" element={<Careers />} />                         ক্যারিয়ার */}
-        {/* <Route path="/advertise" element={<Advertise />} />                     বিজ্ঞাপন দিন */}
-        {/* <Route path="/privacy" element={<Privacy />} />                         গোপনীয়তা নীতি */}
-        {/* <Route path="/terms" element={<Terms />} />                             ব্যবহারের শর্তাবলী */}
-        {/* <Route path="/corrections" element={<Corrections />} />                 সংশোধনী নীতি */}
-        {/* <Route path="/cookies" element={<Cookies />} />                         কুকি নীতি */}
+        
+        <Route path="/editorial-standards" element={<EditorialStandards />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/advertise" element={<Advertise />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/corrections" element={<Corrections />} />
+        <Route path="/cookies" element={<Cookies />} />
       </Route>
 
       {/* AUTH */}
@@ -210,6 +215,7 @@ function AppRoutes() {
               element={<ManageNews currentUserId={userInfo?.id} />}
             />
             <Route path="writer/profile" element={<WriterProfile />} />
+        
           </Route>
 
           {/* READER */}
