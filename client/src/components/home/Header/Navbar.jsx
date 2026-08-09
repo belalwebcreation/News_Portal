@@ -8,8 +8,9 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import LoginButton from "./LoginButton";
 import MobileMenu from "./MobileMenu";
 import useNavOverflow from "./useNavOverflow";
+import ThemeSwitcher from "../../../theme/ThemeSwitcher";
 
-// menu/hamburger বাটনের approx width (w-11 = 44px) + তার আগের gap
+// মেনু/হ্যামবার্গার বাটনের approx width (w-11 = 44px) + তার আগের gap
 const MENU_BUTTON_RESERVED_WIDTH = 56;
 
 const Navbar = () => {
@@ -67,8 +68,8 @@ const Navbar = () => {
     <nav
       className={`border-b transition-[background-color,box-shadow] duration-300 ${
         isScrolled
-          ? "bg-white/90 backdrop-blur-md border-gray-200 shadow-md"
-          : "bg-white border-gray-100 shadow-sm"
+          ? "bg-white/90 backdrop-blur-md border-gray-200 shadow-md dark:bg-gray-900/90 dark:border-gray-800"
+          : "bg-white border-gray-100 shadow-sm dark:bg-gray-900 dark:border-gray-800"
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
@@ -101,7 +102,7 @@ const Navbar = () => {
                   to={item.isHome ? "/" : `/category/${item.category?.slug}`}
                   className={({ isActive }) =>
                     `group relative px-4 h-16 flex items-center text-[15px] font-medium whitespace-nowrap transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-inset ${
-                      isActive ? "text-red-700" : "text-gray-800 hover:text-red-700"
+                      isActive ? "text-red-700" : "text-gray-800 hover:text-red-700 dark:text-gray-200 dark:hover:text-red-500"
                     }`
                   }
                 >
@@ -129,7 +130,9 @@ const Navbar = () => {
             <div className="hidden lg:block">
               <SearchBox />
             </div>
-            
+
+            <ThemeSwitcher />
+
             <LanguageSwitcher />
             <div className="hidden lg:block">
               <LoginButton />

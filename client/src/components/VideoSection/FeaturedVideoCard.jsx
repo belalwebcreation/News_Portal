@@ -12,7 +12,7 @@ const FeaturedVideoCard = memo(({ video }) => {
       aria-label={video.title}
       className="
         group flex flex-col h-full overflow-hidden 
-        rounded-2xl border border-neutral-100 bg-white shadow-sm 
+        rounded-2xl border border-neutral-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm 
         transition-[transform,box-shadow] duration-300 ease-out
         hover:-translate-y-1 hover:shadow-lg
       "
@@ -40,23 +40,23 @@ const FeaturedVideoCard = memo(({ video }) => {
       </div>
 
       {/* Content Container */}
-      <div className="p-4 flex flex-col flex-grow justify-between bg-white">
+      <div className="p-4 flex flex-col flex-grow justify-between bg-white dark:bg-gray-900">
         <div>
           <span className="bg-red-600 text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full inline-block mb-2">
             প্রধান ভিডিও
           </span>
 
-          <h3 className="text-base font-black text-slate-900 leading-snug group-hover:text-red-600 transition-colors duration-300 line-clamp-2">
+          <h3 className="text-base font-black text-slate-900 dark:text-gray-100 leading-snug group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors duration-300 line-clamp-2">
             {video.title}
           </h3>
 
-          <p className="mt-2.5 text-[13px] leading-6 text-slate-500 line-clamp-3">
+          <p className="mt-2.5 text-[13px] leading-6 text-slate-500 dark:text-gray-400 line-clamp-3">
             {video.description}
           </p>
         </div>
 
         {/* Footer Meta */}
-        <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-slate-400">
+        <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-gray-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-gray-500">
           {video.views != null && (
             <span className="flex items-center gap-1">
               <Eye size={13} /> {video.views} ভিউ

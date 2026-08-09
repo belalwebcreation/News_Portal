@@ -21,11 +21,11 @@ const getTickerDuration = (speed) => {
 };
 
 const BreakingNewsSkeleton = () => (
-  <div className="h-12 w-full overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm" aria-label="ব্রেকিং নিউজ লোড হচ্ছে">
+  <div className="h-12 w-full overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-gray-900" aria-label="ব্রেকিং নিউজ লোড হচ্ছে">
     <div className="flex h-full animate-pulse items-center gap-3 px-3 sm:px-4">
-      <div className="h-6 w-28 shrink-0 rounded-md bg-red-100" />
-      <div className="h-3 w-full max-w-2xl rounded-full bg-slate-100" />
-      <div className="hidden h-3 w-24 rounded-full bg-slate-100 lg:block" />
+      <div className="h-6 w-28 shrink-0 rounded-md bg-red-100 dark:bg-red-950/40" />
+      <div className="h-3 w-full max-w-2xl rounded-full bg-slate-100 dark:bg-slate-800" />
+      <div className="hidden h-3 w-24 rounded-full bg-slate-100 dark:bg-slate-800 lg:block" />
     </div>
   </div>
 );
@@ -97,9 +97,9 @@ const BreakingNews = ({
     if (!hasError) return null;
 
     return (
-      <div className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 text-xs text-amber-800 sm:px-4" role="status">
-        <span>ব্রেকিং নিউজ এই মুহূর্তে পাওয়া যাচ্ছে না।</span>
-        <button type="button" onClick={() => setRetryCount((count) => count + 1)} className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-100 px-2.5 py-1.5 font-bold transition hover:bg-amber-200">
+      <div className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 text-xs text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400 sm:px-4" role="status">
+        <span>ব্রেকিং নিউজ এই মুহূর্তে পাওয়া যাচ্ছে না।</span>
+        <button type="button" onClick={() => setRetryCount((count) => count + 1)} className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-100 px-2.5 py-1.5 font-bold transition hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60">
           <FaSyncAlt aria-hidden="true" /> আবার চেষ্টা করুন
         </button>
       </div>
@@ -110,8 +110,8 @@ const BreakingNews = ({
   const showDate = Boolean(breakingNews.showDate && breakingNews.date);
 
   return (
-    <section className={`relative isolate overflow-hidden rounded-xl border border-red-100 bg-white shadow-sm ring-1 ring-black/[0.02] ${className}`} aria-label={label}>
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_rgba(254,226,226,0.85),_transparent_44%)]" />
+    <section className={`relative isolate overflow-hidden rounded-xl border border-red-100 bg-white shadow-sm ring-1 ring-black/[0.02] dark:border-red-900/30 dark:bg-gray-900 dark:ring-white/[0.03] ${className}`} aria-label={label}>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_rgba(254,226,226,0.85),_transparent_44%)] dark:bg-[radial-gradient(circle_at_top_right,_rgba(127,29,29,0.35),_transparent_44%)]" />
 
       <div className="flex min-h-12 flex-col sm:flex-row sm:items-stretch">
         <div className="flex shrink-0 items-center gap-2 bg-gradient-to-r from-red-700 to-red-600 px-3 py-2 text-white sm:px-4">
@@ -123,7 +123,7 @@ const BreakingNews = ({
           <span className="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.13em] sm:text-xs">{label}</span>
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center bg-white">
+        <div className="flex min-w-0 flex-1 items-center bg-white dark:bg-gray-900">
           <div className="relative min-w-0 flex-1 overflow-hidden py-2" aria-live="polite" aria-atomic="true">
             <p className="sr-only">{label}: {visibleItems.map((item) => item.title).join("। ")}</p>
             <div
@@ -137,13 +137,13 @@ const BreakingNews = ({
                       key={`${copy}-${item._id ?? item.slug}`}
                       to={item.slug}
                       tabIndex={copy === 1 ? -1 : 0}
-                      className="group inline-flex shrink-0 items-center whitespace-nowrap text-sm font-semibold text-slate-700 outline-none transition-colors hover:text-red-600 focus-visible:text-red-600 focus-visible:underline"
+                      className="group inline-flex shrink-0 items-center whitespace-nowrap text-sm font-semibold text-slate-700 outline-none transition-colors hover:text-red-600 focus-visible:text-red-600 focus-visible:underline dark:text-slate-300 dark:hover:text-red-500 dark:focus-visible:text-red-500"
                     >
                       <span>{item.title}</span>
-                      {index < visibleItems.length - 1 && <span className="mx-6 text-xs text-red-500/80" aria-hidden="true">●</span>}
+                      {index < visibleItems.length - 1 && <span className="mx-6 text-xs text-red-500/80 dark:text-red-400/80" aria-hidden="true">●</span>}
                     </Link>
                   ))}
-                  <span className="mx-6 text-xs text-red-500/80" aria-hidden="true">●</span>
+                  <span className="mx-6 text-xs text-red-500/80 dark:text-red-400/80" aria-hidden="true">●</span>
                 </div>
               ))}
             </div>
@@ -152,7 +152,7 @@ const BreakingNews = ({
           <button
             type="button"
             onClick={() => setIsPaused((paused) => !paused)}
-            className="mr-2 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-200 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+            className="mr-2 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-200 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:text-slate-400 dark:hover:border-red-900/50 dark:hover:bg-red-950/30 dark:hover:text-red-400 dark:focus-visible:ring-offset-gray-900"
             aria-label={isPaused ? "নিউজ টিকার চালু করুন" : "নিউজ টিকার থামান"}
             aria-pressed={isPaused}
           >
@@ -161,8 +161,8 @@ const BreakingNews = ({
         </div>
 
         {showDate && (
-          <div className="hidden shrink-0 items-center gap-2 border-l border-slate-100 px-4 text-xs font-medium text-slate-500 xl:flex">
-            <FaRegClock className="text-red-500" aria-hidden="true" />
+          <div className="hidden shrink-0 items-center gap-2 border-l border-slate-100 px-4 text-xs font-medium text-slate-500 dark:border-slate-800 dark:text-slate-400 xl:flex">
+            <FaRegClock className="text-red-500 dark:text-red-400" aria-hidden="true" />
             <time>{breakingNews.date}</time>
           </div>
         )}

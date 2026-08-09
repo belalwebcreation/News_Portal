@@ -22,10 +22,15 @@ const LoginButton = () => {
         rounded-md
         text-sm
         font-medium
+        text-gray-800
         border
         border-gray-300
         hover:border-red-600
         hover:text-red-700
+        dark:text-gray-200
+        dark:border-gray-700
+        dark:hover:border-red-500
+        dark:hover:text-red-500
         duration-300
       "
     >

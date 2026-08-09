@@ -42,7 +42,7 @@ const TopHeader = () => {
   }, []);
 
   return (
-    <div className="border-b border-gray-200 bg-white">
+    <div className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-3 lg:py-5">
         {/* মোবাইল/ট্যাবলেট কম্প্যাক্ট রো — শুধু Logo (বামে) + Search + Login (ডানে)
             headline grid এখানে দেখাবে না, lg থেকে এই রো হাইড হয়ে যাবে */}
@@ -67,11 +67,11 @@ const TopHeader = () => {
               <div className="flex justify-center py-8">
                 <Loader2
                   size={32}
-                  className="animate-spin text-red-600"
+                  className="animate-spin text-red-600 dark:text-red-500"
                 />
               </div>
             ) : error ? (
-              <div className="flex flex-col items-center justify-center py-6 text-red-600">
+              <div className="flex flex-col items-center justify-center py-6 text-red-600 dark:text-red-400">
                 <AlertCircle size={30} />
                 <p className="mt-2 text-sm">{error}</p>
 
@@ -83,7 +83,7 @@ const TopHeader = () => {
                 </button>
               </div>
             ) : headlines.length === 0 ? (
-              <div className="py-8 text-center text-gray-500">
+              <div className="py-8 text-center text-gray-500 dark:text-gray-400">
                 No headlines available.
               </div>
             ) : (
@@ -105,7 +105,7 @@ const TopHeader = () => {
                     />
 
                     <div>
-                      <h3 className="text-[15px] font-medium leading-6 text-gray-800 group-hover:text-red-700 transition-colors duration-300 line-clamp-3">
+                      <h3 className="text-[15px] font-medium leading-6 text-gray-800 group-hover:text-red-700 dark:text-gray-200 dark:group-hover:text-red-500 transition-colors duration-300 line-clamp-3">
                         {news.title}
                       </h3>
                     </div>

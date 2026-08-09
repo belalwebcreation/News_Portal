@@ -13,14 +13,14 @@ const TopicBar = memo(({ topics = [], activeTopic, onTopicChange }) => {
   };
 
   return (
-    <div className="relative flex items-center mb-6 group/topic border-b border-slate-100 pb-3">
+    <div className="relative flex items-center mb-6 group/topic border-b border-slate-100 dark:border-gray-800 pb-3">
       
       {/* Left Arrow Button */}
       <button 
         onClick={scrollLeft}
-        className="absolute left-0 z-10 bg-gradient-to-r from-slate-50 via-white to-transparent p-1.5 pr-4 text-slate-600 hover:text-red-600 cursor-pointer md:block hidden opacity-0 group-hover/topic:opacity-100 transition-opacity duration-300"
+        className="absolute left-0 z-10 bg-gradient-to-r from-slate-50 via-white to-transparent dark:from-gray-900 dark:via-gray-900 dark:to-transparent p-1.5 pr-4 text-slate-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 cursor-pointer md:block hidden opacity-0 group-hover/topic:opacity-100 transition-opacity duration-300"
       >
-        <ChevronLeft size={20} className="bg-white rounded-full shadow-xs border border-slate-200" />
+        <ChevronLeft size={20} className="bg-white dark:bg-gray-800 rounded-full shadow-xs border border-slate-200 dark:border-gray-700" />
       </button>
 
       {/* 📜 ৩ ও ৪ নম্বর ভুল সংশোধন: স্ক্রলবল কন্টেইনার এবং ফ্লেক্স-shrink হ্যান্ডেল */}
@@ -38,7 +38,7 @@ const TopicBar = memo(({ topics = [], activeTopic, onTopicChange }) => {
               ${
                 activeTopic === topic.id
                   ? "bg-slate-950 text-white shadow-sm"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                  : "bg-white dark:bg-gray-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700"
               }
             `}
           >
@@ -50,9 +50,9 @@ const TopicBar = memo(({ topics = [], activeTopic, onTopicChange }) => {
       {/* Right Arrow Button */}
       <button 
         onClick={scrollRight}
-        className="absolute right-0 z-10 bg-gradient-to-l from-slate-50 via-white to-transparent p-1.5 pl-4 text-slate-600 hover:text-red-600 cursor-pointer md:block hidden opacity-0 group-hover/topic:opacity-100 transition-opacity duration-300"
+        className="absolute right-0 z-10 bg-gradient-to-l from-slate-50 via-white to-transparent dark:from-gray-900 dark:via-gray-900 dark:to-transparent p-1.5 pl-4 text-slate-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 cursor-pointer md:block hidden opacity-0 group-hover/topic:opacity-100 transition-opacity duration-300"
       >
-        <ChevronRight size={20} className="bg-white rounded-full shadow-xs border border-slate-200" />
+        <ChevronRight size={20} className="bg-white dark:bg-gray-800 rounded-full shadow-xs border border-slate-200 dark:border-gray-700" />
       </button>
     </div>
   );

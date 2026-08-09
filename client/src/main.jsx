@@ -7,21 +7,24 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App";
 import ScrollToTop from "./features/ScrollToTop";
 import { store } from "./app/store";
+import { ThemeProvider } from "./theme/ThemeContext";
 
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <ScrollToTop />
+    <ThemeProvider>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ScrollToTop />
 
-        <GoogleOAuthProvider
-          clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
-        >
-          <App />
-        </GoogleOAuthProvider>
-      </BrowserRouter>
-    </Provider>
+          <GoogleOAuthProvider
+            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+          >
+            <App />
+          </GoogleOAuthProvider>
+        </BrowserRouter>
+      </Provider>
+    </ThemeProvider>
   </React.StrictMode>
 );

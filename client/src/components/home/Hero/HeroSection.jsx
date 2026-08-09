@@ -89,8 +89,8 @@ const HeroSection = () => {
       </div>
 
       {/* 2. Main Hero Card Shell (Responsive Radius & Inner Padding) */}
-      <div className="bg-white rounded-2xl lg:rounded-3xl border border-neutral-100 shadow-sm p-4 sm:p-5 xl:p-8">
-        
+      <div className="bg-white dark:bg-gray-900 rounded-2xl lg:rounded-3xl border border-neutral-100 dark:border-gray-800 shadow-sm p-4 sm:p-5 xl:p-8">
+
         {/* Responsive Grid System (Mobile Gap Gap-6 -> Desktop Gap-8) */}
         <motion.div
           variants={containerVariants}
@@ -98,7 +98,7 @@ const HeroSection = () => {
           animate="visible"
           className="grid grid-cols-12 gap-6 lg:gap-8"
         >
-          
+
           {/* 1. Center Hero Main News (DOM Order 1 on Mobile, Middle Column on Desktop) */}
           <motion.div
             variants={columnVariants}
@@ -107,11 +107,11 @@ const HeroSection = () => {
             {heroData.center ? (
               <HeroCenter news={heroData.center} />
             ) : loading ? (
-              <div className="h-[280px] sm:h-[360px] lg:h-[420px] rounded-xl lg:rounded-2xl bg-neutral-100 animate-pulse" />
+              <div className="h-[280px] sm:h-[360px] lg:h-[420px] rounded-xl lg:rounded-2xl bg-neutral-100 dark:bg-gray-800 animate-pulse" />
             ) : (
               !error && (
-                <div className="h-56 sm:h-64 flex items-center justify-center border border-dashed border-neutral-200 rounded-2xl">
-                  <p className="text-sm font-medium text-neutral-400">
+                <div className="h-56 sm:h-64 flex items-center justify-center border border-dashed border-neutral-200 dark:border-gray-700 rounded-2xl">
+                  <p className="text-sm font-medium text-neutral-400 dark:text-gray-500">
                     এখনো কোনো ফিচার্ড নিউজ নেই।
                   </p>
                 </div>
@@ -122,7 +122,7 @@ const HeroSection = () => {
           {/* 2. Left Column (DOM Order 2 on Mobile, Left Column on Desktop) */}
           <motion.div
             variants={columnVariants}
-            className="col-span-12 lg:col-span-3 order-2 lg:order-1 lg:pr-6 lg:border-r lg:border-neutral-100/80 flex flex-col justify-between"
+            className="col-span-12 lg:col-span-3 order-2 lg:order-1 lg:pr-6 lg:border-r lg:border-neutral-100/80 dark:lg:border-gray-800/80 flex flex-col justify-between"
           >
             {heroData.left.length > 0 ? (
               <HeroLeft newsList={heroData.left} />
@@ -131,7 +131,7 @@ const HeroSection = () => {
                 {Array.from({ length: LEFT_SLOT_COUNT }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-20 sm:h-24 rounded-xl bg-neutral-100 animate-pulse"
+                    className="h-20 sm:h-24 rounded-xl bg-neutral-100 dark:bg-gray-800 animate-pulse"
                   />
                 ))}
               </div>
@@ -141,7 +141,7 @@ const HeroSection = () => {
           {/* 3. Right Column (DOM Order 3 Always) */}
           <motion.div
             variants={columnVariants}
-            className="col-span-12 lg:col-span-3 order-3 lg:pl-6 lg:border-l lg:border-neutral-100/80 flex flex-col justify-between"
+            className="col-span-12 lg:col-span-3 order-3 lg:pl-6 lg:border-l lg:border-neutral-100/80 dark:lg:border-gray-800/80 flex flex-col justify-between"
           >
             {heroData.right.length > 0 ? (
               <HeroRight newsList={heroData.right} />
@@ -150,7 +150,7 @@ const HeroSection = () => {
                 {Array.from({ length: RIGHT_SLOT_COUNT }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-20 sm:h-24 rounded-xl bg-neutral-100 animate-pulse"
+                    className="h-20 sm:h-24 rounded-xl bg-neutral-100 dark:bg-gray-800 animate-pulse"
                   />
                 ))}
               </div>
@@ -162,7 +162,7 @@ const HeroSection = () => {
 
       {/* Global Error Notice - Isolated Below Main Shell */}
       {error && (
-        <div className="mt-4 p-3.5 sm:p-4 rounded-xl bg-red-50 border border-red-100 text-center text-xs sm:text-sm font-medium text-red-600">
+        <div className="mt-4 p-3.5 sm:p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40 text-center text-xs sm:text-sm font-medium text-red-600 dark:text-red-400">
           {error}
         </div>
       )}

@@ -19,7 +19,7 @@ const HeroSmallCard = ({ news }) => {
         className="flex items-start gap-4 lg:gap-5 py-1"
       >
         {/* Fixed Aspect Image Wrapper */}
-        <div className="relative w-28 sm:w-32 aspect-[4/3] flex-shrink-0 overflow-hidden rounded-xl bg-neutral-100 border border-neutral-100/80">
+        <div className="relative w-28 sm:w-32 aspect-[4/3] flex-shrink-0 overflow-hidden rounded-xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100/80 dark:border-gray-800/80">
           <img
             src={image}
             alt={title}
@@ -50,21 +50,23 @@ const HeroSmallCard = ({ news }) => {
               leading-snug
               sm:leading-6
               text-neutral-900
+              dark:text-gray-100
               line-clamp-2
               transition-colors
               duration-300
               group-hover:text-red-600
+              dark:group-hover:text-red-500
             "
           >
             {title}
           </h3>
 
           {/* Clean Editorial Metadata */}
-          <div className="mt-2 flex items-center gap-2 text-xs font-medium text-neutral-500">
+          <div className="mt-2 flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-gray-400">
             {category && (
               <>
-                <span className="text-red-600 font-semibold">{category}</span>
-                <span className="text-neutral-300">•</span>
+                <span className="text-red-600 dark:text-red-500 font-semibold">{category}</span>
+                <span className="text-neutral-300 dark:text-gray-600">•</span>
               </>
             )}
             <span className="truncate">{publishedAt || news.time || "সম্প্রতি"}</span>

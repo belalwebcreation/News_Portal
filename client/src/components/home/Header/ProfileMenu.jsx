@@ -96,10 +96,10 @@ const ProfileMenu = () => {
     <div
       ref={menuRef}
       style={menuStyle || {}}
-      className="max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-gray-100 overflow-hidden z-[999] transition-all duration-200"
+      className="max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-gray-100 dark:bg-gray-900 dark:border-gray-800 overflow-hidden z-[999] transition-all duration-200"
     >
       {/* User Info Header */}
-      <div className="flex items-center gap-3 p-4 bg-gray-50/80 border-b border-gray-100">
+      <div className="flex items-center gap-3 p-4 bg-gray-50/80 border-b border-gray-100 dark:bg-gray-800/60 dark:border-gray-800">
         <ProfileAvatar
           src={userInfo?.avatar?.url}
           alt={userInfo?.name || "Profile"}
@@ -107,10 +107,10 @@ const ProfileMenu = () => {
           position={userInfo?.avatar?.position}
         />
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-gray-900 truncate text-sm">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">
             {userInfo?.name || "User"}
           </h3>
-          <p className="text-xs text-gray-500 truncate mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
             {userInfo?.email}
           </p>
         </div>
@@ -121,50 +121,50 @@ const ProfileMenu = () => {
         <Link
           to={dashboardRoute}
           onClick={() => setOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 rounded-xl transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-colors"
         >
-          <LayoutDashboard className="w-4 h-4 text-gray-500" />
+          <LayoutDashboard className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span>Dashboard</span>
         </Link>
 
         <Link
           to="/profile"
           onClick={() => setOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 rounded-xl transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-colors"
         >
-          <User className="w-4 h-4 text-gray-500" />
+          <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span>My Profile</span>
         </Link>
 
         <Link
           to="/saved-news"
           onClick={() => setOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 rounded-xl transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-colors"
         >
-          <Bookmark className="w-4 h-4 text-gray-500" />
+          <Bookmark className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span>Saved News</span>
         </Link>
 
         <Link
           to="/reading-history"
           onClick={() => setOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 rounded-xl transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-colors"
         >
-          <Clock className="w-4 h-4 text-gray-500" />
+          <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span>Reading History</span>
         </Link>
       </div>
 
       {/* Logout Section */}
-      <div className="p-2 border-t border-gray-100 bg-gray-50/40">
+      <div className="p-2 border-t border-gray-100 bg-gray-50/40 dark:border-gray-800 dark:bg-gray-800/30">
         <button
           onClick={() => {
             logoutUser();
             setOpen(false);
           }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left"
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 rounded-xl transition-colors text-left"
         >
-          <LogOut className="w-4 h-4 text-red-500" />
+          <LogOut className="w-4 h-4 text-red-500 dark:text-red-400" />
           <span>Logout</span>
         </button>
       </div>

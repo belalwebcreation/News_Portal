@@ -34,11 +34,11 @@ const FeaturedNews = ({ news }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group flex flex-col justify-between pb-8 border-b border-neutral-200/60"
+      className="group flex flex-col justify-between pb-8 border-b border-neutral-200/60 dark:border-gray-800/60"
     >
       <div>
         {/* Aspect Ratio Image Container with Overlay and Hover Zoom */}
-        <div className="relative overflow-hidden rounded-2xl bg-neutral-100 border border-neutral-100">
+        <div className="relative overflow-hidden rounded-2xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100 dark:border-gray-800">
           <Link
             to={`/news/${id}`}
             aria-label={title}
@@ -96,9 +96,11 @@ const FeaturedNews = ({ news }) => {
                 tracking-tight 
                 leading-snug 
                 text-neutral-900 
+                dark:text-gray-100
                 transition-colors 
                 duration-300 
                 group-hover:text-red-600
+                dark:group-hover:text-red-500
                 line-clamp-2
               "
             >
@@ -115,6 +117,7 @@ const FeaturedNews = ({ news }) => {
                 sm:text-base 
                 leading-relaxed 
                 text-neutral-600 
+                dark:text-gray-400
                 line-clamp-3 
                 font-normal
               "
@@ -126,13 +129,13 @@ const FeaturedNews = ({ news }) => {
       </div>
 
       {/* Clean Editorial Metadata */}
-      <div className="mt-5 flex items-center justify-between text-xs sm:text-sm text-neutral-500 font-medium">
+      <div className="mt-5 flex items-center justify-between text-xs sm:text-sm text-neutral-500 dark:text-gray-400 font-medium">
         <div className="flex items-center space-x-2">
           <span>{publishedAt || news.time || "সম্প্রতি"}</span>
 
           {news.readTime && (
             <>
-              <span className="text-neutral-300">•</span>
+              <span className="text-neutral-300 dark:text-gray-600">•</span>
               <span>{news.readTime}</span>
             </>
           )}

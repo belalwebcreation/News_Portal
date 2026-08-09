@@ -11,11 +11,11 @@ const PaginationDots = memo(({ totalPages, currentPage, onPageChange }) => {
           <button
             key={index}
             onClick={() => onPageChange(index)}
-            /* ৭. মডার্ন ডায়নামিক অ্যাক্টিভ ক্যাপসুল অ্যানিমেশন */
+            /* ৭. মডার্ন ডায়নামিক অ্যাক্টিভ ক্যাপসুল অ্যানিমেশন */
             className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
               isActive
                 ? "bg-sky-500 w-8 shadow-md shadow-sky-500/20"
-                : "bg-gray-300 w-2.5 hover:bg-gray-400"
+                : "bg-gray-300 dark:bg-gray-700 w-2.5 hover:bg-gray-400 dark:hover:bg-gray-600"
             }`}
             aria-label={`Slide to page ${index + 1}`}
           />

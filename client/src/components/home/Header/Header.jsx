@@ -72,7 +72,7 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-white [overflow-anchor:none] transition-transform duration-300 ease-out ${
+      className={`sticky top-0 z-50 bg-white dark:bg-gray-900 [overflow-anchor:none] transition-transform duration-300 ease-out ${
         visible ? "translate-y-0" : "-translate-y-full"
       }`}
     >

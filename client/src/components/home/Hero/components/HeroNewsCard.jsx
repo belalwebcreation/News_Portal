@@ -32,8 +32,10 @@ const HeroNewsCard = ({ news }) => {
               font-bold
               leading-tight
               text-gray-900
+              dark:text-gray-100
               duration-300
               group-hover:text-red-700
+              dark:group-hover:text-red-500
             "
           >
             {news.title}
@@ -44,13 +46,14 @@ const HeroNewsCard = ({ news }) => {
           className="
             mt-3
             text-gray-600
+            dark:text-gray-400
             leading-7
           "
         >
           {news.description}
         </p>
 
-        <div className="mt-4 flex items-center text-sm text-gray-500">
+        <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
           🕒 {news.time}
         </div>
 

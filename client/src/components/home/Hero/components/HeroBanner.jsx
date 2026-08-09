@@ -9,7 +9,7 @@ const HeroBanner = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-[90px] md:h-[110px] lg:h-[120px] rounded-md bg-neutral-100 animate-pulse" />
+      <div className="w-full h-[90px] md:h-[110px] lg:h-[120px] rounded-md bg-neutral-100 dark:bg-gray-800 animate-pulse" />
     );
   }
 
@@ -41,6 +41,7 @@ const HeroBanner = () => {
         overflow-hidden
         rounded-lg
         bg-neutral-50
+        dark:bg-gray-800
       "
     >
       {bannerLink ? (

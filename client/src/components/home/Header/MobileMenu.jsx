@@ -116,7 +116,7 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
         onClick={() => setOpen((prev) => !prev)}
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
-        className="relative w-11 h-11 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-100 hover:text-red-700 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+        className="relative w-11 h-11 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-100 hover:text-red-700 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-red-500 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
       >
         <span className="relative block w-6 h-6">
           <FiMenu
@@ -151,19 +151,19 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
           <div
             role="dialog"
             aria-modal="true"
-            className={`fixed inset-0 z-[100] bg-white flex flex-col transition-all duration-300 ease-out ${
+            className={`fixed inset-0 z-[100] bg-white dark:bg-gray-900 flex flex-col transition-all duration-300 ease-out ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
             }`}
             style={{ height: "100dvh" }}
           >
-            <div className="h-16 shrink-0 flex items-center justify-between px-5 border-b border-gray-100">
-              <span className="text-base font-extrabold text-red-700 tracking-tight">
+            <div className="h-16 shrink-0 flex items-center justify-between px-5 border-b border-gray-100 dark:border-gray-800">
+              <span className="text-base font-extrabold text-red-700 dark:text-red-500 tracking-tight">
                 মেনু
               </span>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
-                className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+                className="w-10 h-10 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
               >
                 <FiX size={22} />
               </button>
@@ -171,27 +171,27 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
 
             {/* Search — শুধু লিস্ট বড় হলে দরকার */}
             {showSearch && (
-              <div className="shrink-0 px-5 py-3 border-b border-gray-100">
+              <div className="shrink-0 px-5 py-3 border-b border-gray-100 dark:border-gray-800">
                 <div className="relative">
-                  <FiSearch size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <FiSearch size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                   <input
                     ref={searchRef}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="ক্যাটাগরি খুঁজুন..."
-                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100 transition-colors"
+                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-red-500 dark:focus:ring-red-950/40 transition-colors"
                   />
                 </div>
               </div>
             )}
 
             <div className="px-5 pt-4 pb-1 shrink-0 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                 আরও
               </span>
               {!loading && !error && items.length > 0 && (
-                <span className="text-xs font-semibold text-gray-400">{filteredItems.length}</span>
+                <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">{filteredItems.length}</span>
               )}
             </div>
 
@@ -201,20 +201,20 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
                   {SKELETON_ROWS.map((w, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 animate-pulse"
+                      className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 animate-pulse"
                     >
-                      <span className="w-2 h-2 rounded-full bg-gray-200 shrink-0" />
-                      <span className="h-3.5 rounded bg-gray-200" style={{ width: `${w}%` }} />
+                      <span className="w-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0" />
+                      <span className="h-3.5 rounded bg-gray-200 dark:bg-gray-700" style={{ width: `${w}%` }} />
                     </div>
                   ))}
                 </div>
               ) : error ? (
                 <div className="px-5 py-10 text-center space-y-3">
-                  <p className="text-sm text-gray-500">{error}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
                   {onRetry && (
                     <button
                       onClick={onRetry}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:underline"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:underline dark:text-red-400"
                     >
                       <FiRefreshCw size={14} /> আবার চেষ্টা করুন
                     </button>
@@ -222,12 +222,12 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
                 </div>
               ) : items.length === 0 ? (
                 <div className="px-5 py-10 text-center space-y-2">
-                  <FiInbox size={28} className="mx-auto text-gray-300" />
-                  <p className="text-sm text-gray-500">এই মুহূর্তে এখানে দেখানোর কিছু নেই</p>
+                  <FiInbox size={28} className="mx-auto text-gray-300 dark:text-gray-600" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">এই মুহূর্তে এখানে দেখানোর কিছু নেই</p>
                 </div>
               ) : filteredItems.length === 0 ? (
                 <div className="px-5 py-10 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     "{query}" এর সাথে মিলে এমন কোনো ক্যাটাগরি পাওয়া যায়নি
                   </p>
                 </div>
@@ -245,16 +245,16 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
                       end={item.isHome}
                       onClick={() => setOpen(false)}
                       className={({ isActive }) =>
-                        `group flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 transition-colors duration-200 ${
+                        `group flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-800 transition-colors duration-200 ${
                           isActive
-                            ? "bg-red-50 text-red-700"
-                            : "text-gray-800 hover:bg-gray-50 hover:text-red-700"
+                            ? "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400"
+                            : "text-gray-800 hover:bg-gray-50 hover:text-red-700 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-red-500"
                         }`
                       }
                     >
                       <span className="flex items-center gap-3 min-w-0">
                         {item.isHome ? (
-                          <FiHome size={16} className="shrink-0 text-gray-400 group-hover:text-red-600" />
+                          <FiHome size={16} className="shrink-0 text-gray-400 group-hover:text-red-600 dark:text-gray-500 dark:group-hover:text-red-500" />
                         ) : (
                           <span
                             className={`w-2 h-2 rounded-full shrink-0 ${getCategoryDot(item.category?.slug)}`}
@@ -264,7 +264,7 @@ const MobileMenu = ({ items = [], loading = false, error = "", onRetry }) => {
                       </span>
                       <FiChevronRight
                         size={16}
-                        className="shrink-0 text-gray-300 group-hover:text-red-400 group-hover:translate-x-0.5 transition-transform"
+                        className="shrink-0 text-gray-300 group-hover:text-red-400 group-hover:translate-x-0.5 dark:text-gray-600 dark:group-hover:text-red-500 transition-transform"
                       />
                     </NavLink>
                   </div>

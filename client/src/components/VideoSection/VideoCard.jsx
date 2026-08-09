@@ -35,7 +35,9 @@ const VideoCard = memo(({ video, setPaused }) => {
           rounded-2xl
           border
           border-neutral-100
+          dark:border-gray-800
           bg-white
+          dark:bg-gray-900
           shadow-sm
           transition-shadow
           duration-300
@@ -72,16 +74,16 @@ const VideoCard = memo(({ video, setPaused }) => {
 
         <div className="flex flex-1 flex-col justify-between p-4">
           <div>
-            <h3 className="line-clamp-2 text-[15px] font-extrabold leading-snug text-neutral-900 transition-colors duration-200 group-hover:text-red-600">
+            <h3 className="line-clamp-2 text-[15px] font-extrabold leading-snug text-neutral-900 dark:text-gray-100 transition-colors duration-200 group-hover:text-red-600 dark:group-hover:text-red-500">
               {video.title}
             </h3>
 
-            <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-neutral-500">
+            <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-neutral-500 dark:text-gray-400">
               {video.description}
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3 text-[11px] text-neutral-400">
+          <div className="mt-4 flex items-center justify-between border-t border-neutral-100 dark:border-gray-800 pt-3 text-[11px] text-neutral-400 dark:text-gray-500">
             {video.views != null && (
               <span className="flex items-center gap-1">
                 <Eye size={12} />

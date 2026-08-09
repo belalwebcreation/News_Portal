@@ -3,6 +3,9 @@ import {
   MapPin,
   Globe,
   GraduationCap,
+  User,
+  Share2,
+  ExternalLink,
 } from "lucide-react";
 import {
   FaFacebook,
@@ -12,40 +15,50 @@ import {
 } from "react-icons/fa6";
 
 // ===============================
-// SECTION EYEBROW (news-portal style section marker)
+// SECTION EYEBROW (ProfileHeader Matching)
 // ===============================
-
 const SectionEyebrow = ({ label }) => (
-  <div className="mb-3">
-    <span className="block h-1 w-10 rounded-full bg-primary" />
-    <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-base-content/50">
+  <div className="flex items-center gap-2 mb-3">
+    <span className="h-1.5 w-6 rounded-full bg-gradient-to-r from-primary to-indigo-500" />
+    <span className="text-[11px] font-bold uppercase tracking-widest text-primary/90 dark:text-primary-content/80">
       {label}
-    </p>
+    </span>
   </div>
 );
 
 // ===============================
 // INFO ROW
 // ===============================
-
-const InfoRow = ({ icon: Icon, label, value }) => (
-  <div className="flex items-start gap-3 py-3 sm:gap-4 sm:py-4 border-b border-base-300/70 last:border-b-0">
-    <div className="flex-shrink-0 rounded-md bg-base-200 p-2 text-primary">
+const InfoRow = ({ icon: Icon, label, value, isLink = false }) => (
+  <div className="flex items-start gap-3.5 py-3.5 sm:gap-4 border-b border-base-200 dark:border-base-800/60 last:border-b-0 transition-colors">
+    <div className="flex-shrink-0 rounded-xl bg-primary/10 p-2.5 text-primary dark:bg-primary/20 dark:text-primary-content">
       <Icon size={18} />
     </div>
 
     <div className="min-w-0 flex-1">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-base-content/50 sm:text-xs">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-base-content/50">
         {label}
       </p>
 
-      <p
-        className={`mt-0.5 break-words text-sm font-medium sm:text-base ${
-          value ? "text-base-content" : "italic text-base-content/40"
-        }`}
-      >
-        {value || "Not provided"}
-      </p>
+      {isLink && value ? (
+        <a
+          href={value.startsWith("http") ? value : `https://${value}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-0.5 inline-flex items-center gap-1.5 break-all text-sm font-semibold text-primary hover:underline sm:text-base"
+        >
+          <span>{value}</span>
+          <ExternalLink size={14} className="shrink-0" />
+        </a>
+      ) : (
+        <p
+          className={`mt-0.5 break-words text-sm font-semibold sm:text-base ${
+            value ? "text-base-content" : "italic text-base-content/40 font-normal"
+          }`}
+        >
+          {value || "Not provided"}
+        </p>
+      )}
     </div>
   </div>
 );
@@ -53,8 +66,7 @@ const InfoRow = ({ icon: Icon, label, value }) => (
 // ===============================
 // SOCIAL BUTTON
 // ===============================
-
-const SocialButton = ({ href, icon: Icon, label }) => {
+const SocialButton = ({ href, icon: Icon, label, colorClass }) => {
   if (!href) return null;
 
   return (
@@ -62,14 +74,20 @@ const SocialButton = ({ href, icon: Icon, label }) => {
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="group flex items-center gap-3 rounded-lg border border-base-300 px-3 py-2.5 transition-colors hover:border-primary hover:bg-base-200 sm:px-4 sm:py-3"
+      className="group flex items-center gap-3.5 rounded-2xl border border-base-200/80 dark:border-base-700/60 bg-base-100/60 dark:bg-base-200/30 p-3 sm:p-3.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-base-100 hover:shadow-md"
     >
-      <span className="flex-shrink-0 rounded-md bg-base-200 p-2 text-primary transition-colors group-hover:bg-base-100">
-        <Icon size={16} />
-      </span>
-      <span className="truncate text-sm font-medium text-base-content">
-        {label}
-      </span>
+      <div className={`flex-shrink-0 rounded-xl p-2.5 text-white shadow-sm transition-transform duration-300 group-hover:scale-105 ${colorClass}`}>
+        <Icon size={18} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold text-base-content group-hover:text-primary transition-colors">
+          {label}
+        </span>
+        <span className="block text-[11px] text-base-content/50 truncate font-mono">
+          {href.replace(/^https?:\/\/(www\.)?/, "")}
+        </span>
+      </div>
+      <ExternalLink size={14} className="text-base-content/30 group-hover:text-primary shrink-0 transition-colors" />
     </a>
   );
 };
@@ -77,15 +95,14 @@ const SocialButton = ({ href, icon: Icon, label }) => {
 // ===============================
 // LOADING SKELETON
 // ===============================
-
 const ProfileInfoSkeleton = () => (
-  <div className="w-full">
+  <div className="w-full animate-pulse">
     <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3 lg:gap-8">
       <div className="space-y-6 sm:space-y-8 lg:col-span-2">
-        <div className="skeleton h-32 w-full" />
-        <div className="skeleton h-72 w-full" />
+        <div className="h-44 rounded-3xl bg-base-300/60" />
+        <div className="h-80 rounded-3xl bg-base-300/60" />
       </div>
-      <div className="skeleton h-56 w-full lg:col-span-1" />
+      <div className="h-72 rounded-3xl bg-base-300/60 lg:col-span-1" />
     </div>
   </div>
 );
@@ -93,12 +110,6 @@ const ProfileInfoSkeleton = () => (
 // ===============================
 // PROFILE INFO
 // ===============================
-// Note: identity fields (name, username, role, verified badge, avatar,
-// cover photo, email, joined date, bio preview) already live in the
-// standalone ProfileHeader component rendered above the tabs in
-// Profile.jsx. This component only covers what ProfileHeader doesn't:
-// the fuller bio and the remaining contact/personal details.
-
 const ProfileInfo = ({ profile }) => {
   if (!profile) return <ProfileInfoSkeleton />;
 
@@ -120,44 +131,45 @@ const ProfileInfo = ({ profile }) => {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3 lg:gap-8">
+        
         {/* =========================
             MAIN COLUMN
         ========================== */}
         <div className="space-y-6 sm:space-y-8 lg:col-span-2">
-          {/* About */}
-          <section className="card border border-base-300/70 bg-base-100 shadow-sm">
-            <div className="card-body p-5 sm:p-6 lg:p-8">
-              <SectionEyebrow label="Profile" />
+          
+          {/* About Section */}
+          <section className="rounded-3xl border border-base-200/80 dark:border-base-700/60 bg-base-100 shadow-xl p-6 sm:p-8 transition-colors">
+            <SectionEyebrow label="Overview" />
 
-              <h2 className="font-serif text-2xl font-semibold text-base-content sm:text-3xl">
-                About
+            <div className="flex items-center gap-2.5">
+              <User className="text-primary shrink-0" size={24} />
+              <h2 className="font-serif text-2xl font-bold text-base-content sm:text-3xl tracking-tight">
+                About Me
               </h2>
-
-              <p className="mt-4 max-w-prose text-sm leading-relaxed text-base-content/70 sm:text-base">
-                {bio || "No biography has been added yet."}
-              </p>
             </div>
+
+            <p className="mt-4 text-sm leading-relaxed text-base-content/80 sm:text-base font-normal">
+              {bio || "No biography has been added yet."}
+            </p>
           </section>
 
           {/* Personal Information */}
-          <section className="card border border-base-300/70 bg-base-100 shadow-sm">
-            <div className="card-body p-5 sm:p-6 lg:p-8">
-              <SectionEyebrow label="Details" />
+          <section className="rounded-3xl border border-base-200/80 dark:border-base-700/60 bg-base-100 shadow-xl p-6 sm:p-8 transition-colors">
+            <SectionEyebrow label="Details" />
 
-              <h2 className="font-serif text-2xl font-semibold text-base-content sm:text-3xl">
-                Personal Information
-              </h2>
+            <h2 className="font-serif text-2xl font-bold text-base-content sm:text-3xl tracking-tight">
+              Personal Information
+            </h2>
 
-              <div className="mt-4 sm:mt-6">
-                <InfoRow icon={Phone} label="Phone" value={phone} />
-                <InfoRow icon={MapPin} label="Address" value={address} />
-                <InfoRow
-                  icon={GraduationCap}
-                  label="College / Institution"
-                  value={college}
-                />
-                <InfoRow icon={Globe} label="Website" value={website} />
-              </div>
+            <div className="mt-4 sm:mt-6 divide-y divide-base-200 dark:divide-base-800/60">
+              <InfoRow icon={Phone} label="Phone Number" value={phone} />
+              <InfoRow icon={MapPin} label="Location / Address" value={address} />
+              <InfoRow
+                icon={GraduationCap}
+                label="College / Institution"
+                value={college}
+              />
+              <InfoRow icon={Globe} label="Website Portfolio" value={website} isLink />
             </div>
           </section>
         </div>
@@ -167,46 +179,52 @@ const ProfileInfo = ({ profile }) => {
         ========================== */}
         <div className="lg:col-span-1">
           <aside className="lg:sticky lg:top-6">
-            <section className="card border border-base-300/70 bg-base-100 shadow-sm">
-              <div className="card-body p-5 sm:p-6 lg:p-8">
-                <SectionEyebrow label="Connect" />
+            <section className="rounded-3xl border border-base-200/80 dark:border-base-700/60 bg-base-100 shadow-xl p-6 sm:p-8 transition-colors">
+              <SectionEyebrow label="Connect" />
 
-                <h2 className="font-serif text-2xl font-semibold text-base-content sm:text-3xl">
+              <div className="flex items-center gap-2.5 mb-5">
+                <Share2 className="text-primary shrink-0" size={22} />
+                <h2 className="font-serif text-2xl font-bold text-base-content tracking-tight">
                   Social Links
                 </h2>
+              </div>
 
-                <div className="mt-4 grid grid-cols-1 gap-2.5 sm:mt-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-1">
-                  <SocialButton
-                    href={socialLinks.facebook}
-                    icon={FaFacebook}
-                    label="Facebook"
-                  />
-                  <SocialButton
-                    href={socialLinks.twitter}
-                    icon={FaXTwitter}
-                    label="Twitter"
-                  />
-                  <SocialButton
-                    href={socialLinks.linkedin}
-                    icon={FaLinkedin}
-                    label="LinkedIn"
-                  />
-                  <SocialButton
-                    href={socialLinks.github}
-                    icon={FaGithub}
-                    label="GitHub"
-                  />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <SocialButton
+                  href={socialLinks.facebook}
+                  icon={FaFacebook}
+                  label="Facebook"
+                  colorClass="bg-blue-600"
+                />
+                <SocialButton
+                  href={socialLinks.twitter}
+                  icon={FaXTwitter}
+                  label="Twitter / X"
+                  colorClass="bg-slate-900 dark:bg-slate-800"
+                />
+                <SocialButton
+                  href={socialLinks.linkedin}
+                  icon={FaLinkedin}
+                  label="LinkedIn"
+                  colorClass="bg-sky-700"
+                />
+                <SocialButton
+                  href={socialLinks.github}
+                  icon={FaGithub}
+                  label="GitHub"
+                  colorClass="bg-slate-800 dark:bg-slate-900"
+                />
 
-                  {!hasSocialLinks && (
-                    <p className="text-sm text-base-content/60 sm:col-span-2 lg:col-span-1">
-                      No social links added.
-                    </p>
-                  )}
-                </div>
+                {!hasSocialLinks && (
+                  <div className="rounded-2xl border border-dashed border-base-300 p-6 text-center text-sm text-base-content/50 sm:col-span-2 lg:col-span-1">
+                    No social media profiles linked yet.
+                  </div>
+                )}
               </div>
             </section>
           </aside>
         </div>
+
       </div>
     </div>
   );

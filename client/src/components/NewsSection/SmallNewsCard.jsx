@@ -20,7 +20,7 @@ const SmallNewsCard = ({ news }) => {
         className="block focus:outline-none"
       >
         {/* Aspect Ratio Image Container */}
-        <div className="relative overflow-hidden rounded-xl bg-neutral-100 border border-neutral-100/80 aspect-[16/10] w-full">
+        <div className="relative overflow-hidden rounded-xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100/80 dark:border-gray-800/80 aspect-[16/10] w-full">
           <img
             src={image}
             alt={title}
@@ -50,9 +50,11 @@ const SmallNewsCard = ({ news }) => {
               tracking-tight 
               leading-snug 
               text-neutral-900 
+              dark:text-gray-100
               transition-colors 
               duration-300 
               group-hover:text-red-600 
+              dark:group-hover:text-red-500
               line-clamp-2
             "
           >
@@ -60,11 +62,11 @@ const SmallNewsCard = ({ news }) => {
           </h3>
 
           {/* Metadata Footer */}
-          <div className="mt-2 flex items-center gap-2 text-xs font-medium text-neutral-500">
+          <div className="mt-2 flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-gray-400">
             {category && (
               <>
-                <span className="text-red-600 font-semibold">{category}</span>
-                <span className="text-neutral-300">•</span>
+                <span className="text-red-600 dark:text-red-500 font-semibold">{category}</span>
+                <span className="text-neutral-300 dark:text-gray-600">•</span>
               </>
             )}
             <span>{publishedAt || time || "সম্প্রতি"}</span>

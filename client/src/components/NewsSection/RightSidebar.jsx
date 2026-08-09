@@ -4,7 +4,7 @@ const RightSidebar = ({ news }) => {
       {news.map((item) => (
         <article
           key={item.id}
-          className="border-b border-gray-200 pb-6 last:border-b-0"
+          className="border-b border-gray-200 dark:border-gray-800 pb-6 last:border-b-0"
         >
           {/* Image */}
           <img
@@ -14,19 +14,19 @@ const RightSidebar = ({ news }) => {
           />
 
           {/* Title */}
-          <h3 className="mt-4 text-xl font-bold leading-snug hover:text-red-700 transition-colors cursor-pointer">
+          <h3 className="mt-4 text-xl font-bold leading-snug text-gray-900 dark:text-gray-100 hover:text-red-700 dark:hover:text-red-500 transition-colors cursor-pointer">
             {item.title}
           </h3>
 
           {/* Description */}
           {item.description && (
-            <p className="mt-2 text-sm text-gray-600 leading-6">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-6">
               {item.description}
             </p>
           )}
 
           {/* Time */}
-          <p className="mt-3 text-xs text-gray-500">
+          <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
             {item.time}
           </p>
         </article>

@@ -47,15 +47,15 @@ const VideoSection = () => {
   if (loading) {
     return (
       <section className="max-w-screen-2xl mx-auto px-4 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl lg:rounded-3xl border border-neutral-100 shadow-sm p-4 sm:p-5 xl:p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl lg:rounded-3xl border border-neutral-100 dark:border-gray-800 shadow-sm p-4 sm:p-5 xl:p-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-7 w-52 rounded bg-neutral-200" />
+            <div className="h-7 w-52 rounded bg-neutral-200 dark:bg-gray-700" />
 
-            <div className="h-10 w-full rounded-xl bg-neutral-100" />
+            <div className="h-10 w-full rounded-xl bg-neutral-100 dark:bg-gray-800" />
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
-              <div className="h-[420px] rounded-2xl bg-neutral-100" />
-              <div className="lg:col-span-3 h-[420px] rounded-2xl bg-neutral-100" />
+              <div className="h-[420px] rounded-2xl bg-neutral-100 dark:bg-gray-800" />
+              <div className="lg:col-span-3 h-[420px] rounded-2xl bg-neutral-100 dark:bg-gray-800" />
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ const VideoSection = () => {
   return (
     <section className="max-w-screen-2xl mx-auto px-4 lg:px-8 py-8">
 
-      <div className="bg-white rounded-2xl lg:rounded-3xl border border-neutral-100 shadow-sm p-4 sm:p-5 xl:p-8">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl lg:rounded-3xl border border-neutral-100 dark:border-gray-800 shadow-sm p-4 sm:p-5 xl:p-8">
 
         {/* Header */}
         <div className="flex flex-col gap-5 mb-8">
@@ -79,11 +79,11 @@ const VideoSection = () => {
             <span className="w-1.5 h-7 rounded-full bg-red-600" />
 
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-neutral-900">
+              <h2 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-gray-100">
                 ভিডিও গ্যালারি
               </h2>
 
-              <p className="text-sm text-neutral-500 mt-1">
+              <p className="text-sm text-neutral-500 dark:text-gray-400 mt-1">
                 সর্বশেষ ভিডিও সংবাদ ও প্রতিবেদন
               </p>
             </div>
@@ -106,13 +106,13 @@ const VideoSection = () => {
           {/* Featured */}
           <motion.div
             variants={itemVariants}
-            className="col-span-12 lg:col-span-3 lg:pr-6 lg:border-r lg:border-neutral-100"
+            className="col-span-12 lg:col-span-3 lg:pr-6 lg:border-r lg:border-neutral-100 dark:lg:border-gray-800"
           >
             {featuredVideo ? (
               <FeaturedVideoCard video={featuredVideo} />
             ) : (
-              <div className="h-full min-h-[420px] flex items-center justify-center border border-dashed border-neutral-200 rounded-2xl">
-                <p className="text-sm font-medium text-neutral-400">
+              <div className="h-full min-h-[420px] flex items-center justify-center border border-dashed border-neutral-200 dark:border-gray-700 rounded-2xl">
+                <p className="text-sm font-medium text-neutral-400 dark:text-gray-500">
                   এই ক্যাটাগরিতে কোনো প্রধান ভিডিও নেই।
                 </p>
               </div>
@@ -130,8 +130,8 @@ const VideoSection = () => {
                 videos={sliderVideos}
               />
             ) : (
-              <div className="min-h-[420px] flex items-center justify-center border border-dashed border-neutral-200 rounded-2xl">
-                <p className="text-sm font-medium text-neutral-400">
+              <div className="min-h-[420px] flex items-center justify-center border border-dashed border-neutral-200 dark:border-gray-700 rounded-2xl">
+                <p className="text-sm font-medium text-neutral-400 dark:text-gray-500">
                   কোনো অতিরিক্ত ভিডিও পাওয়া যায়নি।
                 </p>
               </div>

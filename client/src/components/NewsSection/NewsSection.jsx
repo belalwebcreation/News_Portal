@@ -63,18 +63,18 @@ const NewsSection = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="max-w-[1450px] mx-auto px-4 lg:px-8 my-10"
+      className="max-w-screen-2xl mx-auto px-4 lg:px-8 my-10"
     >
       {/* Section Container Card Matching Hero Design System */}
-      <div className="bg-white rounded-3xl border border-neutral-200/60 shadow-sm p-5 lg:p-8">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl lg:rounded-3xl border border-neutral-200/60 dark:border-gray-800/60 shadow-sm p-4 sm:p-5 xl:p-8">
         
         {/* Editorial Section Header */}
-        <div className="mb-8 flex items-center justify-between border-b border-neutral-200/60 pb-4">
+        <div className="mb-8 flex items-center justify-between border-b border-neutral-200/60 dark:border-gray-800/60 pb-4">
           <div className="flex items-center gap-2.5">
             <span className="w-1.5 h-5 bg-red-600 rounded-full" />
             <h2
               id="latest-news-heading"
-              className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900"
+              className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-gray-100"
             >
               সর্বশেষ সংবাদ
             </h2>
@@ -85,27 +85,27 @@ const NewsSection = () => {
         {loading ? (
           <div className="grid grid-cols-12 gap-8 items-start">
             <div className="col-span-12 lg:col-span-6 order-1 lg:order-2 space-y-6">
-              <div className="h-[380px] rounded-2xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
+              <div className="h-[380px] rounded-2xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
               <div className="grid grid-cols-2 gap-4">
-                <div className="h-32 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
-                <div className="h-32 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
+                <div className="h-32 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
+                <div className="h-32 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
               </div>
             </div>
             <div className="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-6">
-              <div className="h-48 rounded-2xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
-              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
-              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
+              <div className="h-48 rounded-2xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
+              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
+              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
             </div>
             <div className="col-span-12 lg:col-span-3 order-3 space-y-6">
-              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
-              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
-              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 animate-pulse" />
+              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
+              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
+              <div className="h-24 rounded-xl bg-gradient-to-r from-neutral-100 via-neutral-200 to-neutral-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
             </div>
           </div>
         ) : error ? (
           /* Error Banner inside Card */
-          <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 text-center">
-            <p className="text-sm font-medium text-red-600">{error}</p>
+          <div className="rounded-2xl border border-red-100 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-6 text-center">
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
           </div>
         ) : (
           /* Main 3 | 6 | 3 Layout with Mobile Re-ordering */
@@ -121,7 +121,7 @@ const NewsSection = () => {
             </div>
 
             {/* 2. Left Sidebar (Order 2 on Mobile, Left on Desktop) */}
-            <div className="col-span-12 lg:col-span-3 order-2 lg:order-1 lg:border-r lg:pr-6 xl:pr-8 border-neutral-200/60">
+            <div className="col-span-12 lg:col-span-3 order-2 lg:order-1 lg:border-r lg:pr-6 xl:pr-8 border-neutral-200/60 dark:border-gray-800/60">
               <LeftSidebar
                 featured={left.featured}
                 imageNews={left.imageNews}
@@ -130,7 +130,7 @@ const NewsSection = () => {
             </div>
 
             {/* 3. Right Sidebar (Order 3 Always) */}
-            <div className="col-span-12 lg:col-span-3 order-3 lg:border-l lg:pl-6 xl:pl-8 border-neutral-200/60">
+            <div className="col-span-12 lg:col-span-3 order-3 lg:border-l lg:pl-6 xl:pl-8 border-neutral-200/60 dark:border-gray-800/60">
               <RightSidebar news={right} />
             </div>
 

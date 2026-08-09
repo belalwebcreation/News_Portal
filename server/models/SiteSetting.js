@@ -96,6 +96,90 @@ const siteSettingSchema = new mongoose.Schema(
     },
 
     // ==========================
+    // Footer - Brand Info
+    // ==========================
+    siteName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    tagline: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    aboutText: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    footerVisible: {
+      type: Boolean,
+      default: true,
+    },
+
+    // ==========================
+    // Footer - Social Links
+    // ==========================
+    socialFacebook: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    socialX: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    socialYoutube: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    socialInstagram: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    socialLinksVisible: {
+      type: Boolean,
+      default: true,
+    },
+
+    // ==========================
+    // Footer - Contact Info
+    // ==========================
+    contactAddress: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    contactPhone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    contactEmail: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    contactVisible: {
+      type: Boolean,
+      default: true,
+    },
+
+    // ==========================
     // Navbar
     // ==========================
     navbar: {

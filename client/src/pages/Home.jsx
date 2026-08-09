@@ -9,7 +9,7 @@ import BreakingNews from "../components/home/Header/BreakingNews";
 
 const Home = () => {
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-gray-100 dark:bg-gray-950">
       <BreakingNews />
 
       <HeroSection />

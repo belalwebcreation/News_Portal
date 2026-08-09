@@ -38,7 +38,7 @@ const HeroCenter = ({ news }) => {
     >
       <div>
         {/* Image Container with Aspect Ratio, Subtle Overlay & Performance Attributes */}
-        <div className="relative overflow-hidden rounded-2xl bg-neutral-100 border border-neutral-100">
+        <div className="relative overflow-hidden rounded-2xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100 dark:border-gray-800">
           <Link
             to={`/news/${id}`}
             aria-label={title}
@@ -98,9 +98,11 @@ const HeroCenter = ({ news }) => {
                 tracking-tight 
                 leading-[1.22] 
                 text-neutral-900 
+                dark:text-gray-100
                 transition-colors 
                 duration-300 
                 group-hover:text-red-600
+                dark:group-hover:text-red-500
                 line-clamp-2
               "
             >
@@ -117,6 +119,7 @@ const HeroCenter = ({ news }) => {
                 lg:text-lg 
                 leading-relaxed 
                 text-neutral-600 
+                dark:text-gray-400
                 line-clamp-3 
                 font-normal
               "
@@ -128,14 +131,14 @@ const HeroCenter = ({ news }) => {
       </div>
 
       {/* Clean & Minimal Editorial Metadata */}
-      <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs sm:text-sm text-neutral-500 font-medium">
+      <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-gray-800 flex items-center justify-between text-xs sm:text-sm text-neutral-500 dark:text-gray-400 font-medium">
         <div className="flex items-center space-x-2">
           {/* Publication Time */}
           <span>{publishedAt || news.time || "সম্প্রতি"}</span>
 
           {news.readTime && (
             <>
-              <span className="text-neutral-300">•</span>
+              <span className="text-neutral-300 dark:text-gray-600">•</span>
               <span>{news.readTime}</span>
             </>
           )}

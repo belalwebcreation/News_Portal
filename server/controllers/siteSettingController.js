@@ -36,6 +36,25 @@ const buildSettingsResponse = (settings) => ({
   navbar: [...(settings.navbar || [])].sort(
     (a, b) => a.order - b.order
   ),
+
+  // Footer - Brand Info
+  siteName: settings.siteName || "",
+  tagline: settings.tagline || "",
+  aboutText: settings.aboutText || "",
+  footerVisible: settings.footerVisible,
+
+  // Footer - Social Links
+  socialFacebook: settings.socialFacebook || "",
+  socialX: settings.socialX || "",
+  socialYoutube: settings.socialYoutube || "",
+  socialInstagram: settings.socialInstagram || "",
+  socialLinksVisible: settings.socialLinksVisible,
+
+  // Footer - Contact Info
+  contactAddress: settings.contactAddress || "",
+  contactPhone: settings.contactPhone || "",
+  contactEmail: settings.contactEmail || "",
+  contactVisible: settings.contactVisible,
 });
 
 /* ======================================================
@@ -73,7 +92,27 @@ export const updateSiteSettings = async (req, res) => {
   try {
     const settings = await getOrCreateSettings();
 
-    const { logoVisible, heroBannerVisible, heroBannerLink } = req.body;
+    const {
+      logoVisible,
+      heroBannerVisible,
+      heroBannerLink,
+
+      siteName,
+      tagline,
+      aboutText,
+      footerVisible,
+
+      socialFacebook,
+      socialX,
+      socialYoutube,
+      socialInstagram,
+      socialLinksVisible,
+
+      contactAddress,
+      contactPhone,
+      contactEmail,
+      contactVisible,
+    } = req.body;
 
     if (logoVisible !== undefined) {
       settings.logoVisible = Boolean(logoVisible);
@@ -85,6 +124,61 @@ export const updateSiteSettings = async (req, res) => {
 
     if (heroBannerLink !== undefined) {
       settings.heroBannerLink = String(heroBannerLink).trim();
+    }
+
+    // ---- Footer: Brand Info ----
+    if (siteName !== undefined) {
+      settings.siteName = String(siteName).trim();
+    }
+
+    if (tagline !== undefined) {
+      settings.tagline = String(tagline).trim();
+    }
+
+    if (aboutText !== undefined) {
+      settings.aboutText = String(aboutText).trim();
+    }
+
+    if (footerVisible !== undefined) {
+      settings.footerVisible = Boolean(footerVisible);
+    }
+
+    // ---- Footer: Social Links ----
+    if (socialFacebook !== undefined) {
+      settings.socialFacebook = String(socialFacebook).trim();
+    }
+
+    if (socialX !== undefined) {
+      settings.socialX = String(socialX).trim();
+    }
+
+    if (socialYoutube !== undefined) {
+      settings.socialYoutube = String(socialYoutube).trim();
+    }
+
+    if (socialInstagram !== undefined) {
+      settings.socialInstagram = String(socialInstagram).trim();
+    }
+
+    if (socialLinksVisible !== undefined) {
+      settings.socialLinksVisible = Boolean(socialLinksVisible);
+    }
+
+    // ---- Footer: Contact Info ----
+    if (contactAddress !== undefined) {
+      settings.contactAddress = String(contactAddress).trim();
+    }
+
+    if (contactPhone !== undefined) {
+      settings.contactPhone = String(contactPhone).trim();
+    }
+
+    if (contactEmail !== undefined) {
+      settings.contactEmail = String(contactEmail).trim();
+    }
+
+    if (contactVisible !== undefined) {
+      settings.contactVisible = Boolean(contactVisible);
     }
 
     await settings.save();

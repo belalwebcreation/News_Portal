@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>rajshahi-college-news</title>
+    <script>
+      // React মাউন্ট হওয়ার আগেই সেভ করা থিম apply করে দিচ্ছে,
+      // যাতে পেজ লোড হওয়ার সময় এক মুহূর্তের জন্য ভুল থিম (flash) না দেখা যায়
+      (function () {
+        try {
+          var mode = localStorage.getItem("theme-mode") || "light";
+          var accent = localStorage.getItem("theme-accent") || "#dc2626";
+          if (mode === "dark") {
+            document.documentElement.classList.add("dark");
+          }
+          document.documentElement.style.setProperty("--accent", accent);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

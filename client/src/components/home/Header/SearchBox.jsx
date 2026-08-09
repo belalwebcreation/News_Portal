@@ -59,7 +59,7 @@ const SearchBox = () => {
 
       <button
         onClick={() => setOpen(true)}
-        className="hover:text-red-700 duration-300"
+        className="text-gray-800 hover:text-red-700 dark:text-gray-200 dark:hover:text-red-500 duration-300"
       >
         <FiSearch size={22} />
       </button>
@@ -67,22 +67,23 @@ const SearchBox = () => {
       {/* Popup */}
 
       {open && (
-        <div className="absolute right-0 mt-4 w-[420px] bg-white rounded-xl shadow-2xl border z-50">
+        <div className="absolute right-0 mt-4 w-[420px] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 z-50">
 
           {/* Header */}
 
-          <div className="flex items-center border-b px-4 py-3">
+          <div className="flex items-center border-b border-gray-200 dark:border-gray-800 px-4 py-3">
 
             <input
               ref={inputRef}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="খবর খুঁজুন..."
-              className="flex-1 outline-none text-sm"
+              className="flex-1 outline-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
 
             <button
               onClick={() => setOpen(false)}
+              className="text-gray-600 hover:text-red-700 dark:text-gray-300 dark:hover:text-red-500 duration-300"
             >
               <FiX size={22} />
             </button>
@@ -93,7 +94,7 @@ const SearchBox = () => {
 
           <div className="p-4">
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 text-gray-800 dark:text-gray-200">
 
               <FiClock />
 
@@ -109,7 +110,7 @@ const SearchBox = () => {
 
                 <button
                   key={i}
-                  className="px-3 py-1 rounded-full bg-gray-100 hover:bg-red-700 hover:text-white duration-300 text-sm"
+                  className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-red-700 hover:text-white duration-300 text-sm dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-red-700 dark:hover:text-white"
                 >
                   {item}
                 </button>
@@ -122,9 +123,9 @@ const SearchBox = () => {
 
           {/* Trending */}
 
-          <div className="border-t p-4">
+          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 text-gray-800 dark:text-gray-200">
 
               <FiTrendingUp />
 
@@ -140,7 +141,7 @@ const SearchBox = () => {
 
                 <button
                   key={i}
-                  className="px-3 py-1 rounded-full bg-red-50 text-red-700 hover:bg-red-700 hover:text-white duration-300 text-sm"
+                  className="px-3 py-1 rounded-full bg-red-50 text-red-700 hover:bg-red-700 hover:text-white duration-300 text-sm dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-700 dark:hover:text-white"
                 >
                   {item}
                 </button>

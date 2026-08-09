@@ -13,7 +13,7 @@ const HeroLeft = ({ newsList = [] }) => {
           className={`
             ${
               index !== newsList.length - 1
-                ? "border-b border-gray-200 pb-5"
+                ? "border-b border-gray-200 dark:border-gray-800 pb-5"
                 : ""
             }
           `}

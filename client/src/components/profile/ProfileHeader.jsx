@@ -21,6 +21,7 @@ import {
   Eye,
   Bookmark,
   FileText,
+  UserCheck,
 } from "lucide-react";
 import profileService from "../../services/profileService";
 import { newsService } from "../../features/news/services/newsService";
@@ -52,7 +53,6 @@ const formatWebsiteUrl = (url) => {
   return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 };
 
-// ভিউ কাউন্ট সুন্দর করে ফরম্যাট করার হেল্পার (যেমন: 1200 -> 1.2K)
 const formatViews = (views) => {
   if (views === undefined || views === null) return "0";
   if (typeof views === "number") {
@@ -114,7 +114,6 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
   const [isRepositioningCover, setIsRepositioningCover] = useState(false);
   const [savingCoverPosition, setSavingCoverPosition] = useState(false);
 
-  // 📰 ইউজারের প্রকাশিত আর্টিকেল কাউন্ট সেভ রাখার স্টেট
   const [publishedArticlesCount, setPublishedArticlesCount] = useState(null);
   const [articlesLoading, setArticlesLoading] = useState(true);
 
@@ -157,7 +156,6 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
     };
   }, []);
 
-  // ইউজারের published আর্টিকেলের সংখ্যা জানার জন্য API কল
   useEffect(() => {
     if (!authorId) {
       setArticlesLoading(false);
@@ -367,40 +365,39 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
     },
   ];
 
-  // API থেকে আর্টিকেল সংখ্যা পাওয়া গেলে সেটি দেখাবে, না হলে Profile Context/Stats-এর ব্যাকআপ ডাটা দেখাবে
   const articlesCount = publishedArticlesCount ?? stats.postsCount ?? stats.articlesCount ?? profile?.articlesCount ?? profile?.postsCount ?? 0;
   const rawTotalViews = stats.totalViews ?? stats.views ?? stats.viewsCount ?? profile?.totalViews ?? profile?.views ?? profile?.viewsCount ?? 0;
   const displayTotalViews = formatViews(rawTotalViews);
   const savedCount = stats.savedCount ?? profile?.savedCount ?? profile?.bookmarksCount ?? 0;
 
   return (
-    <section className="relative bg-base-200/40 pb-10 transition-colors">
-      {/* Toast Notification */}
+    <section className="relative bg-base-200/30 dark:bg-base-300/10 pb-12 transition-colors">
+      {/* Dynamic Toast Notification */}
       {status && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div
             role="alert"
-            className={`flex items-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-medium shadow-2xl backdrop-blur-md border ${
+            className={`flex items-center gap-3 rounded-xl px-5 py-3.5 text-sm font-semibold shadow-2xl border ${
               status.type === "success"
-                ? "bg-slate-900/90 text-emerald-400 border-emerald-500/30"
-                : "bg-slate-900/90 text-rose-400 border-rose-500/30"
+                ? "bg-base-100 text-emerald-600 border-emerald-500/30 dark:bg-slate-900 dark:text-emerald-400"
+                : "bg-base-100 text-rose-600 border-rose-500/30 dark:bg-slate-900 dark:text-rose-400"
             }`}
           >
             {status.type === "success" ? (
-              <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
+              <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
             ) : (
-              <AlertCircle size={18} className="text-rose-400 shrink-0" />
+              <AlertCircle size={20} className="text-rose-500 shrink-0" />
             )}
             <span>{status.message}</span>
           </div>
         </div>
       )}
 
-      {/* Hero Cover Photo Area */}
+      {/* Cover Banner Area */}
       <div className="relative">
         <div
           ref={coverContainerRef}
-          className="relative h-56 sm:h-72 lg:h-[340px] w-full overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900"
+          className="relative h-72 sm:h-96 lg:h-[420px] w-full overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950"
         >
           {coverUrl ? (
             <img
@@ -413,55 +410,55 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                 touchAction: isRepositioningCover ? "none" : "auto",
               }}
               className={`h-full w-full select-none object-cover transition-opacity duration-300 ${
-                isRepositioningCover ? "cursor-grab active:cursor-grabbing opacity-90" : ""
+                isRepositioningCover ? "cursor-grab active:cursor-grabbing opacity-85" : "opacity-95"
               }`}
             />
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/30 via-base-300/10 to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-slate-900/40 to-slate-950" />
           )}
 
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+          {/* Semi-transparent Overlay to boost readability without hiding dashboard */}
+          <div className="pointer-events-none absolute inset-0 bg-black/25 backdrop-brightness-95" />
 
           {coverUploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm z-20">
-              <div className="flex items-center gap-3 rounded-xl bg-base-100/90 px-4 py-2.5 shadow-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-20">
+              <div className="flex items-center gap-3 rounded-2xl bg-base-100/90 dark:bg-slate-900 px-5 py-3 shadow-2xl">
                 <Loader2 size={20} className="animate-spin text-primary" />
-                <span className="text-sm font-medium">Uploading cover...</span>
+                <span className="text-sm font-semibold">Updating cover...</span>
               </div>
             </div>
           )}
 
-          {/* Reposition Mode Tooltip Hint */}
+          {/* Reposition Hint */}
           {isRepositioningCover && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none rounded-full bg-slate-900/80 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md border border-white/15 shadow-xl">
-              ✨ Drag to reposition
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none rounded-full bg-slate-900/90 border border-white/20 px-4 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-md">
+              ✨ Drag image to adjust frame
             </div>
           )}
         </div>
 
-        {/* Home Navigation */}
+        {/* Floating Top Actions */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30">
           <Link
             to="/"
             aria-label="Go to homepage"
             title="Home"
-            className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-xl border border-white/20 bg-black/35 hover:bg-black/50 text-white text-xs sm:text-sm font-medium backdrop-blur-xl shadow-xl transition-all duration-200 active:scale-95"
+            className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-white/25 bg-black/40 hover:bg-black/60 text-white text-xs sm:text-sm font-medium backdrop-blur-md shadow-md transition-all active:scale-95"
           >
-            <Home size={15} className="shrink-0" />
-            <span className="inline font-medium">Home</span>
+            <Home size={15} />
+            <span className="font-medium hidden sm:inline">Portal Home</span>
           </Link>
         </div>
 
-        {/* Cover Action Controls — শুধুমাত্র নিজের প্রোফাইলে দেখাবে */}
         {isOwnProfile && (
           <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30">
             {isRepositioningCover ? (
-              <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/45 backdrop-blur-xl border border-white/15 shadow-2xl">
+              <div className="flex items-center gap-2 p-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 shadow-xl">
                 <button
                   type="button"
                   onClick={handleCancelCoverReposition}
                   disabled={savingCoverPosition}
-                  className="inline-flex items-center justify-center h-9 px-4 rounded-xl text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all active:scale-95"
+                  className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -469,13 +466,9 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                   type="button"
                   onClick={handleSaveCoverPosition}
                   disabled={savingCoverPosition}
-                  className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-primary text-primary-content text-xs font-semibold shadow-lg shadow-primary/30 hover:bg-primary-focus active:scale-95 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-content text-xs font-semibold shadow-md hover:bg-primary-focus transition-all"
                 >
-                  {savingCoverPosition ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Check size={14} />
-                  )}
+                  {savingCoverPosition ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
                   <span>Save</span>
                 </button>
               </div>
@@ -484,20 +477,15 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                 <button
                   type="button"
                   onClick={() => setIsCoverMenuOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 h-9 px-3.5 rounded-xl border border-white/20 bg-black/35 hover:bg-black/50 text-white text-xs sm:text-sm font-medium backdrop-blur-xl shadow-xl transition-all duration-200 active:scale-95"
+                  className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-white/25 bg-black/40 hover:bg-black/60 text-white text-xs sm:text-sm font-medium backdrop-blur-md shadow-md transition-all active:scale-95"
                   disabled={coverUploading}
-                  aria-haspopup="menu"
-                  aria-expanded={isCoverMenuOpen}
                 >
-                  <Camera size={15} className="shrink-0" />
-                  <span className="inline font-medium">Change Cover</span>
+                  <Camera size={15} />
+                  <span>Edit Cover</span>
                 </button>
 
                 {isCoverMenuOpen && (
-                  <PhotoEditMenu
-                    items={coverMenuItems}
-                    onClose={() => setIsCoverMenuOpen(false)}
-                  />
+                  <PhotoEditMenu items={coverMenuItems} onClose={() => setIsCoverMenuOpen(false)} />
                 )}
               </div>
             )}
@@ -515,16 +503,16 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
         )}
       </div>
 
-      {/* Main Glass Profile Card */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-16 lg:-mt-20 relative z-20">
-        <div className="rounded-3xl border border-base-100/60 bg-base-100/90 dark:bg-base-100/95 p-5 sm:p-8 shadow-2xl backdrop-blur-xl">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 sm:gap-6">
+      {/* Profile Header Floating Overlay with Glassmorphism */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-28 sm:-mt-32 lg:-mt-36">
+        <div className="rounded-3xl border border-white/20 dark:border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl p-6 sm:p-8 text-white">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             
-            {/* Avatar & Main Identity */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+            {/* Left Column: Avatar and User Details */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-end text-center sm:text-left gap-5 sm:gap-6">
               
-              {/* Profile Avatar Component */}
-              <div className="-mt-10 sm:-mt-16 lg:-mt-20 shrink-0 relative">
+              {/* Profile Avatar */}
+              <div className="shrink-0 relative z-10">
                 <ProfileAvatar
                   src={avatarUrl}
                   alt={name || "Avatar"}
@@ -544,84 +532,53 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                 />
               </div>
 
-              {/* Title & Info */}
-              <div className="pt-0 sm:pt-1 w-full">
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold text-base-content tracking-tight">
-                    {name || "Unnamed User"}
+              {/* Author Title & Username */}
+              <div className="pt-2 sm:pb-1 w-full">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                  <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight drop-shadow-md">
+                    {name || "Unnamed Journalist"}
                   </h1>
                   
                   {isVerified && (
-                    <span className="inline-flex items-center text-primary" title="Verified Author">
-                      <ShieldCheck size={22} className="fill-primary/20" />
+                    <span
+                      className="inline-flex items-center justify-center p-1 rounded-full bg-primary/20 text-primary-content"
+                      title="Verified Author"
+                    >
+                      <ShieldCheck size={20} className="fill-primary" />
                     </span>
                   )}
 
                   {role && (
-                    <span className="badge badge-primary badge-sm font-medium capitalize shadow-sm">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-white/20 text-white border border-white/20 uppercase tracking-wider backdrop-blur-sm">
                       {role}
                     </span>
                   )}
                 </div>
 
-                <p className="mt-0.5 text-xs sm:text-sm font-medium text-base-content/60">
+                <p className="mt-1 text-sm font-medium text-white/80 drop-shadow-sm">
                   @{username || "username"}
                 </p>
-
-                {bio && (
-                  <p className="mt-2.5 max-w-xl text-[15px] sm:text-base leading-relaxed sm:leading-7 text-base-content/80 font-normal">
-                    {bio}
-                  </p>
-                )}
-
-                <div className="mt-3.5 flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-4 text-xs sm:text-sm text-base-content/70">
-                  {isOwnProfile && email && (
-                    <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-medium">
-                      <Mail size={13} className="shrink-0" />
-                      <span>Verified Email</span>
-                    </div>
-                  )}
-
-                  {joined && (
-                    <div className="inline-flex items-center gap-1.5 text-base-content/60">
-                      <CalendarDays size={14} className="shrink-0" />
-                      <span>Joined {joined}</span>
-                    </div>
-                  )}
-
-                  {website && (
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-primary hover:underline max-w-[180px] sm:max-w-xs"
-                    >
-                      <Globe size={14} className="shrink-0" />
-                      <span className="truncate">{formatWebsiteUrl(website)}</span>
-                    </a>
-                  )}
-                </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center sm:justify-end gap-2.5 w-full lg:w-auto pt-2 lg:pt-0">
+            {/* Right Column: Action Buttons */}
+            <div className="flex items-center justify-center sm:justify-end gap-3 w-full lg:w-auto pt-2 lg:pt-0">
               {isOwnProfile && (
                 <>
                   <Link
                     to="/dashboard"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-primary text-primary-content font-semibold text-sm shadow-lg shadow-primary/25 hover:bg-primary-focus hover:shadow-xl active:scale-[0.98] transition-all whitespace-nowrap"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-content font-medium text-sm shadow-lg hover:bg-primary-focus transition-all whitespace-nowrap active:scale-95"
                   >
-                    <LayoutDashboard size={18} className="shrink-0" />
+                    <LayoutDashboard size={17} />
                     <span>Dashboard</span>
                   </Link>
 
                   <Link
                     to="/dashboard/account-settings"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-xl border border-base-300 bg-base-100 text-base-content font-semibold text-sm hover:border-base-content/20 hover:bg-base-200 active:scale-[0.98] transition-all whitespace-nowrap"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-xl border border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md font-medium text-sm transition-all whitespace-nowrap active:scale-95"
                   >
-                    <Edit3 size={17} className="shrink-0" />
-                    <span>Edit</span>
+                    <Edit3 size={16} />
+                    <span>Edit Profile</span>
                   </Link>
                 </>
               )}
@@ -631,76 +588,114 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                 onClick={handleShareProfile}
                 aria-label="Share profile"
                 title="Share Profile"
-                className="inline-flex items-center justify-center h-11 w-11 shrink-0 rounded-xl border border-base-300 bg-base-100 text-base-content/70 hover:text-base-content hover:bg-base-200 active:scale-[0.98] transition-all"
+                className="inline-flex items-center justify-center h-10 w-10 shrink-0 rounded-xl border border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-md transition-all active:scale-95"
               >
-                <Share2 size={18} />
+                <Share2 size={17} />
               </button>
             </div>
           </div>
 
-          {/* Author Stats Grid */}
-          <div className={`mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-base-200/80 grid grid-cols-2 gap-3 sm:gap-4 ${isOwnProfile ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
+          {/* Bio & Details Section */}
+          <div className="mt-5 border-t border-white/15 pt-4">
+            {bio && (
+              <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-white/90 font-normal drop-shadow-sm">
+                {bio}
+              </p>
+            )}
+
+            <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-white/80">
+              {isOwnProfile && email && (
+                <div className="inline-flex items-center gap-1.5 text-emerald-300 font-medium">
+                  <UserCheck size={15} />
+                  <span>{email}</span>
+                </div>
+              )}
+
+              {joined && (
+                <div className="inline-flex items-center gap-1.5 text-white/70">
+                  <CalendarDays size={15} />
+                  <span>Joined {joined}</span>
+                </div>
+              )}
+
+              {website && (
+                <a
+                  href={website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-primary-content hover:underline font-medium max-w-[220px] truncate"
+                >
+                  <Globe size={15} className="shrink-0" />
+                  <span className="truncate">{formatWebsiteUrl(website)}</span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Author News Portal Metrics */}
+          <div className={`mt-6 pt-6 border-t border-white/15 grid grid-cols-2 gap-3 sm:gap-4 ${isOwnProfile ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
             
-            {/* Articles Count Block */}
-            <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-base-200/40 border border-base-200/60 hover:bg-base-200/80 hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default">
-              <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
-                <FileText size={18} className="sm:w-5 sm:h-5" />
+            {/* Articles Published */}
+            <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/15 transition-all">
+              <div className="p-2.5 rounded-xl bg-primary/20 text-white shrink-0">
+                <FileText size={20} />
               </div>
               <div className="min-w-0">
-                <div className="text-base sm:text-xl font-bold text-base-content truncate">
+                <div className="text-lg sm:text-2xl font-bold text-white leading-tight">
                   {articlesLoading ? (
-                    <Loader2 size={16} className="animate-spin text-primary my-1" />
+                    <Loader2 size={16} className="animate-spin text-white my-1" />
                   ) : (
                     articlesCount
                   )}
                 </div>
-                <div className="text-[11px] sm:text-xs font-medium text-base-content/60 truncate">
-                  Published Articles
-                </div>
+                <div className="text-xs font-medium text-white/70 truncate">Articles Published</div>
               </div>
             </div>
 
-            {/* Total Views Block */}
-            <div 
-              className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-base-200/40 border border-base-200/60 hover:bg-base-200/80 hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default"
-              title={typeof rawTotalViews === "number" ? `${rawTotalViews.toLocaleString()} total views` : `${displayTotalViews} total views`}
+            {/* Total Reads / Views */}
+            <div
+              className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/15 transition-all"
+              title={typeof rawTotalViews === "number" ? `${rawTotalViews.toLocaleString()} total reads` : `${displayTotalViews} total reads`}
             >
-              <div className="p-2 sm:p-2.5 rounded-xl bg-secondary/10 text-secondary shrink-0">
-                <Eye size={18} className="sm:w-5 sm:h-5" />
+              <div className="p-2.5 rounded-xl bg-secondary/20 text-white shrink-0">
+                <Eye size={20} />
               </div>
               <div className="min-w-0">
-                <div className="text-base sm:text-xl font-bold text-base-content truncate">
+                <div className="text-lg sm:text-2xl font-bold text-white leading-tight">
                   {displayTotalViews}
                 </div>
-                <div className="text-[11px] sm:text-xs font-medium text-base-content/60 truncate">Total Views</div>
+                <div className="text-xs font-medium text-white/70 truncate">Total Reads</div>
               </div>
             </div>
 
-            {/* Saved Posts Block — শুধুমাত্র নিজের প্রোফাইলে (এটা personal preference, public visitor-দের দেখানোর দরকার নেই) */}
+            {/* Saved Articles */}
             {isOwnProfile && (
-              <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-base-200/40 border border-base-200/60 hover:bg-base-200/80 hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default">
-                <div className="p-2 sm:p-2.5 rounded-xl bg-accent/10 text-accent shrink-0">
-                  <Bookmark size={18} className="sm:w-5 sm:h-5" />
+              <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/15 transition-all">
+                <div className="p-2.5 rounded-xl bg-accent/20 text-white shrink-0">
+                  <Bookmark size={20} />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-base sm:text-xl font-bold text-base-content truncate">{savedCount}</div>
-                  <div className="text-[11px] sm:text-xs font-medium text-base-content/60 truncate">Saved Posts</div>
+                  <div className="text-lg sm:text-2xl font-bold text-white leading-tight">
+                    {savedCount}
+                  </div>
+                  <div className="text-xs font-medium text-white/70 truncate">Bookmarks</div>
                 </div>
               </div>
             )}
 
-            {/* Member Block */}
-            <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-base-200/40 border border-base-200/60 hover:bg-base-200/80 hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default">
-              <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0">
-                <Home size={18} className="sm:w-5 sm:h-5" />
+            {/* Member Since */}
+            <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/15 transition-all">
+              <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 shrink-0">
+                <CalendarDays size={20} />
               </div>
               <div className="min-w-0">
-                <div className="text-base sm:text-xl font-bold text-base-content truncate">
-                  {joined || "2025"}
+                <div className="text-lg sm:text-2xl font-bold text-white leading-tight truncate">
+                  {joined || "2026"}
                 </div>
-                <div className="text-[11px] sm:text-xs font-medium text-base-content/60 truncate">Member</div>
+                <div className="text-xs font-medium text-white/70 truncate">Member Since</div>
               </div>
             </div>
+
           </div>
 
         </div>

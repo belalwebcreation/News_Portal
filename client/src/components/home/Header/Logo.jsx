@@ -8,7 +8,7 @@ const Logo = () => {
   if (loading) {
     return (
       <div className="flex items-center">
-        <div className="w-64 h-20 rounded bg-gray-200 animate-pulse" />
+        <div className="w-64 h-20 rounded bg-gray-200 dark:bg-gray-800 animate-pulse" />
       </div>
     );
   }

@@ -7,7 +7,17 @@ import ReadingHistory from "../models/ReadingHistory.js";
 ====================================================== */
 
 const findProfileById = async (userId) => {
-  return User.findById(userId).lean();
+  const user = await User.findById(userId).lean();
+
+  if (!user) return null;
+
+  // Mongoose timestamps দেয় createdAt, কিন্তু frontend joinedAt আশা করে।
+  // এখানে map করে দেওয়া হলো যাতে User.js schema বা frontend কোনোটাই
+  // পরিবর্তন করতে না হয়। getProfileStats নিচে একই কাজ আলাদাভাবে করে।
+  return {
+    ...user,
+    joinedAt: user.createdAt,
+  };
 };
 
 const updateProfile = async (userId, updateData) => {

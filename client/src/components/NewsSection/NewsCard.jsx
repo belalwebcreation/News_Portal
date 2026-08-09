@@ -45,7 +45,7 @@ const NewsCard = ({ news }) => {
         className="block flex-1 focus:outline-none"
       >
         {/* Aspect Ratio Image Container */}
-        <div className="relative overflow-hidden rounded-xl bg-neutral-100 border border-neutral-100/80 aspect-[16/10] w-full">
+        <div className="relative overflow-hidden rounded-xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100/80 dark:border-gray-800/80 aspect-[16/10] w-full">
           <img
             src={image}
             alt={title}
@@ -87,9 +87,11 @@ const NewsCard = ({ news }) => {
               tracking-tight 
               leading-snug 
               text-neutral-900 
+              dark:text-gray-100
               transition-colors 
               duration-300 
               group-hover:text-red-600 
+              dark:group-hover:text-red-500
               line-clamp-2
             "
           >
@@ -98,7 +100,7 @@ const NewsCard = ({ news }) => {
 
           {/* Description */}
           {description && (
-            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-neutral-600 line-clamp-2 font-normal">
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-gray-400 line-clamp-2 font-normal">
               {description}
             </p>
           )}
@@ -106,13 +108,13 @@ const NewsCard = ({ news }) => {
       </Link>
 
       {/* Editorial Metadata Footer */}
-      <div className="mt-3.5 pt-2 flex items-center justify-between text-xs font-medium text-neutral-500">
+      <div className="mt-3.5 pt-2 flex items-center justify-between text-xs font-medium text-neutral-500 dark:text-gray-400">
         <div className="flex items-center space-x-1.5">
           <span>{publishedAt || time || "সম্প্রতি"}</span>
 
           {readTime && (
             <>
-              <span className="text-neutral-300">•</span>
+              <span className="text-neutral-300 dark:text-gray-600">•</span>
               <span>{readTime}</span>
             </>
           )}

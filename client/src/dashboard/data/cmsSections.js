@@ -130,6 +130,7 @@ const cmsSections = [
     ],
   },
     // ==================================================
+  // ==================================================
   // FOOTER
   // ==================================================
 
@@ -144,7 +145,7 @@ const cmsSections = [
         title: "Footer",
         description: "Footer information",
 
-        manager: "FooterManager",
+        manager: "footer", // <-- "FooterManager" এর জায়গায় "footer"
 
         type: CMS_ITEM_TYPES.GROUP,
         collection: "footer",
@@ -158,7 +159,7 @@ const cmsSections = [
         title: "Social Links",
         description: "Facebook, Youtube, X",
 
-        manager: "SocialManager",
+        manager: "socialLinks", // <-- "SocialManager" এর জায়গায় "socialLinks"
 
         type: CMS_ITEM_TYPES.GROUP,
         collection: "social",
@@ -172,10 +173,36 @@ const cmsSections = [
         title: "Contact",
         description: "Website contact information",
 
-        manager: "ContactManager",
+        manager: "contact", // <-- "ContactManager" এর জায়গায় "contact"
 
         type: CMS_ITEM_TYPES.GROUP,
         collection: "contact",
+
+        multiple: false,
+        visible: true,
+      },
+    ],
+  },
+
+  // ==================================================
+  // SEO
+  // ==================================================
+
+  {
+    id: "seo",
+    title: "SEO",
+    icon: Search,
+
+    items: [
+      {
+        id: "seoSettings",
+        title: "SEO Settings",
+        description: "Meta title, meta description",
+
+        manager: "seo", // <-- "SEOManager" এর জায়গায় "seo" (যদি SEOManager বানিয়ে থাকেন)
+
+        type: CMS_ITEM_TYPES.GROUP,
+        collection: "seo",
 
         multiple: false,
         visible: true,

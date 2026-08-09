@@ -10,7 +10,7 @@ const SidebarFeatured = ({ featured }) => {
   const { id, title, description, time, publishedAt } = featured;
 
   return (
-    <div className="border-b border-neutral-200/60 pb-6">
+    <div className="border-b border-neutral-200/60 dark:border-gray-800/60 pb-6">
       <Link to={`/news/${id}`} className="group block">
         <h3
           className="
@@ -20,9 +20,11 @@ const SidebarFeatured = ({ featured }) => {
             leading-snug 
             tracking-tight 
             text-neutral-900 
+            dark:text-gray-100
             transition-colors 
             duration-300 
             group-hover:text-red-600 
+            dark:group-hover:text-red-500
             line-clamp-3
           "
         >
@@ -30,12 +32,12 @@ const SidebarFeatured = ({ featured }) => {
         </h3>
 
         {description && (
-          <p className="mt-3 text-[15px] leading-relaxed text-neutral-600 line-clamp-3 font-normal">
+          <p className="mt-3 text-[15px] leading-relaxed text-neutral-600 dark:text-gray-400 line-clamp-3 font-normal">
             {description}
           </p>
         )}
 
-        <p className="mt-3 text-xs sm:text-sm font-medium text-neutral-500">
+        <p className="mt-3 text-xs sm:text-sm font-medium text-neutral-500 dark:text-gray-400">
           {publishedAt || time || "সম্প্রতি"}
         </p>
       </Link>
@@ -51,12 +53,12 @@ const SidebarImageList = ({ items }) => {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <span className="w-1 h-4 bg-red-600 rounded-full" />
-        <h4 className="text-sm font-bold tracking-tight text-neutral-900 uppercase">
+        <h4 className="text-sm font-bold tracking-tight text-neutral-900 dark:text-gray-100 uppercase">
           বিশেষ খবর
         </h4>
       </div>
 
-      <div className="divide-y divide-neutral-200/60">
+      <div className="divide-y divide-neutral-200/60 dark:divide-gray-800/60">
         {items.map((item) => (
           <div key={item.id} className="py-4 first:pt-0 last:pb-0">
             <SmallNewsCard news={item} />
@@ -75,12 +77,12 @@ const SidebarTextList = ({ items }) => {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <span className="w-1 h-4 bg-red-600 rounded-full" />
-        <h4 className="text-sm font-bold tracking-tight text-neutral-900 uppercase">
+        <h4 className="text-sm font-bold tracking-tight text-neutral-900 dark:text-gray-100 uppercase">
           আরও শিরোনাম
         </h4>
       </div>
 
-      <div className="divide-y divide-neutral-200/60">
+      <div className="divide-y divide-neutral-200/60 dark:divide-gray-800/60">
         {items.map((item) => (
           <div key={item.id} className="py-3.5 first:pt-0 last:pb-0">
             <TextNews news={item} />

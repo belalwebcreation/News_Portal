@@ -7,6 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import ScrollTop from "../../features/article/pages/components/ScrollTop";
+import { useSiteSettings } from "../../context/SiteSettingsContext"; // 🔻 path verify koro — ContentManagement.jsx-e ei-i depth chilo
 
 // ==========================================================
 // Custom SVG Social Icons (Matches Lucide stroke aesthetic)
@@ -86,12 +87,17 @@ const POLICY_LINKS = [
   { name: "কুকি নীতি", href: "/cookies" },
 ];
 
-const SOCIAL_LINKS = [
-  { name: "Facebook", href: "#", Icon: FacebookIcon },
-  { name: "X", href: "#", Icon: XIcon },
-  { name: "YouTube", href: "#", Icon: YoutubeIcon },
-  { name: "Instagram", href: "#", Icon: InstagramIcon },
-];
+// 🔻 Backend theke kono value na ashle (ba load hote hote) fallback hisebe eigula dekhabe —
+// blank UI dekha jabe na. CMS-e actual value set korle eigula automatically override hoye jabe.
+const FALLBACK = {
+  siteName: "সংবাদ প্রবাহ",
+  tagline: "নির্ভরযোগ্য খবর, প্রতিটি মুহূর্তে",
+  aboutText:
+    "স্বাধীন সাংবাদিকতা ও নির্ভুল তথ্য দিয়ে পাঠকের পাশে আছি ২৪ ঘণ্টা। পেশাদারিত্ব ও সততাই আমাদের মূল চালিকাশক্তি।",
+  address: "১২৩ প্রেস ক্লাব সড়ক, মতিঝিল, ঢাকা-১০০০",
+  phone: "+৮৮০ ১৭০০-০০০০০০",
+  email: "news@example.com",
+};
 
 const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap');`;
 
@@ -99,22 +105,12 @@ const displayFont = { fontFamily: "'Noto Serif Bengali', serif" };
 const bodyFont = { fontFamily: "'Hind Siliguri', sans-serif" };
 
 function Footer({
-  siteName = "সংবাদ প্রবাহ",
-  tagline = "নির্ভরযোগ্য খবর, প্রতিটি মুহূর্তে",
-  aboutText = "স্বাধীন সাংবাদিকতা ও নির্ভুল তথ্য দিয়ে পাঠকের পাশে আছি ২৪ ঘণ্টা। পেশাদারিত্ব ও সততাই আমাদের মূল চালিকাশক্তি।",
-  editorName = "বেলাল হোসেন",
-  address = "১২৩ প্রেস ক্লাব সড়ক, মতিঝিল, ঢাকা-১০০০",
-  phone = "+৮৮০ ১৭০০-০০০০০০",
-  email = "news@example.com",
+  editorName = "বেলাল হোসেন", // 🔻 CMS scope-e nai ekhono, tai prop hisebei thakche
   categories = DEFAULT_CATEGORIES,
 }) {
   const [now, setNow] = useState(() => new Date());
+  const { settings } = useSiteSettings();
 
-  // 🔻 FIX: age ekhane ekta scroll listener + showScrollTop state chilo,
-  // shudhu footer-er nijer scroll-to-top button dekhanor jonno. Seta
-  // remove kora holo — kaj ta ekhon globally <ScrollTop /> component
-  // korche (niche render kora hocche), tai duita alada button r
-  // ekshathe overlap kore dekhabe na.
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(timer);
@@ -125,8 +121,26 @@ function Footer({
     timeStyle: "short",
   }).format(now);
 
+  const siteName = settings?.siteName || FALLBACK.siteName;
+  const tagline = settings?.tagline || FALLBACK.tagline;
+  const aboutText = settings?.aboutText || FALLBACK.aboutText;
+  const address = settings?.contactAddress || FALLBACK.address;
+  const phone = settings?.contactPhone || FALLBACK.phone;
+  const email = settings?.contactEmail || FALLBACK.email;
+
+  const showFooterInfo = settings?.footerVisible ?? true;
+  const showSocialLinks = settings?.socialLinksVisible ?? true;
+  const showContact = settings?.contactVisible ?? true;
+
+  const socialLinks = [
+    { name: "Facebook", href: settings?.socialFacebook, Icon: FacebookIcon },
+    { name: "X", href: settings?.socialX, Icon: XIcon },
+    { name: "YouTube", href: settings?.socialYoutube, Icon: YoutubeIcon },
+    { name: "Instagram", href: settings?.socialInstagram, Icon: InstagramIcon },
+  ].filter((social) => social.href); // 🔻 URL set na thakle icon dekhabe na
+
   return (
-    <footer style={bodyFont} className="relative bg-slate-50 text-slate-700 border-t border-slate-200">
+    <footer style={bodyFont} className="relative bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800">
       <style>{FONT_IMPORT}</style>
 
       {/* Brand Top Red Accent Line */}
@@ -138,42 +152,48 @@ function Footer({
         {/* ===================================================
             1. Main Footer Grid
             =================================================== */}
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 pb-12 border-b border-slate-200">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 pb-12 border-b border-slate-200 dark:border-slate-800">
 
           {/* Col 1: Brand Info & Socials */}
-          <div className="sm:col-span-2 lg:col-span-4">
-            <Link to="/" className="inline-block">
-              <span style={displayFont} className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                {siteName}
-              </span>
-            </Link>
-            <p className="mt-1 text-xs font-semibold text-red-600 uppercase tracking-wide">
-              {tagline}
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-slate-600 max-w-sm">
-              {aboutText}
-            </p>
+          {showFooterInfo && (
+            <div className="sm:col-span-2 lg:col-span-4">
+              <Link to="/" className="inline-block">
+                <span style={displayFont} className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+                  {siteName}
+                </span>
+              </Link>
+              <p className="mt-1 text-xs font-semibold text-red-600 dark:text-red-500 uppercase tracking-wide">
+                {tagline}
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400 max-w-sm">
+                {aboutText}
+              </p>
 
-            {/* Social Icons */}
-            <div className="mt-6 flex items-center gap-2">
-              {SOCIAL_LINKS.map(({ name, href, Icon }) => (
-                <a
-                  key={name}
-                  href={href}
-                  aria-label={name}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-red-600 hover:bg-red-600 hover:text-white"
-                >
-                  <Icon size={18} />
-                </a>
-              ))}
+              {/* Social Icons */}
+              {showSocialLinks && socialLinks.length > 0 && (
+                <div className="mt-6 flex items-center gap-2">
+                  {socialLinks.map(({ name, href, Icon }) => (
+                    <a
+                      key={name}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={name}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-red-600 hover:bg-red-600 hover:text-white dark:hover:border-red-500"
+                    >
+                      <Icon size={18} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Col 2: Category Chips/Links */}
           <nav aria-label="বিভাগসমূহ" className="lg:col-span-3">
             <h4
               style={displayFont}
-              className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 inline-block"
+              className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2 inline-block"
             >
               বিভাগসমূহ
             </h4>
@@ -182,9 +202,9 @@ function Footer({
                 <Link
                   key={category.slug}
                   to={`/category/${category.slug}`}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-red-600 hover:text-red-600 hover:shadow-sm"
+                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition-all hover:border-red-600 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-500 hover:shadow-sm"
                 >
-                  <ChevronRight size={12} className="text-slate-400" />
+                  <ChevronRight size={12} className="text-slate-400 dark:text-slate-500" />
                   {category.name}
                 </Link>
               ))}
@@ -195,7 +215,7 @@ function Footer({
           <nav aria-label="প্রতিষ্ঠান ও নীতি" className="lg:col-span-2">
             <h4
               style={displayFont}
-              className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 inline-block"
+              className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2 inline-block"
             >
               তথ্য ও নীতি
             </h4>
@@ -205,7 +225,7 @@ function Footer({
                   <Link
                     to={link.href}
                     onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                    className="text-slate-600 transition-colors hover:text-red-600 hover:underline"
+                    className="text-slate-600 dark:text-slate-400 transition-colors hover:text-red-600 dark:hover:text-red-500 hover:underline"
                   >
                     {link.name}
                   </Link>
@@ -215,7 +235,7 @@ function Footer({
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="text-slate-600 transition-colors hover:text-red-600 hover:underline"
+                    className="text-slate-600 dark:text-slate-400 transition-colors hover:text-red-600 dark:hover:text-red-500 hover:underline"
                   >
                     {link.name}
                   </Link>
@@ -225,47 +245,49 @@ function Footer({
           </nav>
 
           {/* Col 4: Contact Card */}
-          <div className="lg:col-span-3">
-            <h4
-              style={displayFont}
-              className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 inline-block"
-            >
-              যোগাযোগ
-            </h4>
-            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-xs space-y-3 text-slate-600 shadow-sm">
-              <div className="flex items-start gap-2.5">
-                <MapPin size={16} className="mt-0.5 shrink-0 text-red-600" />
-                <span>{address}</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Phone size={16} className="shrink-0 text-red-600" />
-                <a href={`tel:${phone}`} className="hover:text-red-600 transition-colors">
-                  {phone}
-                </a>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Mail size={16} className="shrink-0 text-red-600" />
-                <a href={`mailto:${email}`} className="hover:text-red-600 transition-colors">
-                  {email}
-                </a>
+          {showContact && (
+            <div className="lg:col-span-3">
+              <h4
+                style={displayFont}
+                className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2 inline-block"
+              >
+                যোগাযোগ
+              </h4>
+              <div className="mt-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-xs space-y-3 text-slate-600 dark:text-slate-400 shadow-sm">
+                <div className="flex items-start gap-2.5">
+                  <MapPin size={16} className="mt-0.5 shrink-0 text-red-600 dark:text-red-500" />
+                  <span>{address}</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Phone size={16} className="shrink-0 text-red-600 dark:text-red-500" />
+                  <a href={`tel:${phone}`} className="hover:text-red-600 dark:hover:text-red-500 transition-colors">
+                    {phone}
+                  </a>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Mail size={16} className="shrink-0 text-red-600 dark:text-red-500" />
+                  <a href={`mailto:${email}`} className="hover:text-red-600 dark:hover:text-red-500 transition-colors">
+                    {email}
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
         </div>
 
         {/* ===================================================
             2. Bottom Bar / Colophon (Newspaper Masthead Style)
             =================================================== */}
-        <div className="pt-6 flex flex-col gap-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="pt-6 flex flex-col gap-4 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>© {now.getFullYear()} {siteName}। সর্বস্বত্ব সংরক্ষিত।</span>
-            <span className="hidden sm:inline text-slate-300">•</span>
-            <span>প্রকাশক ও সম্পাদক: <strong className="text-slate-800">{editorName}</strong></span>
+            <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+            <span>প্রকাশক ও সম্পাদক: <strong className="text-slate-800 dark:text-slate-200">{editorName}</strong></span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="font-mono tabular-nums text-slate-500 bg-slate-200/60 px-2 py-1 rounded">
+            <span className="font-mono tabular-nums text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-800/60 px-2 py-1 rounded">
               {formattedNow}
             </span>
           </div>
@@ -273,13 +295,7 @@ function Footer({
 
       </div>
 
-      {/* 👇 Ekmatra global ScrollTop component — footer-er nijer button
-          shore giye ekhane bosano holo. Eta footer-er bhitor render
-          hocche mane na — ScrollTop nijer `fixed` positioning die
-          page-er niche-e attach thake, tai footer-e boshai to just
-          confirm kora je eta shob public page-e (jekhane footer ache)
-          eksathei mount hocche. */}
-      <ScrollTop />
+      <ScrollTop/>
     </footer>
   );
 }

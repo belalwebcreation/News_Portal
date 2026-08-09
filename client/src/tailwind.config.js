@@ -1,7 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 import typography from "@tailwindcss/typography";
 
+// ===============================
+// Custom font stacks — kept as a plain JS constant and reused directly
+// inside the `typography` extend below, instead of going through
+// theme("fontFamily.display") from inside the plugin callback.
+// Under Tailwind v4, theme() inside the typography extend callback
+// doesn't reliably resolve custom `extend.fontFamily` keys (it returns
+// undefined even though the key is defined right above), which is what
+// was crashing on `.join(", ")`.
+// ===============================
+const fontFamily = {
+  display: ['"Newsreader"', '"Noto Serif Bengali"', "serif"],
+  meta: ['"Space Grotesk"', '"Noto Sans Bengali"', "sans-serif"],
+};
+
 const config = {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -17,17 +32,11 @@ const config = {
         graphite: "#5B6169",
       },
 
-      fontFamily: {
-        display: ['"Newsreader"', '"Noto Serif Bengali"', "serif"],
-        meta: ['"Space Grotesk"', '"Noto Sans Bengali"', "sans-serif"],
-      },
+      fontFamily,
 
       // ===============================
       // Typography (prose) theme for rich-text article bodies —
       // used via `prose prose-dispatch` in ArticleContent.jsx.
-      // Depends on the colors/fontFamily above (theme() reads the fully
-      // merged theme regardless of key order, but keeping this below
-      // them is easier to follow).
       // ===============================
       typography: ({ theme }) => ({
         dispatch: {
@@ -44,10 +53,10 @@ const config = {
             "--tw-prose-code": theme("colors.accent"),
             "--tw-prose-th-borders": theme("colors.ink / 10%"),
             "--tw-prose-td-borders": theme("colors.ink / 10%"),
-            fontFamily: theme("fontFamily.display").join(", "),
-            p: { fontFamily: theme("fontFamily.display").join(", ") },
+            fontFamily: fontFamily.display.join(", "),
+            p: { fontFamily: fontFamily.display.join(", ") },
             "h1, h2, h3, h4": {
-              fontFamily: theme("fontFamily.display").join(", "),
+              fontFamily: fontFamily.display.join(", "),
               fontWeight: "500",
               letterSpacing: "-0.01em",
               scrollMarginTop: "6rem",
@@ -61,7 +70,7 @@ const config = {
             "a:hover": { textDecorationColor: theme("colors.accent") },
             blockquote: { fontStyle: "italic", borderLeftWidth: "2px" },
             code: {
-              fontFamily: theme("fontFamily.meta").join(", "),
+              fontFamily: fontFamily.meta.join(", "),
               backgroundColor: theme("colors.ink / 5%"),
               borderRadius: "0.25rem",
               padding: "0.15rem 0.4rem",
@@ -75,7 +84,7 @@ const config = {
               borderRadius: "0.75rem",
             },
             figcaption: {
-              fontFamily: theme("fontFamily.meta").join(", "),
+              fontFamily: fontFamily.meta.join(", "),
               textTransform: "uppercase",
               letterSpacing: "0.1em",
               fontSize: "0.75rem",
