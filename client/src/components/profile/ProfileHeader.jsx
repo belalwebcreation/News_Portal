@@ -466,7 +466,7 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                   type="button"
                   onClick={handleSaveCoverPosition}
                   disabled={savingCoverPosition}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-content text-xs font-semibold shadow-md hover:bg-primary-focus transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-content text-xs font-semibold shadow-md hover:bg-primary/90 transition-all"
                 >
                   {savingCoverPosition ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
                   <span>Save</span>
@@ -567,7 +567,7 @@ const ProfileHeader = ({ profile, onRefresh, isOwnProfile = true }) => {
                 <>
                   <Link
                     to="/dashboard"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-content font-medium text-sm shadow-lg hover:bg-primary-focus transition-all whitespace-nowrap active:scale-95"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-content font-medium text-sm shadow-lg hover:bg-primary/90 transition-all whitespace-nowrap active:scale-95"
                   >
                     <LayoutDashboard size={17} />
                     <span>Dashboard</span>

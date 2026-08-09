@@ -227,7 +227,9 @@ const ProfileAvatar = ({
             </div>
           )}
 
-          {/* Reposition Mode Tooltip Badge */}
+          {/* Reposition Mode Tooltip Badge — intentionally fixed dark-glass:
+              floats directly over the photo being dragged, so it needs to
+              stay visible regardless of the app's light/dark theme. */}
           {editable && repositioning && (
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none rounded-full bg-slate-900/80 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-md border border-white/20 shadow-md whitespace-nowrap">
               ✨ Drag or use arrows
@@ -266,7 +268,8 @@ const ProfileAvatar = ({
         )}
       </div>
 
-      {/* Modern Floating Glass Action Bar for Reposition Mode */}
+      {/* Modern Floating Glass Action Bar for Reposition Mode — also
+          intentionally fixed dark-glass, same reasoning as the tooltip above. */}
       {editable && repositioning && (
         <div
           className="mt-3.5 flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900/90 dark:bg-slate-950/90 text-white backdrop-blur-xl border border-white/15 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200"
@@ -286,7 +289,7 @@ const ProfileAvatar = ({
             type="button"
             onClick={onSavePosition}
             disabled={savingPosition}
-            className="inline-flex items-center justify-center gap-1 h-8 px-3.5 rounded-xl bg-primary text-primary-content text-xs font-semibold shadow-md shadow-primary/30 hover:bg-primary-focus active:scale-95 transition-all"
+            className="inline-flex items-center justify-center gap-1 h-8 px-3.5 rounded-xl bg-primary text-primary-content text-xs font-semibold shadow-md shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all"
           >
             {savingPosition ? (
               <Loader2 size={13} className="animate-spin" />

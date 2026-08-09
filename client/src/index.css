@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @config "./tailwind.config.js";
 @custom-variant dark (&:where(.dark, .dark *));
+@plugin "daisyui" {
+  themes: light --default, dark;
+}
 
 /* Hide Horizontal Scrollbar */
 

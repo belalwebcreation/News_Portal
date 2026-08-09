@@ -25,7 +25,8 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     if (!mounted) return;
     const root = document.documentElement;
-    root.classList.toggle("dark", mode === "dark"); // Tailwind darkMode: 'class' এর জন্য
+    root.classList.toggle("dark", mode === "dark"); // Tailwind darkMode: 'class' এর জন্য (HeroSection ইত্যাদির dark: classগুলো)
+    root.setAttribute("data-theme", mode); // daisyUI theme switch এর জন্য (Profile.jsx-এর base-100/base-200/card/alert ইত্যাদি)
     root.style.setProperty("--accent", accentColor);
     localStorage.setItem(MODE_KEY, mode);
     localStorage.setItem(ACCENT_KEY, accentColor);

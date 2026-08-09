@@ -31,13 +31,10 @@ const PhotoEditMenu = ({ items, onClose, className = "" }) => {
     <div
       role="menu"
       aria-orientation="vertical"
-      // Explicit solid color instead of the theme's `bg-neutral` token —
-      // this menu floats over photos of any colour, so it can't afford to
-      // be even slightly translucent. The inline `backgroundColor` is a
-      // belt-and-braces fallback in case the Tailwind class ever gets
-      // purged/overridden by a parent; both resolve to the same solid hex.
-      style={{ backgroundColor: "#ffffff" }}
-      className={`absolute right-0 top-full z-[100] mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 text-gray-800 shadow-xl ring-1 ring-black/5 animate-[menu-in_0.12s_ease-out] ${className}`}
+      // daisyUI's `base-100` is a solid, opaque theme token (not translucent),
+      // so it stays safely readable over photos of any colour while still
+      // tracking light/dark mode via `data-theme` — no fixed hex needed.
+      className={`absolute right-0 top-full z-[100] mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-base-300 bg-base-100 py-1.5 text-base-content shadow-xl ring-1 ring-base-content/5 animate-[menu-in_0.12s_ease-out] ${className}`}
     >
       <style>{`
         @keyframes menu-in {
@@ -48,7 +45,7 @@ const PhotoEditMenu = ({ items, onClose, className = "" }) => {
 
       {items.map((item) => (
         <div key={item.label}>
-          {item.divider && <div className="my-1 border-t border-gray-200" />}
+          {item.divider && <div className="my-1 border-t border-base-200" />}
           <button
             type="button"
             role="menuitem"
@@ -63,8 +60,8 @@ const PhotoEditMenu = ({ items, onClose, className = "" }) => {
               item.disabled
                 ? "cursor-not-allowed opacity-40"
                 : item.danger
-                ? "text-red-400 hover:bg-red-500/10 focus-visible:bg-red-500/10"
-                : "hover:bg-gray-100 focus-visible:bg-gray-100"
+                ? "text-error hover:bg-error/10 focus-visible:bg-error/10"
+                : "hover:bg-base-200 focus-visible:bg-base-200"
             }`}
           >
             <item.icon size={18} className="shrink-0" />
