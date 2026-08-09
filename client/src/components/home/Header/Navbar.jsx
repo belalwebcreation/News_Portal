@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { useSiteSettings } from "../../../context/SiteSettingsContext";
@@ -17,12 +17,6 @@ const Navbar = () => {
   const { settings, loading } = useSiteSettings();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // 🔍 DEBUG 1: নেভবার কতবার Mount/Unmount হচ্ছে তা দেখা
-  useEffect(() => {
-    console.log("🔴 [Navbar Lifecycle] MOUNTED (নেভবার লোড হয়েছে)");
-    return () => console.log("⚪ [Navbar Lifecycle] UNMOUNTED (নেভবার বন্ধ হয়েছে)");
-  }, []);
-
   // ১) ব্যাকএন্ড থেকে আসা নেভবার আইটেম ফিল্টার ও সর্ট করা
   const categories = useMemo(
     () =>
@@ -37,26 +31,34 @@ const Navbar = () => {
     { reserved: MENU_BUTTON_RESERVED_WIDTH }
   );
 
-  // 🔍 DEBUG 2: প্রতিটি রেন্ডারে ডেটার অবস্থা দেখা
-  console.log("📊 [Navbar Render Debug]:", {
-    loading,
-    hasSettings: !!settings,
-    totalNavbarItems: settings?.navbar?.length || 0,
-    categoriesCount: categories.length,
-    visibleItemsCount: visibleItems.length,
-    overflowItemsCount: overflowItems.length,
-  });
-
+  // rAF দিয়ে throttle করা স্ক্রল হ্যান্ডলার — প্রতি ফ্রেমে সর্বোচ্চ একবার কাজ করবে,
+  // আর threshold পার হলে তবেই state আপডেট হবে (unnecessary re-render এড়াতে)
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 8);
-    onScroll();
+    let ticking = false;
+    let lastValue = window.scrollY > 8;
+    setIsScrolled(lastValue);
+
+    const update = () => {
+      const next = window.scrollY > 8;
+      if (next !== lastValue) {
+        lastValue = next;
+        setIsScrolled(next);
+      }
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   if (loading) {
-    // 🔍 DEBUG 3: নেভবার লোডিং অবস্থায় ঢুকলে সতর্ক করবে
-    console.warn("⚠️ [Navbar State] Loading is TRUE — Skeleton visible");
     return (
       <nav className="border-y border-gray-200 shadow-sm bg-white">
         <div className="max-w-7xl mx-auto h-16 animate-pulse" />
