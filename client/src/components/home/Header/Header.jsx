@@ -2,25 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import TopHeader from "./TopHeader";
 import Navbar from "./Navbar";
 
-const SCROLL_DELTA_THRESHOLD = 5;
-const TOP_ENTER_THRESHOLD = 2;
-const TOP_EXIT_THRESHOLD = 48;
+// থ্রেশহোল্ডগুলো এখন ছোট — হালকা স্ক্রলেও দ্রুত হাইড/শো হবে
+const SCROLL_DELTA_THRESHOLD = 3; // এর কম হলে noise ধরে ইগনোর হবে
+const TOP_ENTER_THRESHOLD = 2;    // এর নিচে গেলে TopHeader আবার দেখাবে
+const TOP_EXIT_THRESHOLD = 16;    // আগে ৪৮ ছিল — কমিয়ে আনা হলো, দ্রুত রেসপন্সের জন্য
 
-// TopHeader-এর grid-rows collapse/expand transition (duration-300) যতক্ষণ
-// চলছে, ততক্ষণ "visible" টগল বন্ধ রাখা হবে।
-//
-// বাগ: TopHeader collapse হয় height animate করে (grid-rows), আর পুরো header
-// হাইড হয় "-translate-y-full" দিয়ে — যেটা header-এর *তাৎক্ষণিক* height-এর
-// ১০০%। স্বাভাবিক গতিতে scroll down করলে প্রায়ই একই frame-এ currentY একসাথে
-// TOP_EXIT_THRESHOLD আর delta threshold দুটোই পার হয়ে যায়, ফলে atTop আর
-// visible একই সাথে false হয়ে যায়। তখন TopHeader-এর height কমছে ঠিক সেই
-// মুহূর্তেই header তার -100% (যেটা সেই কমতে-থাকা height-এরই ১০০%) হিসাব
-// করে সরার চেষ্টা করে — দুই animation একে অপরের base বদলে দেয় বলে
-// hide "আটকে যায়"।
-//
-// ফিক্স: TopHeader-এর animation শেষ না হওয়া পর্যন্ত visible টগল না করা —
-// দুটো animation কখনো একসাথে না চালানো।
-const TOP_TRANSITION_LOCK_MS = 320; // duration-300-এর চেয়ে সামান্য বেশি বাফার
+// Navbar-এর প্রকৃত height মাউন্টের আগ পর্যন্ত fallback (h-16 = 64px + 1px border)
+const NAVBAR_HEIGHT_FALLBACK = 65;
 
 const Header = () => {
   const [visible, setVisible] = useState(true);
@@ -29,12 +17,29 @@ const Header = () => {
   const atTopRef = useRef(true);
   const lastActedY = useRef(0);
   const ticking = useRef(false);
-  const topTransitionLockUntil = useRef(0);
+
+  const navbarWrapRef = useRef(null);
+  const navbarHeight = useRef(NAVBAR_HEIGHT_FALLBACK);
+
+  // Navbar-এর আসল রেন্ডারড height ResizeObserver দিয়ে dynamically মাপা হচ্ছে।
+  // এটাই মূল ফিক্স: header hide করার সময় translateY এখন এই FIXED pixel
+  // value ব্যবহার করবে, TopHeader-এর animate হতে থাকা height-এর উপর
+  // percentage হিসেবে নির্ভর করবে না — ফলে দুটো animation (TopHeader
+  // collapse আর header hide) একে অপরের target আর বদলাতে পারবে না, এবং
+  // কোনো artificial delay/lock ছাড়াই সাথে সাথে রেসপন্ড করবে।
+  useEffect(() => {
+    if (!navbarWrapRef.current) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const h = entry.contentRect?.height || entry.target.offsetHeight;
+      if (h) navbarHeight.current = h;
+    });
+    ro.observe(navbarWrapRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const updateHeaderState = () => {
       const currentY = Math.max(window.scrollY, 0);
-      const now = performance.now();
 
       let nextAtTop = atTopRef.current;
       if (!atTopRef.current && currentY <= TOP_ENTER_THRESHOLD) {
@@ -43,26 +48,19 @@ const Header = () => {
         nextAtTop = false;
       }
 
-      const atTopJustChanged = nextAtTop !== atTopRef.current;
-
-      if (atTopJustChanged) {
+      if (nextAtTop !== atTopRef.current) {
         atTopRef.current = nextAtTop;
         setAtTop(nextAtTop);
-        topTransitionLockUntil.current = now + TOP_TRANSITION_LOCK_MS;
       }
 
       if (nextAtTop) {
         // টপ জোনে থাকলে সবসময় ফুল header দেখাবে
         setVisible(true);
         lastActedY.current = currentY;
-      } else if (now < topTransitionLockUntil.current) {
-        // TopHeader তখনো animate হচ্ছে — visible টগল স্থগিত। lastActedY
-        // আপডেট রাখা হচ্ছে যাতে lock খোলার পর পুরনো stale delta থেকে
-        // হঠাৎ বড় jump ধরা না পড়ে
-        lastActedY.current = currentY;
       } else {
         const delta = currentY - lastActedY.current;
         if (Math.abs(delta) > SCROLL_DELTA_THRESHOLD) {
+          // নিচের দিকে (delta > 0) → হাইড, উপরের দিকে (delta < 0) → শো
           setVisible(delta < 0);
           lastActedY.current = currentY;
         }
@@ -84,10 +82,16 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-white dark:bg-gray-900 [overflow-anchor:none] transition-transform duration-300 ease-out ${
-        visible ? "translate-y-0" : "-translate-y-full"
-      }`}
+      className="sticky top-0 z-50 bg-white dark:bg-gray-900 [overflow-anchor:none] transition-transform duration-300 ease-out"
+      style={{
+        transform: visible
+          ? "translateY(0)"
+          : `translateY(-${navbarHeight.current}px)`,
+      }}
     >
+      {/* TopHeader কে grid-rows দিয়ে collapse করা হচ্ছে — এটা নিজের মতো
+          স্বাধীনভাবে animate হয়, উপরের translateY আর এর মধ্যে এখন কোনো
+          নির্ভরতা নেই */}
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${
           atTop ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -98,7 +102,9 @@ const Header = () => {
         </div>
       </div>
 
-      <Navbar />
+      <div ref={navbarWrapRef}>
+        <Navbar />
+      </div>
     </header>
   );
 };
