@@ -2,34 +2,39 @@ import { useEffect, useRef, useState } from "react";
 import TopHeader from "./TopHeader";
 import Navbar from "./Navbar";
 
-// স্ক্রলের এই পরিমাণ শিফটকে "noise" ধরে ইগনোর করা হবে, যাতে সামান্য কাঁপাকাঁপিতে
-// header বারবার flicker না করে
 const SCROLL_DELTA_THRESHOLD = 5;
+const TOP_ENTER_THRESHOLD = 2;
+const TOP_EXIT_THRESHOLD = 48;
 
-// "atTop" state-এ ঢোকা আর বের হওয়ার জন্য আলাদা আলাদা threshold (hysteresis)।
-// একটা মাত্র threshold ব্যবহার করলে (আগে ৮px) scrollY ওই মানের আশেপাশে সামান্য
-// ওঠানামা করলেই (trackpad/inertial scroll deceleration-এ এটা খুবই স্বাভাবিক)
-// atTop বারবার true/false flip করে, আর প্রতিবার flip-এ TopHeader-এর grid-rows
-// transition আবার নতুন করে রিস্টার্ট হয়ে যায় — এটাই মূলত "কাঁপা/লাফালাফি"-র কারণ।
-const TOP_ENTER_THRESHOLD = 2; // এই বা এর নিচে গেলে TopHeader আবার দেখানো হবে
-const TOP_EXIT_THRESHOLD = 48; // এটা পার হলে তবেই TopHeader আবার collapse হবে
+// TopHeader-এর grid-rows collapse/expand transition (duration-300) যতক্ষণ
+// চলছে, ততক্ষণ "visible" টগল বন্ধ রাখা হবে।
+//
+// বাগ: TopHeader collapse হয় height animate করে (grid-rows), আর পুরো header
+// হাইড হয় "-translate-y-full" দিয়ে — যেটা header-এর *তাৎক্ষণিক* height-এর
+// ১০০%। স্বাভাবিক গতিতে scroll down করলে প্রায়ই একই frame-এ currentY একসাথে
+// TOP_EXIT_THRESHOLD আর delta threshold দুটোই পার হয়ে যায়, ফলে atTop আর
+// visible একই সাথে false হয়ে যায়। তখন TopHeader-এর height কমছে ঠিক সেই
+// মুহূর্তেই header তার -100% (যেটা সেই কমতে-থাকা height-এরই ১০০%) হিসাব
+// করে সরার চেষ্টা করে — দুই animation একে অপরের base বদলে দেয় বলে
+// hide "আটকে যায়"।
+//
+// ফিক্স: TopHeader-এর animation শেষ না হওয়া পর্যন্ত visible টগল না করা —
+// দুটো animation কখনো একসাথে না চালানো।
+const TOP_TRANSITION_LOCK_MS = 320; // duration-300-এর চেয়ে সামান্য বেশি বাফার
 
 const Header = () => {
   const [visible, setVisible] = useState(true);
   const [atTop, setAtTop] = useState(true);
 
   const atTopRef = useRef(true);
-  // "lastActedY" হলো শেষ যেই scrollY-তে আমরা আসলেই state change করেছিলাম।
-  // প্রতি frame-এর raw scrollY-এর সাথে delta compare করলে trackpad-এর অনেক ছোট
-  // (threshold-এর নিচের) delta প্রতিবারই lastScrollY রিসেট করে দিতো, ফলে দিক
-  // পরিবর্তনের হিসাবটা অস্থির হয়ে যেতো — এখন শেষ "committed" position-এর সাথে
-  // compare করা হচ্ছে।
   const lastActedY = useRef(0);
   const ticking = useRef(false);
+  const topTransitionLockUntil = useRef(0);
 
   useEffect(() => {
     const updateHeaderState = () => {
       const currentY = Math.max(window.scrollY, 0);
+      const now = performance.now();
 
       let nextAtTop = atTopRef.current;
       if (!atTopRef.current && currentY <= TOP_ENTER_THRESHOLD) {
@@ -38,19 +43,26 @@ const Header = () => {
         nextAtTop = false;
       }
 
-      if (nextAtTop !== atTopRef.current) {
+      const atTopJustChanged = nextAtTop !== atTopRef.current;
+
+      if (atTopJustChanged) {
         atTopRef.current = nextAtTop;
         setAtTop(nextAtTop);
+        topTransitionLockUntil.current = now + TOP_TRANSITION_LOCK_MS;
       }
 
       if (nextAtTop) {
         // টপ জোনে থাকলে সবসময় ফুল header দেখাবে
         setVisible(true);
         lastActedY.current = currentY;
+      } else if (now < topTransitionLockUntil.current) {
+        // TopHeader তখনো animate হচ্ছে — visible টগল স্থগিত। lastActedY
+        // আপডেট রাখা হচ্ছে যাতে lock খোলার পর পুরনো stale delta থেকে
+        // হঠাৎ বড় jump ধরা না পড়ে
+        lastActedY.current = currentY;
       } else {
         const delta = currentY - lastActedY.current;
         if (Math.abs(delta) > SCROLL_DELTA_THRESHOLD) {
-          // নিচের দিকে স্ক্রল (delta > 0) → হাইড, উপরের দিকে (delta < 0) → শো
           setVisible(delta < 0);
           lastActedY.current = currentY;
         }
@@ -76,11 +88,6 @@ const Header = () => {
         visible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      {/* TopHeader কে grid-rows দিয়ে collapse করা হচ্ছে — এতে ওর আসল height না জেনেও
-          smooth animation পাওয়া যায়, hardcoded max-height লাগে না।
-          [overflow-anchor:none] header-এ বসানো হয়েছে যাতে এই height change-এর
-          কারণে ব্রাউজার নিজে থেকে scrollY অ্যাডজাস্ট (scroll anchoring) করে আরেকটা
-          synthetic scroll event তৈরি না করে — যেটা feedback loop-টার একটা অংশ ছিল। */}
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${
           atTop ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
