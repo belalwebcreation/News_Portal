@@ -80,7 +80,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-[15px] font-medium ${
       pathname === path
         ? "bg-amber-900 text-white shadow-md"
-        : "text-slate-700 hover:bg-amber-900 hover:text-white"
+        : "text-slate-700 dark:text-slate-300 hover:bg-amber-900 hover:text-white"
     }`;
 
   // 🔗 Home page er logo er ekই logic — settings theke src o visibility
@@ -99,15 +99,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-screen w-72 bg-white border-r border-gray-200 shadow-lg transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 h-screen w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-lg dark:shadow-none transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Header Block: Logo & Close Button */}
-        <div className="h-20 flex items-center justify-between border-b px-5">
+        <div className="h-20 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-5">
           <Link to="/" onClick={() => setSidebarOpen(false)}>
             {settingsLoading ? (
-              <div className="w-44 h-10 rounded bg-gray-200 animate-pulse" />
+              <div className="w-44 h-10 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : (
               logoVisible && (
                 <img
@@ -126,7 +126,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-2xl text-gray-600 hover:text-red-600 transition-colors"
+            className="lg:hidden text-2xl text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 transition-colors"
           >
             <FiX />
           </button>
@@ -153,11 +153,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             </div>
 
             {/* Bottom Fix: Logout Actions */}
-            <li className="pt-4 border-t border-gray-100 pb-4">
+            <li className="pt-4 border-t border-gray-100 dark:border-gray-800 pb-4">
               <Link
                 to="/logout"
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300 font-medium"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white transition-all duration-300 font-medium"
               >
                 <FiLogOut size={20} />
                 <span>Logout</span>

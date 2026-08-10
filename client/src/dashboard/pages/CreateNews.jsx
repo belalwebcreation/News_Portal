@@ -154,7 +154,7 @@ const CreateNews = () => {
 
       });
 
-      তারপর axios/fetch দিয়ে
+      তারপর axios/fetch দিয়ে
 
       POST
 
@@ -185,19 +185,19 @@ const CreateNews = () => {
 
           {/* Page Header */}
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
 
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
                   <div>
 
-                      <h1 className="text-3xl font-bold text-slate-800">
+                      <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
 
                           Create News
 
                       </h1>
 
-                      <p className="text-slate-500 mt-2">
+                      <p className="text-slate-500 dark:text-slate-400 mt-2">
 
                           Publish professional news article.
 
@@ -229,9 +229,9 @@ const CreateNews = () => {
 
               {/* ================= part 2 Basic Information ================= */}
 
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-                  <h2 className="text-xl font-bold text-slate-800 mb-6">
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
                       Basic Information
                   </h2>
 
@@ -241,7 +241,7 @@ const CreateNews = () => {
 
                       <div className="lg:col-span-2">
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               News Title
                           </label>
 
@@ -251,7 +251,7 @@ const CreateNews = () => {
                               value={newsData.title}
                               onChange={handleChange}
                               placeholder="Enter news title..."
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-amber-900"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3 outline-none focus:border-amber-900 dark:focus:border-amber-500"
                           />
 
                       </div>
@@ -260,7 +260,7 @@ const CreateNews = () => {
 
                       <div>
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               News Slug
                           </label>
 
@@ -268,7 +268,7 @@ const CreateNews = () => {
                               type="text"
                               value={newsData.slug}
                               readOnly
-                              className="mt-2 w-full bg-gray-100 border rounded-xl px-4 py-3"
+                              className="mt-2 w-full bg-gray-100 dark:bg-slate-700 dark:text-slate-300 border dark:border-slate-600 rounded-xl px-4 py-3"
                           />
 
                       </div>
@@ -277,7 +277,7 @@ const CreateNews = () => {
 
                       <div>
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               Category
                           </label>
 
@@ -285,7 +285,7 @@ const CreateNews = () => {
                               name="category"
                               value={newsData.category}
                               onChange={handleChange}
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white rounded-xl px-4 py-3"
                           >
 
                               <option value="">Select Category</option>
@@ -319,7 +319,7 @@ const CreateNews = () => {
 
                       <div>
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               Sub Category
                           </label>
 
@@ -329,7 +329,7 @@ const CreateNews = () => {
                               value={newsData.subCategory}
                               onChange={handleChange}
                               placeholder="Sub Category..."
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
                           />
 
                       </div>
@@ -338,7 +338,7 @@ const CreateNews = () => {
 
                       <div>
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               Reporter Name
                           </label>
 
@@ -348,7 +348,7 @@ const CreateNews = () => {
                               value={newsData.reporter}
                               onChange={handleChange}
                               placeholder="Reporter Name..."
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
                           />
 
                           {/* Backend */}
@@ -363,7 +363,7 @@ const CreateNews = () => {
 
                       <div>
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               News Source
                           </label>
 
@@ -373,7 +373,7 @@ const CreateNews = () => {
                               value={newsData.source}
                               onChange={handleChange}
                               placeholder="BBC, Prothom Alo..."
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
                           />
 
                       </div>
@@ -382,7 +382,7 @@ const CreateNews = () => {
 
                       <div className="lg:col-span-2">
 
-                          <label className="font-semibold text-slate-700">
+                          <label className="font-semibold text-slate-700 dark:text-slate-300">
                               Short Description
                           </label>
 
@@ -392,7 +392,7 @@ const CreateNews = () => {
                               value={newsData.shortDescription}
                               onChange={handleChange}
                               placeholder="Write short description..."
-                              className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 resize-none"
+                              className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3 resize-none"
                           />
 
                       </div>
@@ -403,9 +403,9 @@ const CreateNews = () => {
 
               {/* ================= Media Upload ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-    <h2 className="text-xl font-bold text-slate-800 mb-6">
+    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
         Media & Attachments
     </h2>
 
@@ -415,20 +415,20 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold text-slate-700">
+            <label className="font-semibold text-slate-700 dark:text-slate-300">
                 Featured Thumbnail
             </label>
 
-            <div className="mt-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-amber-900 transition">
+            <div className="mt-3 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-2xl p-6 hover:border-amber-900 dark:hover:border-amber-500 transition">
 
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleThumbnail}
-                    className="w-full"
+                    className="w-full dark:text-slate-300"
                 />
 
-                <p className="text-sm text-slate-500 mt-3">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">
                     Recommended Size : 1200 × 700 px
                 </p>
 
@@ -439,7 +439,7 @@ const CreateNews = () => {
                         <img
                             src={thumbnailPreview}
                             alt=""
-                            className="w-full h-60 object-cover rounded-xl border"
+                            className="w-full h-60 object-cover rounded-xl border dark:border-slate-700"
                         />
 
                     </div>
@@ -469,11 +469,11 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold text-slate-700">
+            <label className="font-semibold text-slate-700 dark:text-slate-300">
                 Gallery Images
             </label>
 
-            <div className="mt-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-amber-900 transition">
+            <div className="mt-3 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-2xl p-6 hover:border-amber-900 dark:hover:border-amber-500 transition">
 
                 <input
 
@@ -485,11 +485,11 @@ const CreateNews = () => {
 
                     onChange={handleGallery}
 
-                    className="w-full"
+                    className="w-full dark:text-slate-300"
 
                 />
 
-                <p className="text-sm text-slate-500 mt-3">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">
 
                     Upload Multiple Images
 
@@ -499,7 +499,7 @@ const CreateNews = () => {
 
                     <div className="mt-4">
 
-                        <p className="font-semibold text-green-700">
+                        <p className="font-semibold text-green-700 dark:text-green-400">
 
                             {gallery.length} Image Selected
 
@@ -531,9 +531,9 @@ const CreateNews = () => {
 
 {/* ================= Extra Information ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-    <h2 className="text-xl font-bold text-slate-800 mb-6">
+    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
 
         Additional Information
 
@@ -545,7 +545,7 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Featured Video URL
 
@@ -557,7 +557,7 @@ const CreateNews = () => {
 
                 placeholder="https://youtube.com/..."
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
@@ -574,7 +574,7 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Tags
 
@@ -592,11 +592,11 @@ const CreateNews = () => {
 
                 placeholder="Politics, Bangladesh, Economy"
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
 
                 Separate tags using comma (,)
 
@@ -608,7 +608,7 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Reading Time
 
@@ -620,11 +620,11 @@ const CreateNews = () => {
 
                 placeholder="5"
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
 
                 Example : 5 Minutes
 
@@ -636,7 +636,7 @@ const CreateNews = () => {
 
         <div>
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Source URL
 
@@ -648,7 +648,7 @@ const CreateNews = () => {
 
                 placeholder="https://example.com"
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
@@ -661,9 +661,9 @@ const CreateNews = () => {
 
             {/* ================= News Content ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-    <h2 className="text-xl font-bold text-slate-800 mb-6">
+    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
 
         News Content
 
@@ -671,7 +671,7 @@ const CreateNews = () => {
 
     <div>
 
-        <label className="font-semibold text-slate-700">
+        <label className="font-semibold text-slate-700 dark:text-slate-300">
 
             Full News Description
 
@@ -687,7 +687,7 @@ const CreateNews = () => {
 
             placeholder="Write your complete news..."
 
-            className="mt-3 w-full border border-gray-300 rounded-xl p-5 resize-none outline-none focus:border-amber-900"
+            className="mt-3 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl p-5 resize-none outline-none focus:border-amber-900 dark:focus:border-amber-500"
 
         />
 
@@ -719,9 +719,9 @@ const CreateNews = () => {
 
 {/* ================= SEO ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-    <h2 className="text-xl font-bold text-slate-800 mb-6">
+    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
 
         SEO Optimization
 
@@ -733,7 +733,7 @@ const CreateNews = () => {
 
         <div className="lg:col-span-2">
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Meta Title
 
@@ -751,7 +751,7 @@ const CreateNews = () => {
 
                 placeholder="SEO Meta Title"
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
@@ -761,7 +761,7 @@ const CreateNews = () => {
 
         <div className="lg:col-span-2">
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Meta Description
 
@@ -779,7 +779,7 @@ const CreateNews = () => {
 
                 placeholder="SEO Description..."
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 resize-none"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3 resize-none"
 
             />
 
@@ -789,7 +789,7 @@ const CreateNews = () => {
 
         <div className="lg:col-span-2">
 
-            <label className="font-semibold">
+            <label className="font-semibold dark:text-slate-300">
 
                 Meta Keywords
 
@@ -807,11 +807,11 @@ const CreateNews = () => {
 
                 placeholder="Bangladesh, Politics, Sports..."
 
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+                className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white dark:placeholder-slate-500 rounded-xl px-4 py-3"
 
             />
 
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
 
                 Separate keywords using comma (,)
 
@@ -841,9 +841,9 @@ const CreateNews = () => {
 </div>
         {/* ================= Publish Settings ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-  <h2 className="text-xl font-bold text-slate-800 mb-6">
+  <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
     Publish Settings
   </h2>
 
@@ -853,7 +853,7 @@ const CreateNews = () => {
 
     <div>
 
-      <label className="font-semibold text-slate-700">
+      <label className="font-semibold text-slate-700 dark:text-slate-300">
         Publish Status
       </label>
 
@@ -861,7 +861,7 @@ const CreateNews = () => {
         name="status"
         value={newsData.status}
         onChange={handleChange}
-        className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+        className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white rounded-xl px-4 py-3"
       >
         <option value="Draft">Draft</option>
         <option value="Pending">Pending Review</option>
@@ -884,7 +884,7 @@ const CreateNews = () => {
 
     <div>
 
-      <label className="font-semibold text-slate-700">
+      <label className="font-semibold text-slate-700 dark:text-slate-300">
         Schedule Publish
       </label>
 
@@ -893,7 +893,7 @@ const CreateNews = () => {
         name="publishDate"
         value={newsData.publishDate}
         onChange={handleChange}
-        className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3"
+        className="mt-2 w-full border border-gray-300 dark:border-slate-600 dark:bg-slate-900/40 dark:text-white rounded-xl px-4 py-3"
       />
 
       {/*
@@ -901,9 +901,9 @@ const CreateNews = () => {
 
       publishDate
 
-      যদি Future Date হয়
+      যদি Future Date হয়
 
-      Cron Job দিয়ে Publish হবে
+      Cron Job দিয়ে Publish হবে
 
       */}
     </div>
@@ -916,15 +916,15 @@ const CreateNews = () => {
 
     {/* Breaking */}
 
-    <label className="flex items-center justify-between border rounded-xl p-5 cursor-pointer">
+    <label className="flex items-center justify-between border dark:border-slate-700 rounded-xl p-5 cursor-pointer">
 
       <div>
 
-        <h3 className="font-semibold">
+        <h3 className="font-semibold dark:text-white">
           Breaking News
         </h3>
 
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Show Breaking Badge
         </p>
 
@@ -942,15 +942,15 @@ const CreateNews = () => {
 
     {/* Featured */}
 
-    <label className="flex items-center justify-between border rounded-xl p-5 cursor-pointer">
+    <label className="flex items-center justify-between border dark:border-slate-700 rounded-xl p-5 cursor-pointer">
 
       <div>
 
-        <h3 className="font-semibold">
+        <h3 className="font-semibold dark:text-white">
           Featured News
         </h3>
 
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Show on Homepage
         </p>
 
@@ -968,15 +968,15 @@ const CreateNews = () => {
 
     {/* Trending */}
 
-    <label className="flex items-center justify-between border rounded-xl p-5 cursor-pointer">
+    <label className="flex items-center justify-between border dark:border-slate-700 rounded-xl p-5 cursor-pointer">
 
       <div>
 
-        <h3 className="font-semibold">
+        <h3 className="font-semibold dark:text-white">
           Trending News
         </h3>
 
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Show Trending Section
         </p>
 
@@ -998,21 +998,21 @@ const CreateNews = () => {
 
 {/* ================= Preview ================= */}
 
-<div className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+<div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm p-6">
 
-  <h2 className="text-xl font-bold text-slate-800 mb-6">
+  <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
     News Preview
   </h2>
 
-  <div className="border rounded-2xl p-6 bg-slate-50">
+  <div className="border dark:border-slate-700 rounded-2xl p-6 bg-slate-50 dark:bg-slate-900/40">
 
-    <h1 className="text-3xl font-bold">
+    <h1 className="text-3xl font-bold dark:text-white">
 
       {newsData.title || "News Title"}
 
     </h1>
 
-    <p className="text-slate-500 mt-3">
+    <p className="text-slate-500 dark:text-slate-400 mt-3">
 
       {newsData.shortDescription ||
 
@@ -1074,7 +1074,7 @@ const CreateNews = () => {
 
   <button
     type="button"
-    className="px-8 py-3 rounded-xl border border-gray-300 hover:bg-gray-100 transition"
+    className="px-8 py-3 rounded-xl border border-gray-300 dark:border-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition"
   >
     Save Draft
   </button>

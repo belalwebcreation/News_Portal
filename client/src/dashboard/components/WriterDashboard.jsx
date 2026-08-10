@@ -26,22 +26,22 @@ const STATUS_TABS = [
 ];
 
 const STAT_CARDS = [
-  { key: "totalPosts", label: "Total Posts", icon: MdOutlineArticle, color: "bg-slate-100 text-slate-700" },
-  { key: "publishedCount", label: "Published", icon: FiFileText, color: "bg-emerald-100 text-emerald-700" },
-  { key: "draftCount", label: "Drafts", icon: FiEdit2, color: "bg-amber-100 text-amber-800" },
-  { key: "featuredCount", label: "Featured", icon: FiStar, color: "bg-purple-100 text-purple-700" },
-  { key: "totalViews", label: "Total Views", icon: FiEye, color: "bg-blue-100 text-blue-700" },
-  { key: "totalComments", label: "Comments", icon: FiMessageSquare, color: "bg-indigo-100 text-indigo-700" },
-  { key: "totalShares", label: "Shares", icon: FiShare2, color: "bg-teal-100 text-teal-700" },
-  { key: "totalBookmarks", label: "Bookmarks", icon: FiBookmark, color: "bg-rose-100 text-rose-700" },
+  { key: "totalPosts", label: "Total Posts", icon: MdOutlineArticle, color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300" },
+  { key: "publishedCount", label: "Published", icon: FiFileText, color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  { key: "draftCount", label: "Drafts", icon: FiEdit2, color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" },
+  { key: "featuredCount", label: "Featured", icon: FiStar, color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
+  { key: "totalViews", label: "Total Views", icon: FiEye, color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+  { key: "totalComments", label: "Comments", icon: FiMessageSquare, color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400" },
+  { key: "totalShares", label: "Shares", icon: FiShare2, color: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400" },
+  { key: "totalBookmarks", label: "Bookmarks", icon: FiBookmark, color: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400" },
 ];
 
 const StatusBadge = ({ status }) => (
   <span
     className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
       status === "published"
-        ? "bg-emerald-100 text-emerald-700"
-        : "bg-amber-100 text-amber-800"
+        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+        : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
     }`}
   >
     {status}
@@ -161,8 +161,8 @@ const WriterDashboard = () => {
             <LuLayoutDashboard size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-800">Writer Dashboard</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Writer Dashboard</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               স্বাগতম, {userInfo?.name || userInfo?.username || "Writer"} 👋
             </p>
           </div>
@@ -170,7 +170,7 @@ const WriterDashboard = () => {
 
         <Link
           to="/dashboard/writer/add-news"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-900 text-white font-medium shadow-md hover:bg-amber-800 transition-all duration-300"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-900 text-white font-medium shadow-md hover:bg-amber-800 dark:hover:bg-amber-700 transition-all duration-300"
         >
           <MdOutlinePostAdd size={20} />
           Create News
@@ -182,25 +182,25 @@ const WriterDashboard = () => {
         {STAT_CARDS.map(({ key, label, icon: Icon, color }) => (
           <div
             key={key}
-            className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3"
+            className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-4 shadow-sm flex items-center gap-3"
           >
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
               <Icon size={18} />
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-800 leading-none">
+              <p className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">
                 {statsLoading ? "…" : (stats?.[key] ?? 0).toLocaleString()}
               </p>
-              <p className="text-xs text-slate-500 mt-1">{label}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* News List */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm">
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-gray-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
             {STATUS_TABS.map((tab) => (
               <button
@@ -209,7 +209,7 @@ const WriterDashboard = () => {
                 className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                   activeTab === tab.key
                     ? "bg-amber-900 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-amber-50"
+                    : "text-slate-600 hover:bg-amber-50 dark:text-slate-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-300"
                 }`}
               >
                 {tab.label}
@@ -218,13 +218,13 @@ const WriterDashboard = () => {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Title দিয়ে খুঁজুন..."
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-900/30"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-900/30 dark:focus:ring-amber-500/30"
             />
           </div>
         </div>
@@ -233,7 +233,7 @@ const WriterDashboard = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-500 border-b border-gray-100">
+              <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-gray-100 dark:border-slate-800">
                 <th className="px-4 py-3 font-medium">Title</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Views</th>
@@ -244,18 +244,18 @@ const WriterDashboard = () => {
             <tbody>
               {listLoading &&
                 Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i} className="border-b border-gray-50 animate-pulse">
-                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-48" /></td>
-                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-16" /></td>
-                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-10" /></td>
-                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-20" /></td>
-                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-16 ml-auto" /></td>
+                  <tr key={i} className="border-b border-gray-50 dark:border-slate-800 animate-pulse">
+                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-48" /></td>
+                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-16" /></td>
+                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-10" /></td>
+                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-20" /></td>
+                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-16 ml-auto" /></td>
                   </tr>
                 ))}
 
               {!listLoading && listError && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-red-500">
+                  <td colSpan={5} className="px-4 py-10 text-center text-red-500 dark:text-red-400">
                     {listError}
                   </td>
                 </tr>
@@ -264,14 +264,14 @@ const WriterDashboard = () => {
               {!listLoading && !listError && newsList.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-4 py-12 text-center">
-                    <p className="text-slate-500 mb-3">
+                    <p className="text-slate-500 dark:text-slate-400 mb-3">
                       {search || activeTab !== "all"
                         ? "এই ফিল্টারে কোনো news পাওয়া যায়নি।"
                         : "এখনো কোনো news লেখা হয়নি।"}
                     </p>
                     <Link
                       to="/dashboard/writer/add-news"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-900 text-white text-sm font-medium hover:bg-amber-800 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-900 text-white text-sm font-medium hover:bg-amber-800 dark:hover:bg-amber-700 transition-colors"
                     >
                       <MdOutlinePostAdd size={16} /> প্রথম News লিখুন
                     </Link>
@@ -282,16 +282,16 @@ const WriterDashboard = () => {
               {!listLoading &&
                 !listError &&
                 newsList.map((item) => (
-                  <tr key={item._id} className="border-b border-gray-50 hover:bg-amber-50/40 transition-colors">
+                  <tr key={item._id} className="border-b border-gray-50 dark:border-slate-800 hover:bg-amber-50/40 dark:hover:bg-amber-900/10 transition-colors">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800 line-clamp-1 max-w-xs">{item.title}</p>
-                      <p className="text-xs text-slate-400">{item.category?.name}</p>
+                      <p className="font-medium text-slate-800 dark:text-slate-100 line-clamp-1 max-w-xs">{item.title}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">{item.category?.name}</p>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={item.status} />
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{(item.views ?? 0).toLocaleString()}</td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{(item.views ?? 0).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {new Date(item.publishedAt || item.createdAt).toLocaleDateString("en-GB", {
                         day: "2-digit",
                         month: "short",
@@ -302,7 +302,7 @@ const WriterDashboard = () => {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           to={editPath(item._id)}
-                          className="p-2 rounded-lg text-slate-500 hover:bg-amber-900 hover:text-white transition-colors"
+                          className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-amber-900 hover:text-white transition-colors"
                           title="Edit"
                         >
                           <FiEdit2 size={15} />
@@ -310,7 +310,7 @@ const WriterDashboard = () => {
                         <button
                           onClick={() => handleDelete(item._id, item.title)}
                           disabled={deletingId === item._id}
-                          className="p-2 rounded-lg text-slate-500 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
+                          className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
                           title="Delete"
                         >
                           <FiTrash2 size={15} />
@@ -325,22 +325,22 @@ const WriterDashboard = () => {
 
         {/* Pagination */}
         {!listLoading && meta.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-            <p className="text-xs text-slate-500">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-slate-800">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               মোট {meta.total} টি — পাতা {page} / {meta.pages}
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="p-2 rounded-lg border border-gray-200 text-slate-600 disabled:opacity-40 hover:bg-amber-50"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <FiChevronLeft size={16} />
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(meta.pages, p + 1))}
                 disabled={page >= meta.pages}
-                className="p-2 rounded-lg border border-gray-200 text-slate-600 disabled:opacity-40 hover:bg-amber-50"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <FiChevronRight size={16} />
               </button>

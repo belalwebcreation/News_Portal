@@ -40,7 +40,7 @@ import AccountSettings from "./components/profile/AccountSettings";
 
 // Admin Managers
 import AdminIndex from "./dashboard/pages/AdminIndex";
-import AddWriter from "./dashboard/pages/AddWriter";
+// import AddWriter from "./dashboard/pages/AddWriter";
 import Users from "./dashboard/pages/Users";
 import AdminProfile from "./dashboard/pages/AdminProfile";
 import News from "./dashboard/pages/News";
@@ -189,7 +189,7 @@ function AppRoutes() {
             <Route path="admin/categories" element={<CategoryManagement />} />
             <Route path="admin/news" element={<News />} />
             <Route path="admin/profile" element={<AdminProfile />} />
-            <Route path="admin/add-writer" element={<AddWriter />} />
+            {/* <Route path="admin/add-writer" element={<AddWriter />} /> */}
             <Route path="admin/users" element={<Users />} />
           </Route>
 

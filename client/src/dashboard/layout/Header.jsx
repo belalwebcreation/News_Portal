@@ -87,9 +87,11 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
       right-0
       h-16
       bg-white/90
+      dark:bg-slate-900/90
       backdrop-blur-md
       border-b
       border-gray-200
+      dark:border-slate-800
       shadow-sm
       z-50
       px-4
@@ -115,7 +117,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
         <div className="relative hidden md:block">
           <FiSearch
             size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
           />
 
           <input
@@ -130,11 +132,20 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
               rounded-xl
               border
               border-gray-300
+              dark:border-slate-700
+              bg-white
+              dark:bg-slate-800
+              text-gray-800
+              dark:text-slate-100
+              placeholder:text-gray-400
+              dark:placeholder:text-slate-500
               outline-none
               transition
               focus:border-amber-900
+              dark:focus:border-amber-600
               focus:ring-2
               focus:ring-amber-100
+              dark:focus:ring-amber-900/30
             "
           />
         </div>
@@ -147,6 +158,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
           h-10
           rounded-xl
           bg-gray-100
+          dark:bg-slate-800
           hover:bg-amber-900
           hover:text-white
           transition
@@ -160,11 +172,11 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
 
         {/* Greeting */}
         <div className="hidden xl:block">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100">
             {greeting}, {user?.name || "User"} 👋
           </h2>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             {currentTime.toLocaleDateString("en-US", {
               weekday: "long",
               day: "numeric",
@@ -191,6 +203,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
             lg:h-11
             rounded-xl
             bg-slate-100
+            dark:bg-slate-800
             hover:bg-amber-900
             hover:text-white
             transition-all
@@ -213,6 +226,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
             lg:h-11
             rounded-xl
             bg-slate-100
+            dark:bg-slate-800
             hover:bg-amber-900
             hover:text-white
             transition-all
@@ -235,6 +249,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
               bg-red-500
               ring-2
               ring-white
+              dark:ring-slate-900
               animate-pulse
             "
           />
@@ -254,15 +269,16 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
               lg:px-3
               py-2
               hover:bg-slate-100
+              dark:hover:bg-slate-800
               transition-all
             "
           >
             <div className="hidden md:block text-right">
-              <h3 className="text-sm font-semibold text-gray-800">
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100">
                 {user?.name || "User"}
               </h3>
 
-              <p className="text-xs text-gray-500">{formatRole(user?.role)}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">{formatRole(user?.role)}</p>
             </div>
 
             <ProfileAvatar
@@ -273,7 +289,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
             />
 
             <IoChevronDown
-              className={`hidden md:block text-gray-400 transition-transform duration-300 ${
+              className={`hidden md:block text-gray-400 dark:text-slate-500 transition-transform duration-300 ${
                 profileOpen ? "rotate-180" : ""
               }`}
             />
@@ -287,32 +303,34 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
                 mt-3
                 w-64
                 bg-white
+                dark:bg-slate-900
                 rounded-2xl
                 border
                 border-gray-200
+                dark:border-slate-800
                 shadow-2xl
                 overflow-hidden
               "
             >
-              <div className="px-5 py-4 border-b">
-                <h3 className="font-semibold text-gray-800">{user?.name || "User"}</h3>
+              <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800">
+                <h3 className="font-semibold text-gray-800 dark:text-slate-100">{user?.name || "User"}</h3>
 
-                <p className="text-sm text-gray-500">{formatRole(user?.role)}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{formatRole(user?.role)}</p>
               </div>
 
               <button
                 onClick={goToProfile}
-                className="flex items-center gap-3 w-full px-5 py-3 text-sm hover:bg-slate-50 transition"
+                className="flex items-center gap-3 w-full px-5 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
               >
                 <FiUser size={17} />
                 My Profile
               </button>
 
-              <div className="border-t" />
+              <div className="border-t border-gray-200 dark:border-slate-800" />
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition"
+                className="flex items-center gap-3 w-full px-5 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
               >
                 <FiLogOut size={17} />
                 Logout

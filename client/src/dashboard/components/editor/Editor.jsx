@@ -1,109 +1,109 @@
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-    ClassicEditor,
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import {
+//     ClassicEditor,
 
-    Essentials,
-    Paragraph,
-    Bold,
-    Italic,
-    Underline,
+//     Essentials,
+//     Paragraph,
+//     Bold,
+//     Italic,
+//     Underline,
 
-    Heading,
+//     Heading,
 
-    Font,
-    Alignment,
+//     Font,
+//     Alignment,
 
-    List,
+//     List,
 
-    Link,
+//     Link,
 
-    Table,
-    TableToolbar,
+//     Table,
+//     TableToolbar,
 
-    BlockQuote,
+//     BlockQuote,
 
-    Image,
-    ImageToolbar,
-    ImageCaption,
-    ImageResize,
-    ImageStyle,
-    ImageUpload,
+//     Image,
+//     ImageToolbar,
+//     ImageCaption,
+//     ImageResize,
+//     ImageStyle,
+//     ImageUpload,
 
-    MediaEmbed,
+//     MediaEmbed,
 
-    Undo
-} from "ckeditor5";
+//     Undo
+// } from "ckeditor5";
 
-import "ckeditor5/ckeditor5.css";
+// import "ckeditor5/ckeditor5.css";
 
-import { editorConfig } from "./editorConfig";
+// import { editorConfig } from "./editorConfig";
 
-const Editor = ({ value, onChange }) => {
+// const Editor = ({ value, onChange }) => {
 
-    return (
+//     return (
 
-        <CKEditor
+//         <CKEditor
 
-            editor={ClassicEditor}
+//             editor={ClassicEditor}
 
-            config={{
+//             config={{
 
-                plugins: [
+//                 plugins: [
 
-                    Essentials,
+//                     Essentials,
 
-                    Paragraph,
+//                     Paragraph,
 
-                    Heading,
+//                     Heading,
 
-                    Bold,
-                    Italic,
-                    Underline,
+//                     Bold,
+//                     Italic,
+//                     Underline,
 
-                    Font,
+//                     Font,
 
-                    Alignment,
+//                     Alignment,
 
-                    List,
+//                     List,
 
-                    Link,
+//                     Link,
 
-                    Table,
-                    TableToolbar,
+//                     Table,
+//                     TableToolbar,
 
-                    BlockQuote,
+//                     BlockQuote,
 
-                    Image,
-                    ImageToolbar,
-                    ImageCaption,
-                    ImageResize,
-                    ImageStyle,
-                    ImageUpload,
+//                     Image,
+//                     ImageToolbar,
+//                     ImageCaption,
+//                     ImageResize,
+//                     ImageStyle,
+//                     ImageUpload,
 
-                    MediaEmbed,
+//                     MediaEmbed,
 
-                    Undo
+//                     Undo
 
-                ],
+//                 ],
 
-                ...editorConfig
+//                 ...editorConfig
 
-            }}
+//             }}
 
-            data={value}
+//             data={value}
 
-            onChange={(event, editor) => {
+//             onChange={(event, editor) => {
 
-                const data = editor.getData();
+//                 const data = editor.getData();
 
-                onChange(data);
+//                 onChange(data);
 
-            }}
+//             }}
 
-        />
+//         />
 
-    );
+//     );
 
-};
+// };
 
-export default Editor;
+// export default Editor;

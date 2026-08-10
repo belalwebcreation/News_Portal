@@ -1,72 +1,72 @@
-export const editorConfig = {
+// export const editorConfig = {
 
-    toolbar: {
+//     toolbar: {
 
-        items: [
+//         items: [
 
-            "undo",
-            "redo",
+//             "undo",
+//             "redo",
 
-            "|",
+//             "|",
 
-            "heading",
+//             "heading",
 
-            "|",
+//             "|",
 
-            "fontSize",
+//             "fontSize",
 
-            "fontFamily",
+//             "fontFamily",
 
-            "fontColor",
+//             "fontColor",
 
-            "fontBackgroundColor",
+//             "fontBackgroundColor",
 
-            "|",
+//             "|",
 
-            "bold",
+//             "bold",
 
-            "italic",
+//             "italic",
 
-            "underline",
+//             "underline",
 
-            "strikethrough",
+//             "strikethrough",
 
-            "|",
+//             "|",
 
-            "alignment",
+//             "alignment",
 
-            "|",
+//             "|",
 
-            "bulletedList",
+//             "bulletedList",
 
-            "numberedList",
+//             "numberedList",
 
-            "todoList",
+//             "todoList",
 
-            "|",
+//             "|",
 
-            "outdent",
+//             "outdent",
 
-            "indent",
+//             "indent",
 
-            "|",
+//             "|",
 
-            "link",
+//             "link",
 
-            "insertTable",
+//             "insertTable",
 
-            "blockQuote",
+//             "blockQuote",
 
-            "horizontalLine",
+//             "horizontalLine",
 
-            "|",
+//             "|",
 
-            "imageUpload",
+//             "imageUpload",
 
-            "mediaEmbed"
+//             "mediaEmbed"
 
-        ]
+//         ]
 
-    }
+//     }
 
-};
+// };

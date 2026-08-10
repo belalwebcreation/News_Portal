@@ -237,17 +237,17 @@ const ImageManager = ({
 
       {/* Title */}
       <div>
-        <h2 className="text-xl font-bold">{title}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h2>
 
         {recommendedSize && (
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Recommended Size: {recommendedSize}
           </p>
         )}
       </div>
 
       {/* Preview */}
-      <div className="border rounded-xl p-6 flex justify-center bg-slate-50">
+      <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-6 flex justify-center bg-slate-50 dark:bg-slate-800">
         {preview ? (
           <img
             src={preview}
@@ -255,7 +255,7 @@ const ImageManager = ({
             className="max-h-32 object-contain"
           />
         ) : (
-          <div className="text-slate-400">
+          <div className="text-slate-400 dark:text-slate-500">
             No Image Selected
           </div>
         )}
@@ -263,7 +263,7 @@ const ImageManager = ({
 
       {/* Upload */}
       <div>
-        <label className="cursor-pointer inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-lg">
+        <label className="cursor-pointer inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white px-5 py-3 rounded-lg">
           <Upload size={18} />
           {uploadText}
           <input
@@ -278,7 +278,7 @@ const ImageManager = ({
       {/* Link Input */}
       {allowLink && (
         <div>
-          <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
             <LinkIcon size={16} />
             {linkLabel}
           </label>
@@ -288,7 +288,7 @@ const ImageManager = ({
             value={link}
             onChange={(e) => setLink(e.target.value)}
             placeholder={linkPlaceholder}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-amber-600 focus:outline-none"
+            className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-4 py-2.5 text-sm focus:border-amber-600 dark:focus:border-amber-500 focus:outline-none"
           />
         </div>
       )}
@@ -301,7 +301,7 @@ const ImageManager = ({
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
             visible
               ? "bg-green-600 text-white"
-              : "bg-slate-300"
+              : "bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
           }`}
         >
           {visible ? (
@@ -320,7 +320,7 @@ const ImageManager = ({
 
       {/* Error */}
       {error && (
-        <div className="text-red-600 text-sm">
+        <div className="text-red-600 dark:text-red-400 text-sm">
           {error}
         </div>
       )}
@@ -330,7 +330,7 @@ const ImageManager = ({
         <button
           onClick={handleSave}
           disabled={loading}
-          className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg disabled:opacity-60"
+          className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white px-6 py-3 rounded-lg disabled:opacity-60"
         >
           {loading ? "Saving..." : "Save"}
         </button>
@@ -339,7 +339,7 @@ const ImageManager = ({
           <button
             onClick={requestDelete}
             disabled={deleteLoading}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 disabled:opacity-60"
+            className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 disabled:opacity-60"
           >
             <Trash2 size={18} />
             {deleteLoading ? "Deleting..." : "Delete"}

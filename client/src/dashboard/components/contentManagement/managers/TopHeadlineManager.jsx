@@ -337,8 +337,8 @@ const TopHeadlineManager = ({
   */
   if (loading) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
-        <Loader2 size={38} className="animate-spin text-amber-700" />
+      <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500">
+        <Loader2 size={38} className="animate-spin text-amber-700 dark:text-amber-500" />
         <p className="text-sm font-medium">Loading top headlines...</p>
       </div>
     );
@@ -348,10 +348,10 @@ const TopHeadlineManager = ({
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-black text-slate-800">
+        <h2 className="text-3xl font-black text-slate-800 dark:text-white">
           Top Headline Manager
         </h2>
-        <p className="mt-2 text-slate-500">
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           Manage the headlines, links and images shown at the top of your site.
         </p>
       </div>
@@ -360,7 +360,7 @@ const TopHeadlineManager = ({
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600"
+          className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-4 text-red-600 dark:text-red-400"
         >
           {error}
         </div>
@@ -369,7 +369,7 @@ const TopHeadlineManager = ({
       {success && (
         <div
           role="status"
-          className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-700"
+          className="rounded-xl border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/40 p-4 text-green-700 dark:text-green-400"
         >
           {success}
         </div>
@@ -378,7 +378,7 @@ const TopHeadlineManager = ({
       {actionError && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600"
+          className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-4 text-red-600 dark:text-red-400"
         >
           {actionError}
         </div>
@@ -387,8 +387,8 @@ const TopHeadlineManager = ({
       {/* Section Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-bold text-slate-800">Headlines</h3>
-          <span className="inline-flex h-6 min-w-fit items-center justify-center rounded-full bg-amber-100 px-2 text-xs font-bold text-amber-800">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white">Headlines</h3>
+          <span className="inline-flex h-6 min-w-fit items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 text-xs font-bold text-amber-800 dark:text-amber-300">
             {items.length}/{maxHeadlines}
           </span>
         </div>
@@ -399,7 +399,7 @@ const TopHeadlineManager = ({
             onClick={handleAdd}
             disabled={adding || limitReached}
             title={limitReached ? `Maximum of ${maxHeadlines} headlines reached` : undefined}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {adding ? (
               <>
@@ -415,7 +415,7 @@ const TopHeadlineManager = ({
           </button>
 
           {limitReached && (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Maximum of {maxHeadlines} reached — delete one to add another.
             </p>
           )}
@@ -425,17 +425,17 @@ const TopHeadlineManager = ({
       {/* Headlines List */}
       <div className="space-y-6">
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-14 text-center">
-            <Inbox size={34} className="mx-auto text-slate-400" />
-            <p className="mt-4 font-medium text-slate-600">No headlines yet</p>
-            <p className="mt-1 text-sm text-slate-400">
+          <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-14 text-center">
+            <Inbox size={34} className="mx-auto text-slate-400 dark:text-slate-500" />
+            <p className="mt-4 font-medium text-slate-600 dark:text-slate-300">No headlines yet</p>
+            <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
               Add your first headline to feature it on the site.
             </p>
             <button
               type="button"
               onClick={handleAdd}
               disabled={adding || limitReached}
-              className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-50"
+              className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white transition disabled:opacity-50"
             >
               <Plus size={17} />
               Add Headline
@@ -445,15 +445,15 @@ const TopHeadlineManager = ({
           items.map((item, index) => (
             <div
               key={item._id}
-              className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:shadow-sm"
+              className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 transition hover:shadow-sm"
             >
               {/* Card Header */}
               <div className="flex items-center justify-between mb-6 gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-100 bg-amber-50 text-sm font-bold text-amber-800">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-100 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/30 text-sm font-bold text-amber-800 dark:text-amber-300">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <h4 className="truncate text-lg font-bold text-slate-800">
+                  <h4 className="truncate text-lg font-bold text-slate-800 dark:text-white">
                     {item.title?.trim() || "Untitled headline"}
                   </h4>
                 </div>
@@ -463,7 +463,7 @@ const TopHeadlineManager = ({
                   onClick={() => requestDelete(item._id)}
                   disabled={busyId === item._id}
                   aria-label="Delete headline"
-                  className="shrink-0 rounded-lg p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                  className="shrink-0 rounded-lg p-2 text-red-600 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50"
                 >
                   {busyId === item._id ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -489,7 +489,7 @@ const TopHeadlineManager = ({
               {/* Title + Link */}
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-slate-700 dark:text-slate-300">
                     Title
                   </label>
                   <input
@@ -497,12 +497,12 @@ const TopHeadlineManager = ({
                     value={item.title}
                     onChange={(e) => updateItem(item._id, "title", e.target.value)}
                     placeholder="e.g. PM announces new education policy"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600"
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600 dark:focus:ring-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-slate-700 dark:text-slate-300">
                     News Link
                   </label>
                   <input
@@ -510,19 +510,19 @@ const TopHeadlineManager = ({
                     value={item.slug}
                     onChange={(e) => updateItem(item._id, "slug", e.target.value)}
                     placeholder="/news/article-slug"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600"
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-4 py-3 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-amber-600 dark:focus:ring-amber-500"
                   />
-                  <p className="mt-2 text-sm text-slate-400">
+                  <p className="mt-2 text-sm text-slate-400 dark:text-slate-500">
                     Where this headline links to on your site.
                   </p>
                 </div>
               </div>
 
               {/* Visibility */}
-              <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 p-5">
+              <div className="mt-6 flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 p-5">
                 <div>
-                  <h4 className="font-semibold text-slate-800">Visibility</h4>
-                  <p className="text-sm text-slate-500">
+                  <h4 className="font-semibold text-slate-800 dark:text-white">Visibility</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Show or hide this headline on the site.
                   </p>
                 </div>
@@ -533,8 +533,8 @@ const TopHeadlineManager = ({
                   disabled={busyId === item._id}
                   className={`h-11 px-6 rounded-xl text-white flex items-center gap-2 transition disabled:opacity-50 ${
                     item.visible
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-red-600 hover:bg-red-700"
+                      ? "bg-green-600 hover:bg-green-700 dark:hover:bg-green-500"
+                      : "bg-red-600 hover:bg-red-700 dark:hover:bg-red-500"
                   }`}
                 >
                   {busyId === item._id ? (
@@ -558,8 +558,8 @@ const TopHeadlineManager = ({
       </div>
 
       {/* Sticky Save Bar */}
-      <div className="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white/95 px-6 py-4 backdrop-blur">
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+      <div className="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 px-6 py-4 backdrop-blur">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
           {isDirty && (
             <>
               <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
@@ -573,7 +573,7 @@ const TopHeadlineManager = ({
             type="button"
             onClick={requestCancel}
             disabled={saving}
-            className="h-12 px-6 rounded-xl border border-slate-300 hover:bg-slate-100 transition disabled:opacity-50"
+            className="h-12 px-6 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
           >
             Cancel
           </button>
@@ -584,8 +584,8 @@ const TopHeadlineManager = ({
             disabled={saving || !isDirty}
             className={`h-12 px-8 rounded-xl text-white flex items-center gap-2 transition ${
               saving || !isDirty
-                ? "bg-slate-400 cursor-not-allowed"
-                : "bg-amber-700 hover:bg-amber-800"
+                ? "bg-slate-400 dark:bg-slate-700 cursor-not-allowed"
+                : "bg-amber-700 hover:bg-amber-800 dark:hover:bg-amber-600"
             }`}
           >
             {saving ? (

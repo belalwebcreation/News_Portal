@@ -133,7 +133,7 @@ const TopHeadlineImage = ({
   return (
     <div className="space-y-4">
       {/* Preview */}
-      <div className="w-full h-40 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden">
+      <div className="w-full h-40 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
         {preview ? (
           <img
             src={preview}
@@ -141,7 +141,7 @@ const TopHeadlineImage = ({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="flex flex-col items-center text-slate-400">
+          <div className="flex flex-col items-center text-slate-400 dark:text-slate-500">
             <ImageIcon size={40} />
             <span className="text-sm mt-2">
               No Image
@@ -164,7 +164,7 @@ const TopHeadlineImage = ({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 disabled:opacity-60"
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white flex items-center gap-2 disabled:opacity-60"
         >
           {uploading ? (
             <>
@@ -187,7 +187,7 @@ const TopHeadlineImage = ({
             type="button"
             onClick={requestDelete}
             disabled={deleting}
-            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 dark:hover:bg-red-500 text-white flex items-center gap-2 disabled:opacity-60"
           >
             {deleting ? (
               <>
@@ -208,7 +208,7 @@ const TopHeadlineImage = ({
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">
+        <p className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}

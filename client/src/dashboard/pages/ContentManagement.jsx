@@ -21,11 +21,11 @@ class ManagerErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
         <div className="p-6 text-center">
-          <p className="font-semibold text-red-600">
+          <p className="font-semibold text-red-600 dark:text-red-400">
             Something went wrong loading this section.
           </p>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Close this window and try again.
           </p>
         </div>
@@ -59,11 +59,11 @@ const ContentManagement = () => {
     <div className="p-6">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-black">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white">
           Content Management
         </h1>
 
-        <p className="mt-2 text-slate-500">
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           Manage every dynamic section.
         </p>
       </div>
@@ -90,7 +90,7 @@ const ContentManagement = () => {
             />
           </ManagerErrorBoundary>
         ) : (
-          <div className="p-6 text-center text-slate-500">
+          <div className="p-6 text-center text-slate-500 dark:text-slate-400">
             No manager configured for this section.
           </div>
         )}

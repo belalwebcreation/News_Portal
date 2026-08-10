@@ -123,22 +123,22 @@ const SocialLogin = () => {
     <div className="mt-8">
       {/* Divider */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px bg-gray-300" />
-        <span className="text-sm text-gray-500 font-medium">
+        <div className="flex-1 h-px bg-gray-300 dark:bg-slate-600" />
+        <span className="text-sm text-gray-500 dark:text-slate-400 font-medium">
           OR CONTINUE WITH
         </span>
-        <div className="flex-1 h-px bg-gray-300" />
+        <div className="flex-1 h-px bg-gray-300 dark:bg-slate-600" />
       </div>
 
       {/* Error Messages */}
       {googleError && (
-        <div className="mb-4 rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-2 text-sm">
+        <div className="mb-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-2 text-sm">
           {googleError}
         </div>
       )}
 
       {facebookError && (
-        <div className="mb-4 rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-2 text-sm">
+        <div className="mb-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-2 text-sm">
           {facebookError}
         </div>
       )}
@@ -159,9 +159,13 @@ const SocialLogin = () => {
             rounded-xl
             border
             border-gray-300
+            dark:border-slate-600
             bg-white
+            dark:bg-slate-800
             hover:bg-red-50
+            dark:hover:bg-red-950/30
             hover:border-red-500
+            dark:hover:border-red-500
             transition-all
             duration-300
             shadow-sm
@@ -174,7 +178,7 @@ const SocialLogin = () => {
           ) : (
             <FaGoogle className="text-red-500 text-lg" />
           )}
-          <span className="font-medium">
+          <span className="font-medium text-slate-700 dark:text-slate-200">
             {googleLoading ? "Signing in..." : "Google"}
           </span>
         </button>
@@ -204,9 +208,13 @@ const SocialLogin = () => {
                 rounded-xl
                 border
                 border-gray-300
+                dark:border-slate-600
                 bg-white
+                dark:bg-slate-800
                 hover:bg-blue-50
+                dark:hover:bg-blue-950/30
                 hover:border-blue-600
+                dark:hover:border-blue-600
                 transition-all
                 duration-300
                 shadow-sm
@@ -219,7 +227,7 @@ const SocialLogin = () => {
               ) : (
                 <FaFacebookF className="text-blue-600 text-lg" />
               )}
-              <span className="font-medium">
+              <span className="font-medium text-slate-700 dark:text-slate-200">
                 {facebookLoading ? "Signing in..." : "Facebook"}
               </span>
             </button>
@@ -231,10 +239,10 @@ const SocialLogin = () => {
           type="button"
           onClick={handleGithubLogin}
           disabled={googleLoading || facebookLoading}
-          className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition-all duration-300 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-300 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <FaGithub className="text-black text-lg" />
-          <span className="font-medium">GitHub</span>
+          <FaGithub className="text-black dark:text-white text-lg" />
+          <span className="font-medium text-slate-700 dark:text-slate-200">GitHub</span>
         </button>
 
         {/* Microsoft Button */}
@@ -242,10 +250,10 @@ const SocialLogin = () => {
           type="button"
           onClick={handleMicrosoftLogin}
           disabled={googleLoading || facebookLoading}
-          className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-300 bg-white hover:bg-green-50 hover:border-green-600 transition-all duration-300 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-green-50 dark:hover:bg-green-950/30 hover:border-green-600 dark:hover:border-green-600 transition-all duration-300 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <FaMicrosoft className="text-green-600 text-lg" />
-          <span className="font-medium">Microsoft</span>
+          <span className="font-medium text-slate-700 dark:text-slate-200">Microsoft</span>
         </button>
       </div>
     </div>

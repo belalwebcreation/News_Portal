@@ -8,7 +8,7 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 dark:bg-gray-950 text-slate-900 dark:text-slate-100 transition-colors">
 
       <Sidebar
         sidebarOpen={sidebarOpen}

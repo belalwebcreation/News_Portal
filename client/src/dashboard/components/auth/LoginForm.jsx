@@ -117,18 +117,18 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="mt-10 rounded-3xl bg-white shadow-2xl border border-slate-200 p-8">
+    <div className="mt-10 rounded-3xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-700 p-8 transition-colors duration-300">
       <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white">
           Sign In
         </h2>
-        <p className="mt-2 text-slate-500">
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           Login to access your dashboard.
         </p>
       </div>
 
       {serverError && (
-        <div className="mb-6 rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-3">
+        <div className="mb-6 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-3">
           {serverError}
         </div>
       )}
@@ -139,13 +139,13 @@ const LoginForm = () => {
       >
         {/* Email */}
         <div>
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">
             Email Address
           </label>
           <div className="relative">
             <Mail
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
             />
             <input
               type="email"
@@ -153,15 +153,15 @@ const LoginForm = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className={`w-full rounded-xl border py-4 pl-12 pr-4 outline-none transition ${
+              className={`w-full rounded-xl border py-4 pl-12 pr-4 outline-none transition bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
                 errors.email
-                  ? "border-red-400"
-                  : "border-slate-300 focus:border-amber-700"
+                  ? "border-red-400 dark:border-red-500"
+                  : "border-slate-300 dark:border-slate-600 focus:border-amber-700 dark:focus:border-amber-500"
               }`}
             />
           </div>
           {errors.email && (
-            <p className="text-red-500 text-sm mt-2">
+            <p className="text-red-500 dark:text-red-400 text-sm mt-2">
               {errors.email}
             </p>
           )}
@@ -185,14 +185,14 @@ const LoginForm = () => {
               }
               className="accent-amber-700"
             />
-            <span className="text-sm text-slate-600">
+            <span className="text-sm text-slate-600 dark:text-slate-300">
               Remember Me
             </span>
           </label>
 
           <Link
             to="/forgot-password"
-            className="text-sm font-semibold text-amber-700 hover:underline"
+            className="text-sm font-semibold text-amber-700 dark:text-amber-500 hover:underline"
           >
             Forgot Password?
           </Link>
@@ -208,6 +208,8 @@ const LoginForm = () => {
             rounded-xl
             bg-amber-700
             hover:bg-amber-800
+            dark:bg-amber-600
+            dark:hover:bg-amber-700
             text-white
             font-semibold
             text-lg
@@ -243,13 +245,14 @@ const LoginForm = () => {
 
       {/* Register */}
       <div className="mt-8 text-center">
-        <p className="text-slate-600">
+        <p className="text-slate-600 dark:text-slate-300">
           Don't have an account?{" "}
           <Link
             to="/register"
             className="
               font-semibold
               text-amber-700
+              dark:text-amber-500
               hover:underline
             "
           >
