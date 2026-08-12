@@ -8,50 +8,91 @@ import {
   useState,
 } from "react";
 import axios from "axios";
+import { baseUrl } from "../config/Config";
 
 /**
- * Cookie-based auth (access + refresh tokens, both HttpOnly) — the backend
- * sets and reads these directly; this file never sees a raw token string.
+ * Cookie-based auth (access + refresh tokens, both HttpOnly)
  *
- * What changed from the localStorage version:
- * - No token in localStorage anymore — HttpOnly cookies can't be read by
- *   JS at all, so an XSS bug elsewhere on the site can no longer steal
- *   the session by reading storage.
- * - Session is restored by asking the backend "who am I" (GET /api/auth/me)
- *   instead of decoding a JWT locally, since we no longer have one to decode.
- * - A 401 with code "TOKEN_EXPIRED" triggers one silent
- *   POST /api/auth/refresh + retry instead of an immediate logout — access
- *   tokens are short-lived (15m) on purpose, so this is routine, not just
- *   an end-of-session event.
- * - userInfo is still cached in localStorage, but only as a "paint
- *   something before the network reply lands" hint. It's never trusted for
- *   auth decisions — only the cookie + backend response decide that.
+ * Backend owns the authentication cookies.
+ * This file never reads or stores raw access/refresh tokens.
+ *
+ * Session restoration:
+ *   GET /news/api/auth/me
+ *
+ * Token refresh:
+ *   POST /news/api/auth/refresh
+ *
+ * Logout:
+ *   POST /news/api/auth/logout
+ *
+ * The "/news" prefix comes from VITE_API_BASE_URL in production:
+ *
+ *   https://www.royalbangla.com/news
+ *
+ * Therefore:
+ *
+ *   baseUrl + "/api/auth/me"
+ *   =
+ *   https://www.royalbangla.com/news/api/auth/me
  */
+
+// ============================================================
+// API URLs
+// ============================================================
+
+const AUTH_API = `${baseUrl}/api/auth`;
+
+const ME_URL = `${AUTH_API}/me`;
+const REFRESH_URL = `${AUTH_API}/refresh`;
+const LOGOUT_URL = `${AUTH_API}/logout`;
+
+// ============================================================
+// Context
+// ============================================================
 
 const AuthContext = createContext(null);
 
-axios.defaults.withCredentials = true; // send/receive the auth cookies on every request
+// Send/receive HttpOnly authentication cookies on every request.
+axios.defaults.withCredentials = true;
 
-let refreshPromise = null; // de-dupes concurrent refresh calls from parallel requests
+// Prevent multiple simultaneous refresh requests.
+let refreshPromise = null;
+
+// ============================================================
+// Refresh Access Token
+// ============================================================
 
 const refreshAccessToken = () => {
   if (!refreshPromise) {
     refreshPromise = axios
-      .post("/api/auth/refresh")
+      .post(REFRESH_URL, null, {
+        withCredentials: true,
+      })
       .finally(() => {
         refreshPromise = null;
       });
   }
+
   return refreshPromise;
 };
+
+// ============================================================
+// Auth Provider
+// ============================================================
 
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const hasCheckedSession = useRef(false);
+
+  // ==========================================================
+  // Apply User
+  // ==========================================================
 
   const applyUser = useCallback((user) => {
     setUserInfo(user);
+
     try {
       if (user) {
         localStorage.setItem("userInfo", JSON.stringify(user));
@@ -63,44 +104,71 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Paint a guess immediately from cache — actual auth state is confirmed
-  // by fetchMe() below once the interceptor is registered.
+  // ==========================================================
+  // Restore Cached User Immediately
+  // ==========================================================
+
+  // This is only a visual cache.
+  // It is NEVER trusted as authentication.
+  //
+  // Real authentication is confirmed by /me below.
+
   useEffect(() => {
     try {
       const cached = localStorage.getItem("userInfo");
-      if (cached) setUserInfo(JSON.parse(cached));
+
+      if (cached) {
+        setUserInfo(JSON.parse(cached));
+      }
     } catch {
       localStorage.removeItem("userInfo");
     }
   }, []);
 
-  // Silent-refresh-then-retry on an expired access token; hard logout only
-  // on a refresh failure or any other 401 (e.g. a revoked/invalid session).
-  // Declared before the fetchMe effect below so it's registered first —
-  // effects run in declaration order, and fetchMe's very first request
-  // needs this interceptor already in place to self-heal correctly.
+  // ==========================================================
+  // Axios Response Interceptor
+  // ==========================================================
+
   useEffect(() => {
     const interceptorId = axios.interceptors.response.use(
       (response) => response,
+
       async (error) => {
         const original = error.config;
+
+        const requestUrl = original?.url || "";
+
+        // ------------------------------------------------------
+        // Detect expired access token
+        // ------------------------------------------------------
 
         const isExpiredAccessToken =
           error.response?.status === 401 &&
           error.response?.data?.code === "TOKEN_EXPIRED" &&
           !original?._retried &&
-          !original?.url?.includes("/api/auth/refresh"); // never retry-refresh the refresh call itself
+          !requestUrl.includes("/api/auth/refresh");
+
+        // ------------------------------------------------------
+        // Refresh + Retry
+        // ------------------------------------------------------
 
         if (isExpiredAccessToken) {
           original._retried = true;
+
           try {
             await refreshAccessToken();
+
             return axios(original);
           } catch {
             applyUser(null);
+
             return Promise.reject(error);
           }
         }
+
+        // ------------------------------------------------------
+        // Any other 401 = authenticated session unavailable
+        // ------------------------------------------------------
 
         if (error.response?.status === 401) {
           applyUser(null);
@@ -109,101 +177,214 @@ export const AuthProvider = ({ children }) => {
         return Promise.reject(error);
       }
     );
-    return () => axios.interceptors.response.eject(interceptorId);
+
+    return () => {
+      axios.interceptors.response.eject(interceptorId);
+    };
   }, [applyUser]);
+
+  // ==========================================================
+  // Fetch Current Logged-In User
+  // ==========================================================
 
   const fetchMe = useCallback(async () => {
     try {
-      const { data } = await axios.get("/api/auth/me");
+      /**
+       * IMPORTANT:
+       *
+       * Old:
+       * axios.get("/api/auth/me")
+       *
+       * Production requested:
+       * https://www.royalbangla.com/api/auth/me
+       *
+       * Correct:
+       * https://www.royalbangla.com/news/api/auth/me
+       */
+
+      const { data } = await axios.get(ME_URL, {
+        withCredentials: true,
+      });
+
       applyUser(data.user);
-    } catch {
-      // By the time this catch runs, the interceptor above has already
-      // tried a silent refresh once if it was a TOKEN_EXPIRED case — so a
-      // failure here means there's genuinely no valid session.
+    } catch (error) {
+      console.error(
+        "Session restore failed:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+
+      // If session is genuinely invalid, clear auth state.
       applyUser(null);
     }
   }, [applyUser]);
 
-  // Runs once per app load (guarded against React StrictMode's dev double-invoke).
+  // ==========================================================
+  // Initial Session Check
+  // ==========================================================
+
   useEffect(() => {
     if (hasCheckedSession.current) return;
+
     hasCheckedSession.current = true;
-    fetchMe().finally(() => setLoading(false));
+
+    fetchMe().finally(() => {
+      setLoading(false);
+    });
   }, [fetchMe]);
 
-  // Cookies are already set by the backend's Set-Cookie header on the
-  // login/googleLogin response — this just syncs React state to match.
+  // ==========================================================
+  // Login
+  // ==========================================================
+
   const loginUser = useCallback(
     (user) => {
       applyUser(user);
-      localStorage.setItem("authEvent", `login:${Date.now()}`); // cross-tab ping
+
+      // Cross-tab authentication event.
+      localStorage.setItem("authEvent", `login:${Date.now()}`);
     },
     [applyUser]
   );
 
+  // ==========================================================
+  // Logout
+  // ==========================================================
+
   const logoutUser = useCallback(async () => {
     try {
-      await axios.post("/api/auth/logout");
+      /**
+       * Correct production URL:
+       *
+       * https://www.royalbangla.com/news/api/auth/logout
+       */
+
+      await axios.post(
+        LOGOUT_URL,
+        null,
+        {
+          withCredentials: true,
+        }
+      );
     } catch (err) {
       console.error("Logout request failed:", err);
-      // Clear local state regardless — the UI shouldn't stay "logged in"
-      // just because this one network call failed.
     }
+
+    // Clear local state regardless of server response.
     applyUser(null);
-    localStorage.setItem("authEvent", `logout:${Date.now()}`); // cross-tab ping
+
+    // Cross-tab authentication event.
+    localStorage.setItem("authEvent", `logout:${Date.now()}`);
   }, [applyUser]);
+
+  // ==========================================================
+  // Update User
+  // ==========================================================
 
   const updateUser = useCallback((updatedFields) => {
     setUserInfo((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, ...updatedFields };
+
+      const next = {
+        ...prev,
+        ...updatedFields,
+      };
+
       try {
         localStorage.setItem("userInfo", JSON.stringify(next));
       } catch (err) {
         console.error("Failed to persist user info:", err);
       }
+
       return next;
     });
   }, []);
 
+  // ==========================================================
+  // Role Helpers
+  // ==========================================================
+
   const hasRole = useCallback(
-    (...roles) => !!userInfo && roles.includes(userInfo.role),
+    (...roles) => {
+      return !!userInfo && roles.includes(userInfo.role);
+    },
     [userInfo]
   );
 
-  // A login/logout in one tab should reflect in every other open tab.
+  // ==========================================================
+  // Cross-Tab Authentication Sync
+  // ==========================================================
+
   useEffect(() => {
     const syncAcrossTabs = (event) => {
-      if (event.key === "authEvent") fetchMe();
+      if (event.key === "authEvent") {
+        fetchMe();
+      }
     };
+
     window.addEventListener("storage", syncAcrossTabs);
-    return () => window.removeEventListener("storage", syncAcrossTabs);
+
+    return () => {
+      window.removeEventListener("storage", syncAcrossTabs);
+    };
   }, [fetchMe]);
+
+  // ==========================================================
+  // Context Value
+  // ==========================================================
 
   const value = useMemo(
     () => ({
       userInfo,
       loading,
+
       isLoggedIn: !!userInfo,
+
       isAdmin: userInfo?.role === "admin",
-      isWriter: userInfo?.role === "writer" || userInfo?.role === "admin",
+
+      isWriter:
+        userInfo?.role === "writer" ||
+        userInfo?.role === "admin",
+
+      hasRole,
+
+      loginUser,
+
+      logoutUser,
+
+      updateUser,
+    }),
+    [
+      userInfo,
+      loading,
       hasRole,
       loginUser,
       logoutUser,
       updateUser,
-    }),
-    [userInfo, loading, hasRole, loginUser, logoutUser, updateUser]
+    ]
   );
 
+  // ==========================================================
+  // Provider
+  // ==========================================================
+
   return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
+// ============================================================
+// useAuth Hook
+// ============================================================
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 };

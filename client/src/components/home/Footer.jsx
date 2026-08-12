@@ -7,7 +7,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import ScrollTop from "../../features/article/pages/components/ScrollTop";
-import { useSiteSettings } from "../../context/SiteSettingsContext"; // 🔻 path verify koro — ContentManagement.jsx-e ei-i depth chilo
+import { useSiteSettings } from "../../context/SiteSettingsContext";
+import { categoryService } from "../../features/category/services/categoryService"; // 🔻 path ঠিক করে নিও (project structure onujayi)
 
 // ==========================================================
 // Custom SVG Social Icons (Matches Lucide stroke aesthetic)
@@ -62,6 +63,9 @@ const InstagramIcon = (props) => (
 // ==========================================================
 // Default Data Configurations
 // ==========================================================
+// 🔻 Ei array ekhon shudhu 2 kaje lagbe:
+//   1. API fetch loading/fail obosthay fallback hisebe
+//   2. categories prop diye override korte chaile
 const DEFAULT_CATEGORIES = [
   { name: "জাতীয়", slug: "national" },
   { name: "রাজনীতি", slug: "politics" },
@@ -87,8 +91,6 @@ const POLICY_LINKS = [
   { name: "কুকি নীতি", href: "/cookies" },
 ];
 
-// 🔻 Backend theke kono value na ashle (ba load hote hote) fallback hisebe eigula dekhabe —
-// blank UI dekha jabe na. CMS-e actual value set korle eigula automatically override hoye jabe.
 const FALLBACK = {
   siteName: "সংবাদ প্রবাহ",
   tagline: "নির্ভরযোগ্য খবর, প্রতিটি মুহূর্তে",
@@ -105,16 +107,45 @@ const displayFont = { fontFamily: "'Noto Serif Bengali', serif" };
 const bodyFont = { fontFamily: "'Hind Siliguri', sans-serif" };
 
 function Footer({
-  editorName = "বেলাল হোসেন", // 🔻 CMS scope-e nai ekhono, tai prop hisebei thakche
-  categories = DEFAULT_CATEGORIES,
+  editorName = "মহসিন-আল-মামুন",
+  categories: categoriesProp, // 🔻 optional override — na dile automatically API theke top 5 fetch hobe
 }) {
   const [now, setNow] = useState(() => new Date());
   const { settings } = useSiteSettings();
+
+  const [categories, setCategories] = useState(categoriesProp ?? DEFAULT_CATEGORIES);
+  const [categoriesLoading, setCategoriesLoading] = useState(!categoriesProp);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(timer);
   }, []);
+
+  // 🔻 Dynamic category fetch — top 5 (sob theke besi news thaka category) load hobe
+  useEffect(() => {
+    if (categoriesProp) return; // prop diye override korle fetch skip
+
+    let isMounted = true;
+
+    (async () => {
+      try {
+        setCategoriesLoading(true);
+        const topCategories = await categoryService.getTopCategories(7);
+        if (!isMounted) return;
+        setCategories(topCategories); // [] hote pare jodi backend-e kono category na thake — eta valid state
+      } catch (error) {
+        if (!isMounted) return;
+        console.error("Footer: category load failed:", error);
+        setCategories(DEFAULT_CATEGORIES); // fetch fail korle UI blank na dekhiye fallback dekhabe
+      } finally {
+        if (isMounted) setCategoriesLoading(false);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [categoriesProp]);
 
   const formattedNow = new Intl.DateTimeFormat("bn-BD", {
     dateStyle: "long",
@@ -137,24 +168,18 @@ function Footer({
     { name: "X", href: settings?.socialX, Icon: XIcon },
     { name: "YouTube", href: settings?.socialYoutube, Icon: YoutubeIcon },
     { name: "Instagram", href: settings?.socialInstagram, Icon: InstagramIcon },
-  ].filter((social) => social.href); // 🔻 URL set na thakle icon dekhabe na
+  ].filter((social) => social.href);
 
   return (
     <footer style={bodyFont} className="relative bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800">
       <style>{FONT_IMPORT}</style>
 
-      {/* Brand Top Red Accent Line */}
       <div className="h-1 w-full bg-red-600" />
 
-      {/* Main Container */}
-      <div className="mx-auto max-w-[1440px] px-4 pt-12 pb-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-360 px-4 pt-12 pb-8 sm:px-6 lg:px-8">
 
-        {/* ===================================================
-            1. Main Footer Grid
-            =================================================== */}
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 pb-12 border-b border-slate-200 dark:border-slate-800">
 
-          {/* Col 1: Brand Info & Socials */}
           {showFooterInfo && (
             <div className="sm:col-span-2 lg:col-span-4">
               <Link to="/" className="inline-block">
@@ -169,7 +194,6 @@ function Footer({
                 {aboutText}
               </p>
 
-              {/* Social Icons */}
               {showSocialLinks && socialLinks.length > 0 && (
                 <div className="mt-6 flex items-center gap-2">
                   {socialLinks.map(({ name, href, Icon }) => (
@@ -189,29 +213,37 @@ function Footer({
             </div>
           )}
 
-          {/* Col 2: Category Chips/Links */}
-          <nav aria-label="বিভাগসমূহ" className="lg:col-span-3">
-            <h4
-              style={displayFont}
-              className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2 inline-block"
-            >
-              বিভাগসমূহ
-            </h4>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Link
-                  key={category.slug}
-                  to={`/category/${category.slug}`}
-                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition-all hover:border-red-600 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-500 hover:shadow-sm"
-                >
-                  <ChevronRight size={12} className="text-slate-400 dark:text-slate-500" />
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          </nav>
+          {/* Col 2: Category Chips — ekhon dynamic, top 5 by news count */}
+          {categories.length > 0 && (
+            <nav aria-label="বিভাগসমূহ" className="lg:col-span-3">
+              <h4
+                style={displayFont}
+                className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-2 inline-block"
+              >
+                বিভাগসমূহ
+              </h4>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {categoriesLoading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="h-7 w-20 animate-pulse rounded-md bg-slate-200 dark:bg-slate-700"
+                      />
+                    ))
+                  : categories.map((category) => (
+                      <Link
+                        key={category.slug}
+                        to={`/category/${category.slug}`}
+                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition-all hover:border-red-600 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-500 hover:shadow-sm"
+                      >
+                        <ChevronRight size={12} className="text-slate-400 dark:text-slate-500" />
+                        {category.name}
+                      </Link>
+                    ))}
+              </div>
+            </nav>
+          )}
 
-          {/* Col 3: Navigation Links */}
           <nav aria-label="প্রতিষ্ঠান ও নীতি" className="lg:col-span-2">
             <h4
               style={displayFont}
@@ -244,7 +276,6 @@ function Footer({
             </ul>
           </nav>
 
-          {/* Col 4: Contact Card */}
           {showContact && (
             <div className="lg:col-span-3">
               <h4
@@ -276,9 +307,6 @@ function Footer({
 
         </div>
 
-        {/* ===================================================
-            2. Bottom Bar / Colophon (Newspaper Masthead Style)
-            =================================================== */}
         <div className="pt-6 flex flex-col gap-4 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>© {now.getFullYear()} {siteName}। সর্বস্বত্ব সংরক্ষিত।</span>

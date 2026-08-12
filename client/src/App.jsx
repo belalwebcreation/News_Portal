@@ -55,11 +55,11 @@ import ArticleEditorRoute from "./features/article/ArticleEditorRoute";
 import ManageNews from "./features/article/ManageNews";
 import WriterProfile from "./dashboard/pages/WriterProfile";
 import ReaderIndex from "./dashboard/pages/ReaderIndex";
-import ReaderProfile from "./dashboard/pages/ReaderProfile";
+// import ReaderProfile from "./dashboard/pages/ReaderProfile";
 import ReaderBookmarks from "./dashboard/pages/ReaderBookmarks";
 import ReaderComments from "./dashboard/pages/ReaderComments";
 import ReaderHistory from "./dashboard/pages/ReaderHistory";
-import ReaderSettings from "./dashboard/pages/ReaderSettings";
+// import ReaderSettings from "./dashboard/pages/ReaderSettings";
 
 // publish article
 import { newsService } from "./features/news/services/newsService";
@@ -221,11 +221,11 @@ function AppRoutes() {
           {/* READER */}
           <Route element={<ProtectRole roles={["reader"]} />}>
             <Route path="reader" element={<ReaderIndex />} />
-            <Route path="reader/profile" element={<ReaderProfile />} />
+            {/* <Route path="reader/profile" element={<ReaderProfile />} /> */}
             <Route path="reader/bookmarks" element={<ReaderBookmarks />} />
             <Route path="reader/comments" element={<ReaderComments />} />
             <Route path="reader/history" element={<ReaderHistory />} />
-            <Route path="reader/settings" element={<ReaderSettings />} />
+            {/* <Route path="reader/settings" element={<ReaderSettings />} /> */}
           </Route>
         </Route>
       </Route>

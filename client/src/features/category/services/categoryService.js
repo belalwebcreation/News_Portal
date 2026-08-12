@@ -68,4 +68,22 @@ export const categoryService = {
       );
     }
   },
+
+  // ==========================
+  // Get Top Categories (most news first)
+  // ==========================
+  async getTopCategories(limit = 7) {
+    try {
+      const categories = await this.getAllCategories();
+      return [...categories]
+        .sort((a, b) => (b.newsCount ?? 0) - (a.newsCount ?? 0)) // 🔻 field name backend onujayi check kore niyo
+        .slice(0, limit);
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          "জনপ্রিয় ক্যাটাগরি লোড করতে সমস্যা হয়েছে।",
+        { cause: error }
+      );
+    }
+  },
 };

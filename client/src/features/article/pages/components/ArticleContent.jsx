@@ -7,13 +7,13 @@ const ArticleContent = ({ article, html }) => {
   return (
     <article className="mx-auto max-w-3xl px-6 pb-16 sm:px-8">
       {article?.summary && (
-        <p className="mb-8 font-display text-xl italic leading-relaxed text-ink/80 sm:text-2xl">
+        <p className="mb-8 font-display text-xl italic leading-relaxed text-ink/80 dark:text-paper/80 sm:text-2xl">
           {article.summary}
         </p>
       )}
 
       <div
-        className="article-preview__body prose prose-dispatch max-w-none break-words sm:prose-lg
+        className="article-preview__body prose prose-dispatch dark:prose-invert max-w-none break-words sm:prose-lg
           prose-img:my-0 prose-img:w-auto prose-img:h-auto prose-img:max-w-none
           [&_ul>li::marker]:text-accent [&_ol>li::marker]:text-accent"
         dangerouslySetInnerHTML={{

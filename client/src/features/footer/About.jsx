@@ -109,10 +109,10 @@ function About({
   timeline = DEFAULT_TIMELINE,
   values = DEFAULT_VALUES,
   trustCards = TRUST_CARDS,
-  editorName = "বেলাল হোসেন",
+  editorName = "মহসিন-আল-মামুন",
   editorRole = "প্রকাশক ও প্রধান সম্পাদক",
   editorImage = null,
-  editorBio = "দুই দশকেরও বেশি সময় ধরে মূলধারার সাংবাদিকতা ও সম্পাদকীয় নেতৃত্বে যুক্ত। দেশীয় ও আন্তর্জাতিক সংবাদ নীতিমালায় অভিজ্ঞ এই সাংবাদিক সার্বিক সম্পাদনার দায়িত্ব পালন করছেন।",
+  editorBio = "Royal Bangla News-এর প্রতিষ্ঠাতা ও সম্পাদক। নির্ভরযোগ্য তথ্য, দায়িত্বশীল উপস্থাপন এবং পাঠকবান্ধব সাংবাদিকতার চর্চাকে গুরুত্ব দিয়ে এই প্ল্যাটফর্ম পরিচালিত হচ্ছে।",
   contactRouteExists = true,
   
   // Developer Props

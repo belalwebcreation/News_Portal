@@ -31,8 +31,9 @@
 .related-card{
     overflow:hidden;
     border-radius:12px;
-    border:1px solid #e5e7eb;
-    transition:.25s;
+    border:1px solid var(--article-line, #e5e7eb);
+    background: var(--article-panel, #fff);
+    transition:.25s, background-color .25s ease, border-color .25s ease;
 }
 
 .related-card:hover{
@@ -48,11 +49,12 @@
 .related-card h3{
     padding:16px;
     font-size:20px;
+    color: var(--article-ink, inherit);
 }
 
 .related-card p{
     padding:0 16px 16px;
-    color:#666;
+    color: var(--article-muted, #666);
 }
 
 
@@ -425,4 +427,58 @@
   .toc__item a {
     transition: none !important;
   }
+}
+
+/* ============================================================
+   Dark mode — <html class="dark"> ThemeContext দিয়ে toggle হয়।
+   Token গুলো redefine করলেই author-card/scroll-top/share-buttons/
+   toc/related-card সব automatically dark হয়ে যাবে।
+   ============================================================ */
+
+:root.dark {
+  --article-ink: #F5F6F4;
+  --article-muted: #9BA1A8;
+  --article-line: rgba(245, 246, 244, 0.12);
+  --article-panel: #1B1F23;
+  --article-soft: #14181C;
+  --article-accent: #E2564C;
+  --article-accent-dark: #F2897E;
+  --article-accent-soft: rgba(226, 86, 76, 0.16);
+  --article-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.dark .toc {
+  --toc-bg: #1B1F23;
+  --toc-border: rgba(245, 246, 244, 0.12);
+  --toc-muted: #9BA1A8;
+  --toc-text: #F5F6F4;
+  --toc-accent: #A5A0F5;
+  --toc-hover-bg: rgba(245, 246, 244, 0.06);
+  --toc-rail: rgba(245, 246, 244, 0.12);
+}
+
+/* Token-এর বাইরে যেগুলো hardcoded ছিল */
+.dark .scroll-top:hover,
+.dark .share-buttons__button:hover {
+  border-color: rgba(150, 200, 175, 0.4);
+}
+
+.dark .share-buttons__button.is-copied {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.dark .share-buttons--vertical {
+  background: var(--article-panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.dark .floating-share-bar {
+  background: rgba(20, 24, 28, 0.92);
+  border-top-color: rgba(245, 246, 244, 0.08);
+}
+
+.dark .related-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }

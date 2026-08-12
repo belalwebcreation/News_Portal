@@ -125,7 +125,7 @@ const ArticleDetails = () => {
 
   if (loading) {
     return (
-      <section className="article-details loading">
+      <section className="article-details loading dark:bg-ink dark:text-paper transition-colors duration-300">
         <div className="container">
           Loading article...
         </div>
@@ -135,7 +135,7 @@ const ArticleDetails = () => {
 
   if (error) {
     return (
-      <section className="article-details error">
+      <section className="article-details error dark:bg-ink dark:text-paper transition-colors duration-300">
         <div className="container">
           <h2>{error}</h2>
         </div>
@@ -146,7 +146,7 @@ const ArticleDetails = () => {
   if (!article) return null;
 
   return (
-    <main className="article-details bg-paper">
+    <main className="article-details bg-paper dark:bg-ink dark:text-paper transition-colors duration-300">
 
       <ReadingProgress />
 

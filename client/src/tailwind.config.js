@@ -38,7 +38,7 @@ const config = {
       // Typography (prose) theme for rich-text article bodies —
       // used via `prose prose-dispatch` in ArticleContent.jsx.
       // ===============================
-      typography: ({ theme }) => ({
+     typography: ({ theme }) => ({
         dispatch: {
           css: {
             "--tw-prose-body": theme("colors.ink / 90%"),
@@ -93,7 +93,24 @@ const config = {
             table: { display: "block", overflowX: "auto" },
           },
         },
+        invert: {
+          css: {
+            "--tw-prose-body": theme("colors.paper / 85%"),
+            "--tw-prose-headings": theme("colors.paper"),
+            "--tw-prose-links": theme("colors.accent"),
+            "--tw-prose-bold": theme("colors.paper"),
+            "--tw-prose-bullets": theme("colors.accent"),
+            "--tw-prose-hr": theme("colors.paper / 10%"),
+            "--tw-prose-quotes": theme("colors.paper / 80%"),
+            "--tw-prose-quote-borders": theme("colors.accent"),
+            "--tw-prose-captions": theme("colors.graphite"),
+            "--tw-prose-code": theme("colors.accent"),
+            "--tw-prose-th-borders": theme("colors.paper / 10%"),
+            "--tw-prose-td-borders": theme("colors.paper / 10%"),
+          },
+        },
       }),
+
     },
   },
   plugins: [typography],
