@@ -215,7 +215,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     emailVerificationExpires,
   });
 
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${rawVerificationToken}`;
+const verifyUrl = `${process.env.CLIENT_URL}/news/verify-email/${rawVerificationToken}`;
 
   const message = `
     <h2>Welcome to News Portal</h2>
@@ -334,7 +334,7 @@ export const resendVerificationEmail = asyncHandler(async (req, res) => {
   user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${rawVerificationToken}`;
+ const verifyUrl = `${process.env.CLIENT_URL}/news/verify-email/${rawVerificationToken}`;
 
   const message = `
     <h2>Verify your email</h2>
