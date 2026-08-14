@@ -931,7 +931,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   user.passwordResetExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
   await user.save();
 
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${rawResetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/news/reset-password/${rawResetToken}`;
 
   const message = `
     <h2>Reset your password</h2>

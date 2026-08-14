@@ -34,6 +34,7 @@ import Cookies from "./features/footer/Cookies";
 import Login from "./dashboard/pages/Login";
 import Register from "./dashboard/pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Unauthorized from "./dashboard/pages/Unauthorized";
 import VerifyEmail from "./dashboard/pages/auth/VerifyEmail";
 import AccountSettings from "./components/profile/AccountSettings";
@@ -174,6 +175,7 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/verify-email/:token" element={<VerifyEmail />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       {/* DASHBOARD CONTAINER */}
       <Route path="/dashboard" element={<ProtectDashboard />}>

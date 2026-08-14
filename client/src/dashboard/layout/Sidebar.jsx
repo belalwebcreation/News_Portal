@@ -12,7 +12,6 @@ import {
   MdOutlineCategory 
 } from "react-icons/md";
 import {
-  FiLogOut,
   FiX,
   FiBookmark,
   FiGrid,
@@ -26,16 +25,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const role = userInfo?.role;
 
   // 👑 Admin ও Superadmin — দুজনেরই একই মেনু (superadmin এর extra ক্ষমতা page এর ভেতরেই handle হয়, যেমন Users.jsx এ demote বাটন)
-  // এখানে "Create News" যোগ করা হলো যাতে admin/superadmin সরাসরি sidebar থেকে writer এর news লেখার পেজে যেতে পারে
-  // 🆕 "Section Management" যোগ করা হলো — হোমপেজের হিরো/ব্যানার সেকশন ম্যানেজ করার পেজ (WriterSectionManagement মডিউল)
+  // "Create News" এখন Dashboard এর ঠিক নিচেই রাখা হলো, যাতে admin/superadmin সবার আগে সেটা দেখতে পায়
   const adminMenuItems = [
     { title: "Dashboard", path: "/dashboard/admin", icon: <LuLayoutDashboard size={20} /> },
+    { title: "Create News", path: "/dashboard/writer/add-news", icon: <MdOutlinePostAdd size={20} /> },
     { title: "Content Management", path: "/dashboard/admin/content-management", icon: <FiGrid size={20} /> },
     { title: "Category Management", path: "/dashboard/admin/categories", icon: <MdOutlineCategory size={20} /> },
     { title: "News Master List", path: "/dashboard/admin/news", icon: <MdOutlineArticle size={20} /> },
     { title: "User List", path: "/dashboard/admin/users", icon: <FaRegUser size={18} /> },
-    { title: "Create News", path: "/dashboard/writer/add-news", icon: <MdOutlinePostAdd size={20} /> },
-  
   ];
 
   // 📝 Industry-Level Data Structure: সহজে নতুন মেনু যোগ বা পরিবর্তন করার জন্য
@@ -134,36 +131,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Navigation Link List */}
         <div className="px-4 py-6 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
-          <ul className="space-y-2 flex flex-col h-full justify-between">
-            
-            {/* Main Dynamic Group */}
-            <div className="space-y-2">
-              {activeMenus.map((menu, index) => (
-                <li key={index}>
-                  <Link
-                    to={menu.path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={menuClass(menu.path)}
-                  >
-                    {menu.icon}
-                    <span>{menu.title}</span>
-                  </Link>
-                </li>
-              ))}
-            </div>
-
-            {/* Bottom Fix: Logout Actions */}
-            <li className="pt-4 border-t border-gray-100 dark:border-gray-800 pb-4">
-              <Link
-                to="/logout"
-                onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white transition-all duration-300 font-medium"
-              >
-                <FiLogOut size={20} />
-                <span>Logout</span>
-              </Link>
-            </li>
-
+          <ul className="space-y-2">
+            {activeMenus.map((menu, index) => (
+              <li key={index}>
+                <Link
+                  to={menu.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={menuClass(menu.path)}
+                >
+                  {menu.icon}
+                  <span>{menu.title}</span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </aside>
