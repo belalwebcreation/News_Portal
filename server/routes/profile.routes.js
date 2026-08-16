@@ -12,7 +12,11 @@ import {
   changePassword,
   getProfileStats,
   getSavedNews,
+  getSavedNewsCount,     // NEW
+  getBookmarkStatus,     // NEW
+  toggleBookmark,        // NEW
   getReadingHistory,
+  recordReadingHistory,
   clearReadingHistory,
 } from "../controllers/profile.controller.js";
 
@@ -31,11 +35,7 @@ const router = express.Router();
    Profile
 ====================================================== */
 
-router.get(
-  "/",
-  protect,
-  getProfile
-);
+router.get("/", protect, getProfile);
 
 router.put(
   "/",
@@ -48,24 +48,9 @@ router.put(
    Avatar
 ====================================================== */
 
-router.patch(
-  "/avatar",
-  protect,
-  upload.single("avatar"),
-  updateAvatar
-);
-
-router.delete(
-  "/avatar",
-  protect,
-  removeAvatar
-);
-
-router.patch(
-  "/avatar/position",
-  protect,
-  updateAvatarPosition
-);
+router.patch("/avatar", protect, upload.single("avatar"), updateAvatar);
+router.delete("/avatar", protect, removeAvatar);
+router.patch("/avatar/position", protect, updateAvatarPosition);
 
 /* ======================================================
    Cover Photo
@@ -77,18 +62,8 @@ router.patch(
   upload.single("coverPhoto"),
   updateCoverPhoto
 );
-
-router.delete(
-  "/cover-photo",
-  protect,
-  removeCoverPhoto
-);
-
-router.patch(
-  "/cover-photo/position",
-  protect,
-  updateCoverPosition
-);
+router.delete("/cover-photo", protect, removeCoverPhoto);
+router.patch("/cover-photo/position", protect, updateCoverPosition);
 
 /* ======================================================
    Change Password
@@ -105,36 +80,23 @@ router.patch(
    Profile Stats
 ====================================================== */
 
-router.get(
-  "/stats",
-  protect,
-  getProfileStats
-);
+router.get("/stats", protect, getProfileStats);
 
 /* ======================================================
-   Saved News
+   Saved News / Bookmarks
 ====================================================== */
 
-router.get(
-  "/saved-news",
-  protect,
-  getSavedNews
-);
+router.get("/saved-news", protect, getSavedNews);
+router.get("/saved-news/count", protect, getSavedNewsCount);          // NEW
+router.get("/saved-news/:newsId/status", protect, getBookmarkStatus); // NEW
+router.post("/saved-news/:newsId/toggle", protect, toggleBookmark);   // NEW
 
 /* ======================================================
    Reading History
 ====================================================== */
 
-router.get(
-  "/reading-history",
-  protect,
-  getReadingHistory
-);
-
-router.delete(
-  "/reading-history",
-  protect,
-  clearReadingHistory
-);
+router.get("/reading-history", protect, getReadingHistory);
+router.post("/reading-history", protect, recordReadingHistory);
+router.delete("/reading-history", protect, clearReadingHistory);
 
 export default router;

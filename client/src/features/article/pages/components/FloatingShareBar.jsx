@@ -52,7 +52,7 @@ export function FloatingShareBar(props) {
         onClick={handleToggle}
         aria-label={open ? "শেয়ার বার বন্ধ করুন" : "শেয়ার বার খুলুন"}
         aria-expanded={open}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-md transition-colors hover:bg-slate-700"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-md transition-colors hover:bg-slate-700 dark:bg-paper dark:text-ink dark:hover:bg-paper/90"
       >
         {open ? <ChevronsLeft size={18} /> : <ChevronsRight size={18} />}
       </button>

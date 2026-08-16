@@ -74,7 +74,7 @@ export function MenuBar({ editor, onOpenLink, onInsertImage, onInsertYoutube, on
       <Divider />
       <div className="editor-toolbar__group">
         <ToolbarButton label="Add link" active={editor.isActive('link')} onClick={onOpenLink}>↗</ToolbarButton>
-        <ToolbarButton label="Add image" onClick={onInsertImage}>▧</ToolbarButton>
+        <ToolbarButton label="Add image" onClick={() => { console.log('🟢 IMAGE BUTTON CLICKED'); onInsertImage(); }}>▧</ToolbarButton>
         <ToolbarButton label="Add video" onClick={onInsertYoutube}>▶</ToolbarButton>
         <ToolbarButton label="Mention teammate" onClick={onOpenMention}>@</ToolbarButton>
       </div>

@@ -50,6 +50,15 @@ export function TipTapEditor({
     setModal,
   ] = useState(null);
 
+  useEffect(() => {
+  console.log('🟣 TipTapEditor MOUNTED');
+  return () => console.log('🔴 TipTapEditor UNMOUNTED');
+}, []);
+
+useEffect(() => {
+  console.trace('🔵 MODAL STATE CHANGED TO:', modal);
+}, [modal]);
+
 
   const {
     editor,

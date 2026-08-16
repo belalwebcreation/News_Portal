@@ -40,7 +40,6 @@ const uploadAvatar = async (file) => {
   return data.data;
 };
 
-// ⚠️ Backend DELETE route লাগবে
 const removeAvatar = async () => {
   const { data } = await api.delete(
     "/profile/avatar"
@@ -49,9 +48,7 @@ const removeAvatar = async () => {
   return data.data;
 };
 
-// ⚠️ Backend PATCH route লাগবে (শুধু crop position আপডেট করবে, ফাইল পাঠাবে না)
 const updateAvatarPosition = async (position) => {
-  // position = { x: number, y: number } — দুটোই 0-100 এর মধ্যে percentage
   const { data } = await api.patch(
     "/profile/avatar/position",
     position
@@ -82,7 +79,6 @@ const uploadCoverPhoto = async (file) => {
   return data.data;
 };
 
-// ⚠️ Backend DELETE route লাগবে
 const removeCoverPhoto = async () => {
   const { data } = await api.delete(
     "/profile/cover-photo"
@@ -91,9 +87,7 @@ const removeCoverPhoto = async () => {
   return data.data;
 };
 
-// ⚠️ Backend PATCH route লাগবে (শুধু crop position আপডেট করবে, ফাইল পাঠাবে না)
 const updateCoverPosition = async (position) => {
-  // position = { x: number, y: number } — দুটোই 0-100 এর মধ্যে percentage
   const { data } = await api.patch(
     "/profile/cover-photo/position",
     position
@@ -106,9 +100,7 @@ const updateCoverPosition = async (position) => {
 // Password
 // ===============================
 
-const changePassword = async (
-  passwordData
-) => {
+const changePassword = async (passwordData) => {
   const { data } = await api.patch(
     "/profile/change-password",
     passwordData
@@ -151,6 +143,25 @@ const getSavedNews = async (
 };
 
 // ===============================
+// Bookmarks (toggle / status / count)
+// ===============================
+
+const getSavedNewsCount = async () => {
+  const { data } = await api.get("/profile/saved-news/count");
+  return data.data; // { total }
+};
+
+const getBookmarkStatus = async (newsId) => {
+  const { data } = await api.get(`/profile/saved-news/${newsId}/status`);
+  return data.data; // { bookmarked }
+};
+
+const toggleBookmark = async (newsId) => {
+  const { data } = await api.post(`/profile/saved-news/${newsId}/toggle`);
+  return data.data; // { bookmarked, bookmarksCount }
+};
+
+// ===============================
 // Reading History
 // ===============================
 
@@ -171,6 +182,29 @@ const getReadingHistory = async (
   return data.data;
 };
 
+// ===============================
+// Record Reading History
+// ===============================
+
+const recordReadingHistory = async (
+  newsId,
+  progress = 0
+) => {
+  const { data } = await api.post(
+    "/profile/reading-history",
+    {
+      newsId,
+      progress,
+    }
+  );
+
+  return data.data;
+};
+
+// ===============================
+// Clear Reading History
+// ===============================
+
 const clearReadingHistory = async () => {
   const { data } = await api.delete(
     "/profile/reading-history"
@@ -185,7 +219,6 @@ const clearReadingHistory = async () => {
 
 const profileService = {
   getProfile,
-
   updateProfile,
 
   uploadAvatar,
@@ -201,8 +234,12 @@ const profileService = {
   getProfileStats,
 
   getSavedNews,
+  getSavedNewsCount,
+  getBookmarkStatus,
+  toggleBookmark,
 
   getReadingHistory,
+  recordReadingHistory,
   clearReadingHistory,
 };
 

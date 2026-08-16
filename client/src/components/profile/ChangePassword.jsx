@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import profileService from "../../services/profileService";
 import {
   Lock,
   KeyRound,
@@ -205,6 +206,13 @@ const ChangePassword = ({ onSuccessNotification, onForgotPassword }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
+    if (!formData.currentPassword) {
+      setErrorMessage("Please enter your current password.");
+      return;
+    }
+
     if (passwordMismatch) {
       setErrorMessage("New passwords do not match.");
       return;
@@ -217,21 +225,25 @@ const ChangePassword = ({ onSuccessNotification, onForgotPassword }) => {
 
     try {
       setLoading(true);
-      setErrorMessage("");
 
-      // Simulated API Call
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await profileService.changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
 
       handleReset();
 
-      const successMsg = "Password updated successfully. All other devices signed out.";
-      
       // Use parent Toast System for Success
       if (onSuccessNotification) {
-        onSuccessNotification(successMsg);
+        onSuccessNotification("Password updated successfully.");
       }
     } catch (error) {
-      setErrorMessage(error.message || "Failed to update password. Please try again.");
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update password. Please try again.";
+
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }

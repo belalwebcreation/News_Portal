@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { useCallback } from "react";
 
 // Contexts
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -6,13 +7,16 @@ import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import { CategoryProvider } from "./context/CategoryContext";
 
 // Layout & Middleware
-import PublicLayout from "./layouts/PublicLayout"; // 👈 PublicLayout Import করা হলো (আপনার ফাইল লোকেশন অনুযায়ী path প্রয়োজনমতো ঠিক করে নিন)
+import PublicLayout from "./layouts/PublicLayout";
 import MainLayout from "./dashboard/layout/MainLayout";
 import ProtectDashboard from "./middleware/ProtectDashboard";
 import ProtectRole from "./middleware/ProtectRole";
 
 // Constants
-import { getRoleHomePath } from "./constants/roles"; // 👈 এখন single source of truth এখান থেকে আসছে
+import { getRoleHomePath } from "./constants/roles";
+
+// Config — baseUrl + api endpoints (আগে এখানে import-ই ছিল না)
+import { baseUrl, api } from "./config/Config";
 
 // Public Pages
 import Home from "./pages/Home";
@@ -65,17 +69,33 @@ import ReaderHistory from "./dashboard/pages/ReaderHistory";
 // publish article
 import { newsService } from "./features/news/services/newsService";
 
-const uploadNewsImage = async (file) => {
-  const token = localStorage.getItem("token");
+/*
+|--------------------------------------------------------------------------
+| Upload News Image
+|--------------------------------------------------------------------------
+|
+| আগে এখানে:
+|   - localStorage.getItem("token") দিয়ে Bearer header পাঠানো হতো
+|     (পুরনো token-based auth-এর leftover, এখন httpOnly cookie
+|     ব্যবহার হচ্ছে বলে এটা সবসময় null/অকার্যকর)
+|   - URL hardcoded ছিল "/api/news/image", যেটাতে "/news" prefix
+|     মিসিং ছিল, ফলে backend route (/news/api/news/image) এ
+|     কখনোই ঠিকমতো hit হতো না।
+|
+| Fix:
+|   - baseUrl + api.uploadNewsImage দিয়ে সঠিক URL বানানো হলো
+|   - credentials: "include" দিয়ে explicitly cookie পাঠানো
+|     নিশ্চিত করা হলো (httpOnly accessToken cookie এভাবেই যাবে)
+|
+*/
 
+const uploadNewsImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
 
-  const res = await fetch("/api/news/image", {
+  const res = await fetch(`${baseUrl}${api.uploadNewsImage}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
     body: formData,
   });
 
@@ -96,14 +116,9 @@ const uploadNewsImage = async (file) => {
   };
 };
 
-function AppRoutes() {
-  const { userInfo } = useAuth();
-  const navigate = useNavigate();
-  console.log("userInfo =", userInfo);
-
-  const defaultRoute = getRoleHomePath(userInfo?.role);
-
-  const buildPayload = (articleData, status) => ({
+// 👇 buildPayload কে component-এর বাইরে আনা হলো — এটা কোনো state/prop ব্যবহার করে না,
+// তাই বাইরে থাকলে প্রতি render-এ নতুন function তৈরি হবে না।
+const buildPayload = (articleData, status) => ({
   title: articleData.title,
   summary: articleData.excerpt,
   content: articleData.body,
@@ -115,7 +130,18 @@ function AppRoutes() {
   tags: articleData.tags || [],
 });
 
-  const saveArticle = async (articleData) => {
+function AppRoutes() {
+  const { userInfo } = useAuth();
+  const navigate = useNavigate();
+  console.log("userInfo =", userInfo);
+
+  const defaultRoute = getRoleHomePath(userInfo?.role);
+
+  // 👇 useCallback দিয়ে wrap করা হলো — dependency array খালি, কারণ buildPayload আর
+  // newsService দুটোই module-level এবং কখনো বদলায় না। ফলে saveArticle এখন
+  // প্রতি render-এ একই reference রাখবে, আর child component-এর effect/dependency
+  // অকারণে re-trigger হবে না।
+  const saveArticle = useCallback(async (articleData) => {
     try {
       const payload = buildPayload(articleData, "draft");
       return articleData.id
@@ -125,9 +151,10 @@ function AppRoutes() {
       console.error("Save Draft Error:", error);
       throw error;
     }
-  };
+  }, []);
 
-  const publishArticle = async (articleData) => {
+  // 👇 useCallback দিয়ে wrap করা হলো — navigate ছাড়া আর কোনো external dependency নেই।
+  const publishArticle = useCallback(async (articleData) => {
     console.log("===== BODY START =====");
     console.log(articleData.body.substring(0, 300));
     console.log("===== BODY END =====");
@@ -145,7 +172,7 @@ function AppRoutes() {
       console.error("Publish Error:", error);
       throw error;
     }
-  };
+  }, [navigate]);
 
   return (
     <Routes>

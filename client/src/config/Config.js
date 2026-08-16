@@ -6,9 +6,33 @@
 // =============================
 // Backend API Base URL
 // =============================
-// VITE_API_URL এর জায়গায় VITE_API_BASE_URL ব্যবহার করা হয়েছে
+//
+// IMPORTANT:
+// এটা ইচ্ছাকৃতভাবে একটা RELATIVE path ("/news"), কোনো
+// absolute URL (http://localhost:5000/news) না।
+//
+// কারণ:
+//
+// Dev:
+//   Frontend  -> http://localhost:5173
+//   axios call -> http://localhost:5173/news/api/...
+//   এটা vite.config.js এর proxy ("/news/api") ধরে
+//   ভেতরে ভেতরে http://localhost:5000 এ forward করে দেয়।
+//   ফলে browser এর চোখে সবসময় SAME-ORIGIN request —
+//   httpOnly cookie block হওয়ার কোনো সুযোগ থাকে না।
+//
+// Production:
+//   Frontend ও backend এমনিতেই same domain এ serve হয়
+//   (https://www.royalbangla.com/news), তাই relative path
+//   এখানেও ঠিকভাবে কাজ করে, কোনো পরিবর্তন লাগে না।
+//
+// যদি .env ফাইলে VITE_API_BASE_URL এখনো
+// "http://localhost:5000/news" এর মতো absolute value সেট
+// করা থাকে, সেটা এই default কে override করে ফেলবে —
+// তাই .env থেকেও সেটা সরিয়ে/relative করে দিতে হবে।
+//
 export const baseUrl =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_BASE_URL || "/news";
 
 // =============================
 // API Endpoints

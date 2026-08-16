@@ -18,7 +18,6 @@ import '../../editor/styles.css';
 import "./style.css";
 
 import ScrollTop from "./components/ScrollTop";
-import ShareButtons from "./components/ShareButtons";
 import FloatingShareBar from "./components/FloatingShareBar";
 import { useScrollRange } from "./hooks/useScrollRange";
 
@@ -148,7 +147,7 @@ const ArticleDetails = () => {
   return (
     <main className="article-details bg-paper dark:bg-ink dark:text-paper transition-colors duration-300">
 
-      <ReadingProgress />
+      <ReadingProgress newsId={article._id} />
 
       <ArticleHeader article={article} />
 
@@ -193,12 +192,7 @@ const ArticleDetails = () => {
 
           <ScrollTop threshold={400} />
 
-          <ShareButtons
-            url={shareUrl}
-            title={article.title}
-            summary={article.summary}
-          />
-
+  
         </div>
       </section>
 

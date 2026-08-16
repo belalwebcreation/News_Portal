@@ -22,7 +22,7 @@ const ArticleHero = ({ article }) => {
         height={thumbHeight}
         loading="eager"
         decoding="async"
-        className="aspect-[16/9] w-full rounded-2xl border border-ink/10 object-cover"
+        className="aspect-[16/9] w-full rounded-2xl border border-ink/10 object-cover transition-colors dark:border-paper/10"
       />
 
       {imageCaption && (

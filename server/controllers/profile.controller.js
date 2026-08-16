@@ -357,6 +357,67 @@ export const getSavedNews = async (req, res, next) => {
 };
 
 /* ======================================================
+   BOOKMARK — SAVED NEWS COUNT
+====================================================== */
+
+export const getSavedNewsCount = async (req, res, next) => {
+  try {
+    const total = await profileService.getSavedNewsCount(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      data: { total },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ======================================================
+   BOOKMARK — STATUS
+====================================================== */
+
+export const getBookmarkStatus = async (req, res, next) => {
+  try {
+    const { newsId } = req.params;
+
+    const result = await profileService.getBookmarkStatus(
+      req.user.id,
+      newsId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ======================================================
+   BOOKMARK — TOGGLE
+====================================================== */
+
+export const toggleBookmark = async (req, res, next) => {
+  try {
+    const { newsId } = req.params;
+
+    const result = await profileService.toggleBookmark(
+      req.user.id,
+      newsId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ======================================================
    READING HISTORY
 ====================================================== */
 
@@ -373,6 +434,55 @@ export const getReadingHistory = async (req, res, next) => {
     res.status(200).json({
       success: true,
       ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ======================================================
+   RECORD / UPDATE READING PROGRESS
+   — নতুন যোগ করা হলো। এতদিন এই রিসোর্সে শুধু GET (দেখানোর জন্য) আর
+   DELETE (clear করার জন্য) ছিল — কোনো CREATE/UPDATE route-ই ছিল না।
+   ফলে ফ্রন্টএন্ডে ReadingProgress যতই স্ক্রল % হিসাব করুক না কেন,
+   সেটা সেভ করার মতো কোনো endpoint-ই এতদিন ছিল না — তাই Continue
+   Reading আর Articles Read সবসময় খালি থাকতো, এটাই মূল কারণ।
+====================================================== */
+
+export const recordReadingHistory = async (req, res, next) => {
+  try {
+    const { newsId, progress } = req.body;
+
+    if (!newsId) {
+      return res.status(400).json({
+        success: false,
+        message: "newsId is required.",
+      });
+    }
+
+    const numericProgress = Number(progress);
+
+    if (
+      Number.isNaN(numericProgress) ||
+      numericProgress < 0 ||
+      numericProgress > 100
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "progress must be a number between 0 and 100.",
+      });
+    }
+
+    const entry = await profileService.recordReadingHistory(
+      req.user.id,
+      newsId,
+      Math.round(numericProgress)
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Reading progress saved.",
+      data: entry,
     });
   } catch (error) {
     next(error);

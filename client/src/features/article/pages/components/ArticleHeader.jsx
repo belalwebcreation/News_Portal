@@ -11,19 +11,19 @@ const ArticleHeader = ({ article }) => {
       {categoryName && (
         <Link
           to={`/category/${categorySlug}`}
-          className="group inline-flex items-center gap-2 font-meta text-[13px] font-semibold uppercase tracking-[0.16em] text-accent transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent motion-reduce:transition-none"
+          className="group inline-flex items-center gap-2 font-meta text-[13px] font-semibold uppercase tracking-[0.16em] text-accent transition-colors hover:text-ink dark:hover:text-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent motion-reduce:transition-none"
         >
           <span className="h-px w-6 bg-accent transition-all group-hover:w-9 motion-reduce:transition-none" />
           {categoryName}
         </Link>
       )}
 
-      <h1 className="mt-5 font-display text-4xl font-medium leading-[1.08] tracking-tight text-ink sm:text-5xl md:text-6xl">
+      <h1 className="mt-5 font-display text-4xl font-medium leading-[1.08] tracking-tight text-ink transition-colors dark:text-paper sm:text-5xl md:text-6xl">
         {article.title}
       </h1>
 
       {article.summary && (
-        <p className="mt-5 max-w-xl font-meta text-lg leading-relaxed text-graphite">
+        <p className="mt-5 max-w-xl font-meta text-lg leading-relaxed text-graphite transition-colors dark:text-paper/70">
           {article.summary}
         </p>
       )}

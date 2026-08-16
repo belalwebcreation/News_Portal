@@ -12,7 +12,7 @@ function Bar({ width, height = "14px", radius = "6px", className = "" }) {
   return (
     <div
       aria-hidden="true"
-      className={`animate-pulse bg-ink/10 ${className}`}
+      className={`animate-pulse bg-ink/10 dark:bg-paper/10 ${className}`}
       style={{ width, height, borderRadius: radius }}
     />
   );
@@ -20,7 +20,7 @@ function Bar({ width, height = "14px", radius = "6px", className = "" }) {
 
 export function ArticleSkeleton() {
   return (
-    <main aria-busy="true" aria-label="Loading article" className="bg-paper">
+    <main aria-busy="true" aria-label="Loading article" className="bg-paper dark:bg-ink transition-colors">
       {/* Hero */}
       <div className="mx-auto max-w-3xl px-6 pt-14 pb-10 sm:px-8 sm:pt-20">
         <Bar width="110px" height="20px" radius="9999px" />
@@ -30,11 +30,11 @@ export function ArticleSkeleton() {
       </div>
 
       <div className="mx-auto max-w-5xl px-6 pb-16 sm:px-8">
-        <div className="aspect-[16/9] w-full animate-pulse rounded-2xl border border-ink/10 bg-ink/10" />
+        <div className="aspect-[16/9] w-full animate-pulse rounded-2xl border border-ink/10 bg-ink/10 dark:border-paper/10 dark:bg-paper/10" />
       </div>
 
       {/* Meta */}
-      <section className="mx-auto flex max-w-3xl flex-col gap-6 border-y border-ink/10 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <section className="mx-auto flex max-w-3xl flex-col gap-6 border-y border-ink/10 px-6 py-6 dark:border-paper/10 sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <div className="flex items-center gap-4">
           <Bar width="44px" height="44px" radius="9999px" className="shrink-0" />
           <div className="space-y-2">
@@ -43,11 +43,11 @@ export function ArticleSkeleton() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-ink/10 pt-5 sm:flex sm:items-center sm:gap-6 sm:border-t-0 sm:pt-0">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-ink/10 pt-5 dark:border-paper/10 sm:flex sm:items-center sm:gap-6 sm:border-t-0 sm:pt-0">
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="flex flex-col items-start gap-1.5 sm:items-center sm:border-l sm:border-ink/10 sm:pl-6 sm:first:border-l-0 sm:first:pl-0"
+              className="flex flex-col items-start gap-1.5 sm:items-center sm:border-l sm:border-ink/10 sm:pl-6 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-paper/10"
             >
               <Bar width="28px" height="18px" />
               <Bar width="48px" height="9px" />

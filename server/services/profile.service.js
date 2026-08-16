@@ -63,9 +63,6 @@ const updateAvatar = async (userId, file) => {
 
 /* ======================================================
    REMOVE AVATAR
-   — নতুন যোগ করা হলো। আলাদা কোনো repository method লাগেনি — updateAvatar
-   যে profileRepository.updateAvatar(userId, {public_id, url}) কল করছে,
-   ঠিক সেটাই খালি string দিয়ে কল করলে avatar রিসেট হয়ে যায়।
 ====================================================== */
 
 const removeAvatar = async (userId) => {
@@ -85,6 +82,10 @@ const removeAvatar = async (userId) => {
   });
 };
 
+/* ======================================================
+   UPDATE AVATAR POSITION
+====================================================== */
+
 const updateAvatarPosition = async (userId, position) => {
   const user = await profileRepository.findProfileById(userId);
 
@@ -96,9 +97,11 @@ const updateAvatarPosition = async (userId, position) => {
     throw new Error("No avatar to reposition.");
   }
 
-  return profileRepository.updateAvatarPosition(userId, position);
+  return profileRepository.updateAvatarPosition(
+    userId,
+    position
+  );
 };
-
 
 /* ======================================================
    UPDATE COVER PHOTO
@@ -128,8 +131,6 @@ const updateCoverPhoto = async (userId, file) => {
 
 /* ======================================================
    REMOVE COVER PHOTO
-   — removeAvatar-এর মতোই, existing updateCoverPhoto repository method
-   পুনর্ব্যবহার করা হলো।
 ====================================================== */
 
 const removeCoverPhoto = async (userId) => {
@@ -164,7 +165,10 @@ const updateCoverPosition = async (userId, position) => {
     throw new Error("No cover photo to reposition.");
   }
 
-  return profileRepository.updateCoverPosition(userId, position);
+  return profileRepository.updateCoverPosition(
+    userId,
+    position
+  );
 };
 
 /* ======================================================
@@ -183,7 +187,9 @@ const changePassword = async (
     throw new Error("User not found.");
   }
 
-  const isMatched = await user.matchPassword(currentPassword);
+  const isMatched = await user.matchPassword(
+    currentPassword
+  );
 
   if (!isMatched) {
     throw new Error("Current password is incorrect.");
@@ -234,8 +240,73 @@ const getSavedNews = async (
   };
 };
 
+// NEW — শুধু total count (ReaderIndex-এর stat card-এর জন্য, page fetch না করেই)
+const getSavedNewsCount = async (userId) => {
+  return profileRepository.countSavedNews(userId);
+};
+
+// NEW — একটা নির্দিষ্ট article বুকমার্ক করা আছে কিনা (ArticleDetails পেজে বাটনের initial state)
+const getBookmarkStatus = async (userId, newsId) => {
+  const bookmarked = await profileRepository.isNewsBookmarked(
+    userId,
+    newsId
+  );
+
+  return { bookmarked };
+};
+
+// NEW — বুকমার্ক টগল করা (add হলে remove, remove থাকলে add)
+const toggleBookmark = async (userId, newsId) => {
+  const alreadyBookmarked = await profileRepository.isNewsBookmarked(
+    userId,
+    newsId
+  );
+
+  if (alreadyBookmarked) {
+    await profileRepository.removeSavedNews(userId, newsId);
+  } else {
+    const exists = await profileRepository.newsExists(newsId);
+
+    if (!exists) {
+      throw new Error("News article not found.");
+    }
+
+    try {
+      await profileRepository.saveNews(userId, newsId);
+    } catch (err) {
+      // Double-click race condition (duplicate bookmark) — চুপচাপ ignore
+      if (err.code !== 11000) throw err;
+    }
+  }
+
+  const bookmarksCount = await profileRepository.getNewsBookmarksCount(
+    newsId
+  );
+
+  return {
+    bookmarked: !alreadyBookmarked,
+    bookmarksCount,
+  };
+};
+
 /* ======================================================
-   READING HISTORY
+   RECORD / UPDATE READING HISTORY
+====================================================== */
+
+const recordReadingHistory = async (
+  userId,
+  newsId,
+  progress = 0
+) => {
+  return profileRepository.recordReadingHistory(
+    userId,
+    newsId,
+    progress
+  );
+};
+
+/* ======================================================
+   GET READING HISTORY
 ====================================================== */
 
 const getReadingHistory = async (
@@ -270,28 +341,38 @@ const getReadingHistory = async (
    CLEAR READING HISTORY
 ====================================================== */
 
-const clearReadingHistory = async (
-  userId
-) => {
-  await profileRepository.clearReadingHistory(
-    userId
-  );
+const clearReadingHistory = async (userId) => {
+  await profileRepository.clearReadingHistory(userId);
 
   return true;
 };
 
+/* ======================================================
+   EXPORT
+====================================================== */
+
 export default {
   getProfile,
   updateProfile,
+
   updateAvatar,
   removeAvatar,
-  updateAvatarPosition,   // 👈 নতুন
+  updateAvatarPosition,
+
   updateCoverPhoto,
   removeCoverPhoto,
-  updateCoverPosition,    // 👈 নতুন
+  updateCoverPosition,
+
   changePassword,
+
   getProfileStats,
+
   getSavedNews,
+  getSavedNewsCount,   // NEW
+  getBookmarkStatus,   // NEW
+  toggleBookmark,      // NEW
+
+  recordReadingHistory,
   getReadingHistory,
   clearReadingHistory,
 };

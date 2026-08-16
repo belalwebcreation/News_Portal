@@ -31,8 +31,8 @@ const AuthorCard = ({ author }) => {
       aria-label="About the author"
       className="mx-auto mb-16 max-w-3xl px-6 sm:px-8"
     >
-      <div className="flex flex-col items-start gap-5 rounded-2xl border border-ink/10 bg-paper p-6 sm:flex-row sm:items-center sm:gap-6 sm:p-8">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-accent/10 ring-1 ring-inset ring-ink/10 sm:h-20 sm:w-20">
+      <div className="flex flex-col items-start gap-5 rounded-2xl border border-ink/10 bg-paper p-6 transition-colors dark:border-paper/10 dark:bg-ink sm:flex-row sm:items-center sm:gap-6 sm:p-8">
+        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-accent/10 ring-1 ring-inset ring-ink/10 dark:ring-paper/10 sm:h-20 sm:w-20">
           {avatarUrl ? (
             <img
               src={avatarUrl}
@@ -49,7 +49,7 @@ const AuthorCard = ({ author }) => {
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <h3 className="font-meta text-base font-semibold text-ink sm:text-lg">
+            <h3 className="font-meta text-base font-semibold text-ink transition-colors dark:text-paper sm:text-lg">
               {name}
             </h3>
 
@@ -61,7 +61,7 @@ const AuthorCard = ({ author }) => {
           </div>
 
           {author.bio && (
-            <p className="mt-2 font-meta text-sm leading-relaxed text-graphite">
+            <p className="mt-2 font-meta text-sm leading-relaxed text-graphite transition-colors dark:text-paper/70">
               {author.bio}
             </p>
           )}

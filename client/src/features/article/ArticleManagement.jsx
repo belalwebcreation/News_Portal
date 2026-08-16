@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TipTapEditor from '../editor/TipTapEditor';
 import useAutoSave from '../hooks/useAutoSave';
@@ -102,25 +102,96 @@ export function ArticleManagement({
   const [toast, setToast] = useState(null);
   const imageUpload = useImageUpload({ upload: uploadImage });
 
+  // 🔧 FIX #4: আসল MongoDB _id ট্র্যাক করার জন্য ref। _id fallback রাখা
+  // জরুরি — existing article edit করতে খুললে backend থেকে `_id` আসে,
+  // `id` না। এই ref না থাকলে প্রতিটা autosave-এ id হারিয়ে গিয়ে backend-এ
+  // বারবার createNews() কল হয়ে duplicate document তৈরি হচ্ছিল।
+  const persistedArticleIdRef = useRef(
+    initialArticle?.id || initialArticle?._id || null
+  );
+
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState(null);
 
+  // 🔧 FIX #1: আগে এই effect শুধু [currentUserId]-এর ওপর নির্ভর করত, মানে
+  // currentUserId-এর reference একটুও flicker করলেই (বা প্রথমবার undefined→id
+  // resolve হলেও) পুরো article state রিসেট হয়ে যেত — ইউজার যা টাইপ করছিল
+  // সব হারিয়ে যাওয়ার ঝুঁকি ছিল। এখন শুধুমাত্র তখনই রিসেট হবে যখন সত্যিকারের
+  // একজন ভিন্ন user-এ (একটা real id থেকে আরেকটা real id-তে) সুইচ হয়েছে।
+  const [loadedForUserId, setLoadedForUserId] = useState(currentUserId);
+
   useEffect(() => {
-    setArticle(getInitialArticle());
+    if (currentUserId && currentUserId !== loadedForUserId) {
+      setArticle(getInitialArticle());
+      setLoadedForUserId(currentUserId);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId]);
 
-  const savePayload = async (nextArticle) => {
-    const payload = createArticlePayload(nextArticle);
+  // 🔧 FIX #2 + #4 (মিলিয়ে): useCallback দিয়ে wrap করা আগের মতোই আছে,
+  // কিন্তু এখন existingId (article.id → article._id → ref-এর শেষ জানা id)
+  // ধরে রেখে payload-এ পাঠানো হচ্ছে, আর onSave()-এর response থেকে ফেরত
+  // আসা _id ধরে persistedArticleIdRef + article state আপডেট করা হচ্ছে।
+  // ফলে দ্বিতীয় autosave থেকে App.jsx সবসময় id পাবে এবং updateNews()
+  // চালাবে, createNews() না।
+  const savePayload = useCallback(async (nextArticle) => {
+    const existingId =
+      nextArticle?.id ||
+      nextArticle?._id ||
+      persistedArticleIdRef.current ||
+      null;
 
-    localStorage.setItem(draftKey(payload.id), JSON.stringify(payload));
+    const payload = createArticlePayload({
+      ...nextArticle,
+      id: existingId,
+    });
 
-    if (onSave) {
-      await onSave(payload);
+    localStorage.setItem(draftKey(existingId), JSON.stringify(payload));
+
+    if (!onSave) {
+      return payload;
     }
-  };
-  const autoSave = useAutoSave(article, savePayload, { delay: 1800 });
+
+    const savedArticle = await onSave(payload);
+
+    // newsService.createNews/updateNews সবসময় raw Mongoose document
+    // ফেরত দেয় (backend controller { success, data: news } পাঠায়, আর
+    // newsService সেখান থেকে data.data রিটার্ন করে) — তাই _id ই ground
+    // truth ফিল্ড। বাকিগুলো শুধু safety-net fallback।
+    const savedId =
+      savedArticle?._id ||
+      savedArticle?.id ||
+      savedArticle?.data?._id ||
+      savedArticle?.data?.id ||
+      existingId;
+
+    if (savedId && savedId !== persistedArticleIdRef.current) {
+      persistedArticleIdRef.current = savedId;
+
+      setArticle((current) =>
+        current.id === savedId ? current : { ...current, id: savedId }
+      );
+
+      // "new" draft key থেকে আসল id-এর draft key-তে সরিয়ে নেওয়া হলো
+      localStorage.setItem(
+        draftKey(savedId),
+        JSON.stringify({ ...payload, id: savedId })
+      );
+    }
+
+    return savedArticle;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onSave, currentUserId]);
+
+  // 🔧 FIX #3: category খালি থাকা অবস্থায় autosave বন্ধ রাখা হলো। আগে প্রতি
+  // ১৮০০ms পরপর createNews কল হচ্ছিল যতক্ষণ না category select করা হয়,
+  // আর backend category required বলে প্রতিবারই 400 (Bad Request) ফেরত
+  // দিচ্ছিল (দেখুন console log-এ বারবার "নিউজ তৈরি করা যায়নি" error)।
+  const autoSave = useAutoSave(article, savePayload, {
+  delay: 1800,
+  enabled: Boolean(article.category) && Boolean(article.title?.trim()),
+});
 
   const fetchCategories = async () => {
     setLoadingCategories(true);
@@ -150,11 +221,11 @@ export function ArticleManagement({
   const wordCount = useMemo(() => countWords(article.body), [article.body]);
   const readingTime = useMemo(() => formatReadingTime(article.body), [article.body]);
 
-  // ✅ NEW: body-তে youtube embed আছে কিনা লাইভ চেক — checkbox enable/disable
+  // ✅ body-তে youtube embed আছে কিনা লাইভ চেক — checkbox enable/disable
   // আর hint text-এর জন্য
   const videoDetected = useMemo(() => hasEmbeddedVideo(article.body), [article.body]);
 
-  // ✅ NEW: এডিট করতে করতে ভিডিও body থেকে সরে গেলে checkbox নিজে থেকে uncheck হয়ে
+  // ✅ এডিট করতে করতে ভিডিও body থেকে সরে গেলে checkbox নিজে থেকে uncheck হয়ে
   // যাবে, নাহলে empty video card নিয়ে stale flag থেকে যেতে পারে
   useEffect(() => {
     if (!videoDetected && article.showInVideoSection) {
@@ -275,7 +346,7 @@ export function ArticleManagement({
               Main Grid থেকে বাদ পড়বে — তবে ক্যাটাগরি পেজে সবসময় থেকেই যাবে।
             </small>
 
-            {/* ✅ NEW: Video Section toggle — শুধু body-তে আসলে youtube embed
+            {/* ✅ Video Section toggle — শুধু body-তে আসলে youtube embed
                 থাকলেই enable হবে */}
             <label
               className="field-label"

@@ -4,6 +4,8 @@ import "../../../editor/styles.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import ProfileAvatar from "../../../../components/profile/ProfileAvatar";
+import BookmarkButton from "./BookmarkButton";
+import ShareButtons from "./ShareButtons"; // NEW
 
 const formatDate = (date) => {
   if (!date) return "";
@@ -15,9 +17,12 @@ const formatDate = (date) => {
 };
 
 const STATUS_STYLES = {
-  published: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  draft: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  archived: "bg-graphite/10 text-graphite ring-graphite/20",
+  published:
+    "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:ring-emerald-400/30",
+  draft:
+    "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:ring-amber-400/30",
+  archived:
+    "bg-graphite/10 text-graphite ring-graphite/20 dark:bg-paper/10 dark:text-paper/70 dark:ring-paper/20",
 };
 
 const ArticleMeta = ({ article, metrics }) => {
@@ -37,7 +42,7 @@ const ArticleMeta = ({ article, metrics }) => {
 
   const statusClass =
     STATUS_STYLES[status.toLowerCase()] ||
-    "bg-graphite/10 text-graphite ring-graphite/20";
+    "bg-graphite/10 text-graphite ring-graphite/20 dark:bg-paper/10 dark:text-paper/70 dark:ring-paper/20";
 
   const stats = [
     { key: "minutes", label: "min read", value: metrics?.minutes || 1 },
@@ -58,10 +63,10 @@ const ArticleMeta = ({ article, metrics }) => {
         position={article?.author?.avatar?.position} // ✅ NEW: reposition করা থাকলে respect করবে
       />
       <div className="min-w-0">
-        <h4 className="truncate font-meta text-sm font-semibold text-ink">
+        <h4 className="truncate font-meta text-sm font-semibold text-ink transition-colors dark:text-paper">
           {authorName}
         </h4>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 font-meta text-xs text-graphite">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 font-meta text-xs text-graphite transition-colors dark:text-paper/70">
           <span>{formatDate(publishedDate)}</span>
           {updatedDate && updatedDate !== publishedDate && (
             <span className="before:mr-1.5 before:content-['·']">
@@ -75,42 +80,60 @@ const ArticleMeta = ({ article, metrics }) => {
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-6 sm:px-8">
-      <div className="rounded-2xl border border-ink/10 bg-ink/[0.02] px-5 py-4 sm:px-6 sm:py-5">
+      <div className="rounded-2xl border border-ink/10 bg-ink/[0.02] px-5 py-4 transition-colors dark:border-paper/10 dark:bg-paper/[0.02] sm:px-6 sm:py-5">
         <div className="flex items-start justify-between gap-3">
-          {authorUsername ? (
-            <Link
-              to={`/profile/${authorUsername}`}
-              className="-m-1 flex min-w-0 items-center gap-3 rounded-lg p-1 transition-colors hover:bg-ink/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
-            >
-              {authorContent}
-            </Link>
-          ) : (
-            <div className="flex min-w-0 items-center gap-3">{authorContent}</div>
-          )}
+  {authorUsername ? (
+    <Link
+      to={`/profile/${authorUsername}`}
+      className="-m-1 flex min-w-0 items-center gap-3 rounded-lg p-1 transition-colors hover:bg-ink/[0.04] dark:hover:bg-paper/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+    >
+      {authorContent}
+    </Link>
+  ) : (
+    <div className="flex min-w-0 items-center gap-3">{authorContent}</div>
+  )}
 
-          {status && (
-            <span
-              className={`shrink-0 inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 font-meta text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset ${statusClass}`}
-            >
-              {status}
-            </span>
-          )}
-        </div>
+  <div className="flex shrink-0 items-center gap-2">
+    {article?._id && (
+      <BookmarkButton
+        newsId={article._id}
+        initialCount={article.bookmarksCount || 0}
+      />
+    )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-ink/10 pt-4 font-meta text-xs text-graphite">
-          {stats.map((s, i) => (
-            <span key={s.key} className="flex items-center gap-x-3">
-              {i > 0 && (
-                <span aria-hidden="true" className="text-ink/20">
-                  ·
+    {status && (
+      <span
+        className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 font-meta text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset transition-colors ${statusClass}`}
+      >
+        {status}
+      </span>
+    )}
+  </div>
+</div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-3 border-t border-ink/10 pt-4 transition-colors dark:border-paper/10">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-meta text-xs text-graphite transition-colors dark:text-paper/70">
+            {stats.map((s, i) => (
+              <span key={s.key} className="flex items-center gap-x-3">
+                {i > 0 && (
+                  <span aria-hidden="true" className="text-ink/20 dark:text-paper/20">
+                    ·
+                  </span>
+                )}
+                <span className="whitespace-nowrap">
+                  <strong className="font-semibold text-ink transition-colors dark:text-paper">{s.value}</strong>{" "}
+                  <span className="uppercase tracking-[0.06em]">{s.label}</span>
                 </span>
-              )}
-              <span className="whitespace-nowrap">
-                <strong className="font-semibold text-ink">{s.value}</strong>{" "}
-                <span className="uppercase tracking-[0.06em]">{s.label}</span>
               </span>
-            </span>
-          ))}
+            ))}
+          </div>
+
+          <ShareButtons
+            layout="horizontal"
+            variant="compact"
+            title={article?.title}
+            summary={article?.summary}
+          />
         </div>
       </div>
     </section>
@@ -119,6 +142,8 @@ const ArticleMeta = ({ article, metrics }) => {
 
 ArticleMeta.propTypes = {
   article: PropTypes.shape({
+    title: PropTypes.string,
+    summary: PropTypes.string,
     author: PropTypes.shape({
       name: PropTypes.string,
       email: PropTypes.string,
