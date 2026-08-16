@@ -1,32 +1,71 @@
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+
 import { useCallback } from "react";
 
-// Contexts
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { SiteSettingsProvider } from "./context/SiteSettingsContext";
-import { CategoryProvider } from "./context/CategoryContext";
+// ============================================================
+// CONTEXTS
+// ============================================================
 
-// Layout & Middleware
+import {
+  AuthProvider,
+  useAuth,
+} from "./context/AuthContext";
+
+import {
+  SiteSettingsProvider,
+} from "./context/SiteSettingsContext";
+
+import {
+  CategoryProvider,
+} from "./context/CategoryContext";
+
+// ============================================================
+// LAYOUT & MIDDLEWARE
+// ============================================================
+
 import PublicLayout from "./layouts/PublicLayout";
 import MainLayout from "./dashboard/layout/MainLayout";
+
 import ProtectDashboard from "./middleware/ProtectDashboard";
 import ProtectRole from "./middleware/ProtectRole";
 
-// Constants
-import { getRoleHomePath } from "./constants/roles";
+// ============================================================
+// CONSTANTS
+// ============================================================
 
-// Config — baseUrl + api endpoints (আগে এখানে import-ই ছিল না)
-import { baseUrl, api } from "./config/Config";
+import {
+  getRoleHomePath,
+} from "./constants/roles";
 
-// Public Pages
+// ============================================================
+// CONFIG
+// ============================================================
+
+import {
+  baseUrl,
+  api,
+} from "./config/Config";
+
+// ============================================================
+// PUBLIC PAGES
+// ============================================================
+
 import Home from "./pages/Home";
 import CategoryNews from "./pages/CategoryNews";
 import Profile from "./pages/profile/Profile";
+
 import ArticleDetails from "./features/article/pages/ArticleDetails";
+
 import PublicProfilePage from "./pages/PublicProfilePage";
+
 import About from "./features/footer/About";
 import DeveloperProfile from "./features/footer/DeveloperProfile";
-import EditorialStandards from "./features/footer/EditorialStandards"; 
+import EditorialStandards from "./features/footer/EditorialStandards";
 import Careers from "./features/footer/Careers";
 import Advertise from "./features/footer/Advertise";
 import Privacy from "./features/footer/Privacy";
@@ -34,235 +73,764 @@ import Terms from "./features/footer/Terms";
 import Corrections from "./features/footer/Corrections";
 import Cookies from "./features/footer/Cookies";
 
-// Auth
+// ============================================================
+// AUTH
+// ============================================================
+
 import Login from "./dashboard/pages/Login";
 import Register from "./dashboard/pages/auth/Register";
+
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+
 import Unauthorized from "./dashboard/pages/Unauthorized";
 import VerifyEmail from "./dashboard/pages/auth/VerifyEmail";
+
 import AccountSettings from "./components/profile/AccountSettings";
 
-// Admin Managers
+// ============================================================
+// ADMIN
+// ============================================================
+
 import AdminIndex from "./dashboard/pages/AdminIndex";
-// import AddWriter from "./dashboard/pages/AddWriter";
 import Users from "./dashboard/pages/Users";
 import AdminProfile from "./dashboard/pages/AdminProfile";
 import News from "./dashboard/pages/News";
+
 import SiteSettings from "./dashboard/pages/admin/SiteSettings";
 import ContentManagement from "./dashboard/pages/ContentManagement";
+
 import CategoryManagement from "./features/category/CategoryManagement";
 
-// Writer & Reader
+// ============================================================
+// WRITER / READER
+// ============================================================
+
 import WriterDashboard from "./dashboard/components/WriterDashboard";
+
 import CreateNewsHub from "./features/article/CreateNewsHub";
 import ArticleEditorRoute from "./features/article/ArticleEditorRoute";
 import ManageNews from "./features/article/ManageNews";
+
 import WriterProfile from "./dashboard/pages/WriterProfile";
+
 import ReaderIndex from "./dashboard/pages/ReaderIndex";
-// import ReaderProfile from "./dashboard/pages/ReaderProfile";
 import ReaderBookmarks from "./dashboard/pages/ReaderBookmarks";
 import ReaderComments from "./dashboard/pages/ReaderComments";
 import ReaderHistory from "./dashboard/pages/ReaderHistory";
-// import ReaderSettings from "./dashboard/pages/ReaderSettings";
 
-// publish article
-import { newsService } from "./features/news/services/newsService";
+// ============================================================
+// NEWS SERVICE
+// ============================================================
 
-/*
-|--------------------------------------------------------------------------
-| Upload News Image
-|--------------------------------------------------------------------------
-|
-| আগে এখানে:
-|   - localStorage.getItem("token") দিয়ে Bearer header পাঠানো হতো
-|     (পুরনো token-based auth-এর leftover, এখন httpOnly cookie
-|     ব্যবহার হচ্ছে বলে এটা সবসময় null/অকার্যকর)
-|   - URL hardcoded ছিল "/api/news/image", যেটাতে "/news" prefix
-|     মিসিং ছিল, ফলে backend route (/news/api/news/image) এ
-|     কখনোই ঠিকমতো hit হতো না।
-|
-| Fix:
-|   - baseUrl + api.uploadNewsImage দিয়ে সঠিক URL বানানো হলো
-|   - credentials: "include" দিয়ে explicitly cookie পাঠানো
-|     নিশ্চিত করা হলো (httpOnly accessToken cookie এভাবেই যাবে)
-|
-*/
+import {
+  newsService,
+} from "./features/news/services/newsService";
+
+// ============================================================
+// UPLOAD NEWS IMAGE
+// ============================================================
 
 const uploadNewsImage = async (file) => {
   const formData = new FormData();
+
   formData.append("image", file);
 
-  const res = await fetch(`${baseUrl}${api.uploadNewsImage}`, {
-    method: "POST",
-    credentials: "include",
-    body: formData,
-  });
+  const response = await fetch(
+    `${baseUrl}${api.uploadNewsImage}`,
+    {
+      method: "POST",
 
-  if (!res.ok) {
-    throw new Error("Upload failed");
+      /*
+       * Auth এখন httpOnly cookie based.
+       * তাই localStorage token / Authorization header
+       * এখানে ব্যবহার করা হবে না।
+       */
+      credentials: "include",
+
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    let message = "Upload failed";
+
+    try {
+      const errorData =
+        await response.json();
+
+      message =
+        errorData?.message ||
+        message;
+    } catch {
+      // Ignore JSON parsing error.
+    }
+
+    throw new Error(message);
   }
 
-  const data = await res.json();
+  const data =
+    await response.json();
 
   return {
     id: data.mediaId,
+
     mediaId: data.mediaId,
-    public_id: data.cloudinaryPublicId,
+
+    public_id:
+      data.cloudinaryPublicId,
+
     url: data.url,
-    secureUrl: data.secureUrl,
+
+    secureUrl:
+      data.secureUrl,
+
     name: file.name,
+
     local: false,
   };
 };
 
-// 👇 buildPayload কে component-এর বাইরে আনা হলো — এটা কোনো state/prop ব্যবহার করে না,
-// তাই বাইরে থাকলে প্রতি render-এ নতুন function তৈরি হবে না।
-const buildPayload = (articleData, status) => ({
-  title: articleData.title,
-  summary: articleData.excerpt,
-  content: articleData.body,
-  category: articleData.category,
-  thumbnail: articleData.coverImage?.mediaId || null,
-  status,
-  isFeatured: Boolean(articleData.isFeatured),
-  showInVideoSection: Boolean(articleData.showInVideoSection), // ✅ যোগ করা হলো
-  tags: articleData.tags || [],
-});
+// ============================================================
+// BUILD NEWS PAYLOAD
+// ============================================================
+//
+// Important:
+// status এখানে caller থেকে আসবে.
+//
+// AutoSave:
+//    status = "draft"
+//
+// Publish:
+//    status = "published"
+//
+// ============================================================
+
+const buildPayload = (
+  articleData,
+  status
+) => {
+  return {
+    title:
+      articleData?.title || "",
+
+    summary:
+      articleData?.excerpt || "",
+
+    content:
+      articleData?.body || "",
+
+    category:
+      articleData?.category || null,
+
+    thumbnail:
+      articleData?.coverImage?.mediaId ||
+      null,
+
+    status:
+      status ||
+      articleData?.status ||
+      "draft",
+
+    isFeatured:
+      Boolean(
+        articleData?.isFeatured
+      ),
+
+    showInVideoSection:
+      Boolean(
+        articleData?.showInVideoSection
+      ),
+
+    tags:
+      Array.isArray(articleData?.tags)
+        ? articleData.tags
+        : [],
+  };
+};
+
+// ============================================================
+// APP ROUTES
+// ============================================================
 
 function AppRoutes() {
-  const { userInfo } = useAuth();
-  const navigate = useNavigate();
-  console.log("userInfo =", userInfo);
+  const {
+    userInfo,
+  } = useAuth();
 
-  const defaultRoute = getRoleHomePath(userInfo?.role);
+  const navigate =
+    useNavigate();
 
-  // 👇 useCallback দিয়ে wrap করা হলো — dependency array খালি, কারণ buildPayload আর
-  // newsService দুটোই module-level এবং কখনো বদলায় না। ফলে saveArticle এখন
-  // প্রতি render-এ একই reference রাখবে, আর child component-এর effect/dependency
-  // অকারণে re-trigger হবে না।
-  const saveArticle = useCallback(async (articleData) => {
-    try {
-      const payload = buildPayload(articleData, "draft");
-      return articleData.id
-        ? await newsService.updateNews(articleData.id, payload)
-        : await newsService.createNews(payload);
-    } catch (error) {
-      console.error("Save Draft Error:", error);
-      throw error;
-    }
-  }, []);
+  /*
+   * Debug only.
+   *
+   * চাইলে পরে remove করতে পারো।
+   */
+  console.log(
+    "userInfo =",
+    userInfo
+  );
 
-  // 👇 useCallback দিয়ে wrap করা হলো — navigate ছাড়া আর কোনো external dependency নেই।
-  const publishArticle = useCallback(async (articleData) => {
-    console.log("===== BODY START =====");
-    console.log(articleData.body.substring(0, 300));
-    console.log("===== BODY END =====");
+  const defaultRoute =
+    getRoleHomePath(
+      userInfo?.role
+    );
 
-    try {
-      const payload = buildPayload(articleData, "published");
-      const result = articleData.id
-        ? await newsService.updateNews(articleData.id, payload)
-        : await newsService.createNews(payload);
+  // ==========================================================
+  // SAVE ARTICLE
+  // ==========================================================
+  //
+  // This function is used by ArticleManagement.
+  //
+  // Existing article:
+  //
+  // PUT /api/news/:id
+  //
+  // New article:
+  //
+  // POST /api/news
+  //
+  // IMPORTANT:
+  // status is NOT hardcoded to draft.
+  // ArticleManagement decides whether this is a draft save
+  // or a publish operation.
+  //
+  // ==========================================================
 
-      setTimeout(() => navigate("/dashboard/writer/add-news"), 1200);
+  const saveArticle = useCallback(
+    async (articleData) => {
+      try {
+        const status =
+          articleData?.status ||
+          "draft";
 
-      return result;
-    } catch (error) {
-      console.error("Publish Error:", error);
-      throw error;
-    }
-  }, [navigate]);
+        const payload =
+          buildPayload(
+            articleData,
+            status
+          );
+
+        /*
+         * IMPORTANT:
+         *
+         * ArticleManagement stores the MongoDB _id
+         * as article.id after the first POST.
+         *
+         * So every following autosave goes through PUT.
+         */
+
+        const articleId =
+          articleData?.id ||
+          articleData?._id ||
+          null;
+
+        let result;
+
+        if (articleId) {
+          result =
+            await newsService.updateNews(
+              articleId,
+              payload
+            );
+        } else {
+          result =
+            await newsService.createNews(
+              payload
+            );
+        }
+
+        return result;
+      } catch (error) {
+        console.error(
+          "Save Article Error:",
+          error
+        );
+
+        throw error;
+      }
+    },
+    []
+  );
+
+  // ==========================================================
+  // PUBLISH ARTICLE
+  // ==========================================================
+  //
+  // ArticleManagement already waits for an active autosave
+  // before calling this function.
+  //
+  // Therefore this function should ONLY publish.
+  //
+  // ==========================================================
+
+  const publishArticle = useCallback(
+    async (articleData) => {
+      try {
+        console.log(
+          "===== PUBLISH START ====="
+        );
+
+        console.log(
+          "Article ID:",
+          articleData?.id ||
+            articleData?._id ||
+            "NEW ARTICLE"
+        );
+
+        console.log(
+          "Title:",
+          articleData?.title
+        );
+
+        console.log(
+          "===== BODY START ====="
+        );
+
+        console.log(
+          (
+            articleData?.body ||
+            ""
+          ).substring(0, 300)
+        );
+
+        console.log(
+          "===== BODY END ====="
+        );
+
+        // ----------------------------------------------------
+        // ALWAYS publish here.
+        // ----------------------------------------------------
+
+        const payload =
+          buildPayload(
+            articleData,
+            "published"
+          );
+
+        const articleId =
+          articleData?.id ||
+          articleData?._id ||
+          null;
+
+        let result;
+
+        // ----------------------------------------------------
+        // Existing article
+        // ----------------------------------------------------
+
+        if (articleId) {
+          console.log(
+            "Publishing existing article:",
+            articleId
+          );
+
+          result =
+            await newsService.updateNews(
+              articleId,
+              payload
+            );
+        }
+
+        // ----------------------------------------------------
+        // Brand new article
+        //
+        // Normally ArticleManagement should already have
+        // created the draft first, but this fallback keeps
+        // publishing functional even if no ID exists.
+        // ----------------------------------------------------
+
+        else {
+          console.log(
+            "Publishing new article..."
+          );
+
+          result =
+            await newsService.createNews(
+              payload
+            );
+        }
+
+        console.log(
+          "===== PUBLISH SUCCESS ====="
+        );
+
+        /*
+         * Navigate only after the server confirms success.
+         */
+        setTimeout(() => {
+          navigate(
+            "/dashboard/writer/add-news"
+          );
+        }, 1200);
+
+        return result;
+      } catch (error) {
+        console.error(
+          "Publish Error:",
+          error
+        );
+
+        throw error;
+      }
+    },
+    [navigate]
+  );
+
+  // ==========================================================
+  // ROUTES
+  // ==========================================================
 
   return (
     <Routes>
-      {/* PUBLIC — PublicLayout এর ভেতরে নেস্টেড */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/category/:slug" element={<CategoryNews />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/news/:slug" element={<ArticleDetails />} />
-        <Route path="/profile/:username" element={<PublicProfilePage />} />
 
-        {/* FOOTER PAGES — Footer.jsx এর COMPANY_LINKS / POLICY_LINKS এর সাথে মিল রেখে */}
-        <Route path="/about" element={<About />} />
-        <Route path="/developer" element={<DeveloperProfile />} />
-        
-        <Route path="/editorial-standards" element={<EditorialStandards />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/advertise" element={<Advertise />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/corrections" element={<Corrections />} />
-        <Route path="/cookies" element={<Cookies />} />
+      {/* ==================================================== */}
+      {/* PUBLIC */}
+      {/* ==================================================== */}
+
+      <Route
+        element={<PublicLayout />}
+      >
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        <Route
+          path="/category/:slug"
+          element={<CategoryNews />}
+        />
+
+        <Route
+          path="/profile"
+          element={<Profile />}
+        />
+
+        <Route
+          path="/news/:slug"
+          element={<ArticleDetails />}
+        />
+
+        <Route
+          path="/profile/:username"
+          element={<PublicProfilePage />}
+        />
+
+        {/* Footer */}
+
+        <Route
+          path="/about"
+          element={<About />}
+        />
+
+        <Route
+          path="/developer"
+          element={<DeveloperProfile />}
+        />
+
+        <Route
+          path="/editorial-standards"
+          element={<EditorialStandards />}
+        />
+
+        <Route
+          path="/careers"
+          element={<Careers />}
+        />
+
+        <Route
+          path="/advertise"
+          element={<Advertise />}
+        />
+
+        <Route
+          path="/privacy"
+          element={<Privacy />}
+        />
+
+        <Route
+          path="/terms"
+          element={<Terms />}
+        />
+
+        <Route
+          path="/corrections"
+          element={<Corrections />}
+        />
+
+        <Route
+          path="/cookies"
+          element={<Cookies />}
+        />
       </Route>
 
+      {/* ==================================================== */}
       {/* AUTH */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/verify-email/:token" element={<VerifyEmail />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      {/* ==================================================== */}
 
-      {/* DASHBOARD CONTAINER */}
-      <Route path="/dashboard" element={<ProtectDashboard />}>
+      <Route
+        path="/login"
+        element={<Login />}
+      />
+
+      <Route
+        path="/register"
+        element={<Register />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPassword />}
+      />
+
+      <Route
+        path="/verify-email/:token"
+        element={<VerifyEmail />}
+      />
+
+      <Route
+        path="/reset-password/:token"
+        element={<ResetPassword />}
+      />
+
+      {/* ==================================================== */}
+      {/* DASHBOARD */}
+      {/* ==================================================== */}
+
+      <Route
+        path="/dashboard"
+        element={<ProtectDashboard />}
+      >
         <Route element={<MainLayout />}>
-          <Route index element={<Navigate to={defaultRoute} replace />} />
-          <Route path="unable-access" element={<Unauthorized />} />
-          <Route path="account-settings" element={<AccountSettings />} />
 
+          {/* Dashboard default */}
+
+          <Route
+            index
+            element={
+              <Navigate
+                to={defaultRoute}
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="unable-access"
+            element={<Unauthorized />}
+          />
+
+          <Route
+            path="account-settings"
+            element={<AccountSettings />}
+          />
+
+          {/* ================================================= */}
           {/* ADMIN + SUPERADMIN */}
-          <Route element={<ProtectRole roles={["admin", "superadmin"]} />}>
-            <Route path="admin" element={<AdminIndex />} />
-            <Route path="admin/content-management" element={<ContentManagement />} />
-            <Route path="admin/categories" element={<CategoryManagement />} />
-            <Route path="admin/news" element={<News />} />
-            <Route path="admin/profile" element={<AdminProfile />} />
-            {/* <Route path="admin/add-writer" element={<AddWriter />} /> */}
-            <Route path="admin/users" element={<Users />} />
+          {/* ================================================= */}
+
+          <Route
+            element={
+              <ProtectRole
+                roles={[
+                  "admin",
+                  "superadmin",
+                ]}
+              />
+            }
+          >
+            <Route
+              path="admin"
+              element={<AdminIndex />}
+            />
+
+            <Route
+              path="admin/content-management"
+              element={
+                <ContentManagement />
+              }
+            />
+
+            <Route
+              path="admin/categories"
+              element={
+                <CategoryManagement />
+              }
+            />
+
+            <Route
+              path="admin/news"
+              element={<News />}
+            />
+
+            <Route
+              path="admin/profile"
+              element={<AdminProfile />}
+            />
+
+            <Route
+              path="admin/users"
+              element={<Users />}
+            />
           </Route>
 
-          <Route path="admin/site-settings" element={<SiteSettings />} />
+          {/* ================================================= */}
+          {/* SITE SETTINGS */}
+          {/* ================================================= */}
 
-          {/* WRITER (admin ও superadmin ও পূর্ণ writer access পাবে) */}
-          <Route element={<ProtectRole roles={["writer", "admin", "superadmin"]} />}>
-            <Route path="writer" element={<WriterDashboard />} /> {/* ✅ NEW — Writer Dashboard (stats + my news) */}
-            <Route path="writer/add-news" element={<CreateNewsHub />} />
+          <Route
+            path="admin/site-settings"
+            element={<SiteSettings />}
+          />
+
+          {/* ================================================= */}
+          {/* WRITER */}
+          {/* ================================================= */}
+
+          <Route
+            element={
+              <ProtectRole
+                roles={[
+                  "writer",
+                  "admin",
+                  "superadmin",
+                ]}
+              />
+            }
+          >
+
+            <Route
+              path="writer"
+              element={
+                <WriterDashboard />
+              }
+            />
+
+            <Route
+              path="writer/add-news"
+              element={
+                <CreateNewsHub />
+              }
+            />
+
+            {/* --------------------------------------------- */}
+            {/* ARTICLE EDITOR */}
+            {/* --------------------------------------------- */}
+
             <Route
               path="writer/add-news/editor"
               element={
                 <ArticleEditorRoute
-                  currentUserId={userInfo?.id}
-                  uploadImage={uploadNewsImage}
-                  onSave={saveArticle}
-                  onPublish={publishArticle}
+                  currentUserId={
+                    userInfo?.id ||
+                    userInfo?._id ||
+                    null
+                  }
+
+                  uploadImage={
+                    uploadNewsImage
+                  }
+
+                  onSave={
+                    saveArticle
+                  }
+
+                  onPublish={
+                    publishArticle
+                  }
                 />
               }
             />
+
+            {/* --------------------------------------------- */}
+            {/* MANAGE NEWS */}
+            {/* --------------------------------------------- */}
+
             <Route
               path="writer/add-news/manage"
-              element={<ManageNews currentUserId={userInfo?.id} />}
+              element={
+                <ManageNews
+                  currentUserId={
+                    userInfo?.id ||
+                    userInfo?._id ||
+                    null
+                  }
+                />
+              }
             />
-            <Route path="writer/profile" element={<WriterProfile />} />
-        
+
+            <Route
+              path="writer/profile"
+              element={
+                <WriterProfile />
+              }
+            />
+
           </Route>
 
+          {/* ================================================= */}
           {/* READER */}
-          <Route element={<ProtectRole roles={["reader"]} />}>
-            <Route path="reader" element={<ReaderIndex />} />
-            {/* <Route path="reader/profile" element={<ReaderProfile />} /> */}
-            <Route path="reader/bookmarks" element={<ReaderBookmarks />} />
-            <Route path="reader/comments" element={<ReaderComments />} />
-            <Route path="reader/history" element={<ReaderHistory />} />
-            {/* <Route path="reader/settings" element={<ReaderSettings />} /> */}
+          {/* ================================================= */}
+
+          <Route
+            element={
+              <ProtectRole
+                roles={["reader"]}
+              />
+            }
+          >
+            <Route
+              path="reader"
+              element={
+                <ReaderIndex />
+              }
+            />
+
+            <Route
+              path="reader/bookmarks"
+              element={
+                <ReaderBookmarks />
+              }
+            />
+
+            <Route
+              path="reader/comments"
+              element={
+                <ReaderComments />
+              }
+            />
+
+            <Route
+              path="reader/history"
+              element={
+                <ReaderHistory />
+              }
+            />
           </Route>
+
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* ==================================================== */}
+      {/* FALLBACK */}
+      {/* ==================================================== */}
+
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/"
+            replace
+          />
+        }
+      />
+
     </Routes>
   );
 }
+
+// ============================================================
+// APP
+// ============================================================
 
 function App() {
   return (
@@ -275,5 +843,9 @@ function App() {
     </AuthProvider>
   );
 }
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 export default App;

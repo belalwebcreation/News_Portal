@@ -1,19 +1,27 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 /**
- * Debounced autosave hook.
+ * Debounced persistence hook.
  *
- * Important behavior:
- * - Typing করলে debounce করে save করবে
- * - Manual Save Draft করলে pending autosave timer cancel করবে
- * - একই সময়ে একাধিক save request চলতে দেবে না
- * - Latest value ধরে রাখবে
- * - Save successful হলে status = saved
+ * Important guarantees:
+ *
+ * 1. Only the latest scheduled save is executed.
+ * 2. cancel() invalidates pending/in-flight save cycles.
+ * 3. A stale save cannot update the UI state after a newer save cycle.
+ * 4. saveNow() can still be used for manual save.
  */
 export function useAutoSave(
   value,
   onSave,
-  { delay = 1400, enabled = true } = {}
+  {
+    delay = 1400,
+    enabled = true,
+  } = {}
 ) {
   const latestValue = useRef(value);
   const latestSave = useRef(onSave);
@@ -21,58 +29,69 @@ export function useAutoSave(
   const firstRender = useRef(true);
   const timer = useRef(null);
 
-  // একটি save request চলছে কিনা
-  const savingRef = useRef(false);
-
-  // Save চলাকালীন নতুন value এলে সেটা পরে save করার জন্য
-  const queuedValueRef = useRef(null);
+  // Every new save cycle gets a new generation.
+  const generationRef = useRef(0);
 
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
   const [lastSavedAt, setLastSavedAt] = useState(null);
 
-  // Always keep latest references
   latestValue.current = value;
   latestSave.current = onSave;
 
   /**
-   * Clear scheduled debounce timer
+   * Cancel the currently scheduled save and invalidate
+   * any older save cycle.
    */
-  const clearTimer = useCallback(() => {
+  const cancel = useCallback(() => {
+    generationRef.current += 1;
+
     if (timer.current) {
       window.clearTimeout(timer.current);
       timer.current = null;
     }
+
+    setStatus("idle");
+    setError(null);
   }, []);
 
   /**
-   * Actual save
+   * Execute save immediately.
    */
   const save = useCallback(
     async (nextValue = latestValue.current) => {
       if (!latestSave.current) {
-        return null;
+        return;
       }
 
-      // যদি already save চলছে,
-      // latest value queue করে রাখি।
-      if (savingRef.current) {
-        queuedValueRef.current = nextValue;
-        return null;
-      }
+      const generation = ++generationRef.current;
 
-      savingRef.current = true;
       setStatus("saving");
       setError(null);
 
       try {
         const result = await latestSave.current(nextValue);
 
+        /*
+         * If another save/cancel happened while this request
+         * was running, this request is stale.
+         */
+        if (generation !== generationRef.current) {
+          return result;
+        }
+
         setStatus("saved");
         setLastSavedAt(new Date());
 
         return result;
       } catch (saveError) {
+        /*
+         * Ignore errors from stale requests.
+         */
+        if (generation !== generationRef.current) {
+          return;
+        }
+
         setStatus("error");
 
         const nextError =
@@ -83,30 +102,13 @@ export function useAutoSave(
         setError(nextError);
 
         throw nextError;
-      } finally {
-        savingRef.current = false;
-
-        // Save চলাকালীন নতুন change হলে
-        // সর্বশেষ value আবার save করব।
-        if (queuedValueRef.current !== null) {
-          const queuedValue = queuedValueRef.current;
-
-          queuedValueRef.current = null;
-
-          // ছোট delay দিয়ে latest value save
-          timer.current = window.setTimeout(() => {
-            timer.current = null;
-
-            save(queuedValue).catch(() => {});
-          }, 300);
-        }
       }
     },
     []
   );
 
   /**
-   * Automatic debounced save
+   * Debounced autosave.
    */
   useEffect(() => {
     if (firstRender.current) {
@@ -115,11 +117,17 @@ export function useAutoSave(
     }
 
     if (!enabled) {
-      clearTimer();
+      if (timer.current) {
+        window.clearTimeout(timer.current);
+        timer.current = null;
+      }
+
       return undefined;
     }
 
-    clearTimer();
+    if (timer.current) {
+      window.clearTimeout(timer.current);
+    }
 
     setStatus("pending");
 
@@ -129,52 +137,40 @@ export function useAutoSave(
       save(value).catch(() => {});
     }, delay);
 
-    return clearTimer;
-  }, [value, delay, enabled, save, clearTimer]);
+    return () => {
+      if (timer.current) {
+        window.clearTimeout(timer.current);
+        timer.current = null;
+      }
+    };
+  }, [
+    value,
+    delay,
+    enabled,
+    save,
+  ]);
 
   /**
-   * Cleanup
+   * Cleanup.
    */
   useEffect(() => {
     return () => {
-      clearTimer();
-      queuedValueRef.current = null;
+      generationRef.current += 1;
+
+      if (timer.current) {
+        window.clearTimeout(timer.current);
+        timer.current = null;
+      }
     };
-  }, [clearTimer]);
-
-  /**
-   * Manual Save Draft
-   *
-   * আগে pending autosave cancel হবে।
-   */
-  const saveNow = useCallback(
-    async (nextValue = latestValue.current) => {
-      clearTimer();
-
-      queuedValueRef.current = null;
-
-      return save(nextValue);
-    },
-    [clearTimer, save]
-  );
-
-  /**
-   * Cancel pending autosave
-   */
-  const cancel = useCallback(() => {
-    clearTimer();
-    queuedValueRef.current = null;
-
-    if (!savingRef.current) {
-      setStatus("idle");
-    }
-  }, [clearTimer]);
+  }, []);
 
   return {
     status,
     error,
     lastSavedAt,
-    saveNow,
+
+    saveNow: save,
+
     cancel,
   };
 }
