@@ -7,11 +7,16 @@ import TextNews from "./TextNews";
 const SidebarFeatured = ({ featured }) => {
   if (!featured) return null;
 
-  const { id, title, description, time, publishedAt } = featured;
+  const { slug, title, description, time, publishedAt, categorySlug } = featured;
+
+  // ⚠️ basename="/news" স্বয়ংক্রিয়ভাবে যোগ হয় — এখানে "/news" নিজে লেখা যাবে না।
+  // App.jsx-এ শুধু "/:categorySlug/:slug" route আছে, standalone "/:slug" নেই —
+  // categorySlug না থাকলে ভ্যালিড লিংক বানানো সম্ভব না, তাই "#" ফলব্যাক।
+  const articleUrl = categorySlug && slug ? `/${categorySlug}/${slug}` : "#";
 
   return (
     <div className="border-b border-neutral-200/60 dark:border-gray-800/60 pb-6">
-      <Link to={`/news/${id}`} className="group block">
+      <Link to={articleUrl} className="group block">
         <h3
           className="
             text-xl 

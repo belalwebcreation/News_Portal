@@ -318,6 +318,47 @@ export const newsService = {
   },
 
 
+    // ==========================================================
+  // APPROVE NEWS (review -> published)
+  // ==========================================================
+
+  async approveNews(id) {
+    try {
+      const { data } = await apiClient.patch(
+        `${api.news}/${id}/approve`,
+        {},
+        { withCredentials: true }
+      );
+      return data.data;
+    } catch (error) {
+      throw new Error(
+        getErrorMessage(error, "আর্টিকেল Approve করা যায়নি।"),
+        { cause: error }
+      );
+    }
+  },
+
+  // ==========================================================
+  // REJECT NEWS (review -> draft)
+  // ==========================================================
+
+  async rejectNews(id, reason = "") {
+    try {
+      const { data } = await apiClient.patch(
+        `${api.news}/${id}/reject`,
+        { reason },
+        { withCredentials: true }
+      );
+      return data.data;
+    } catch (error) {
+      throw new Error(
+        getErrorMessage(error, "আর্টিকেল Reject করা যায়নি।"),
+        { cause: error }
+      );
+    }
+  },
+
+
   // ==========================================================
   // NEWS SECTION LAYOUT
   // ==========================================================

@@ -6,9 +6,15 @@ import PlayButton from "./PlayButton";
 const FeaturedVideoCard = memo(({ video }) => {
   if (!video) return null;
 
+  // ⚠️ useVideoSectionData.js-এ mapNewsToVideo() "category" ফিল্ডেই
+  // slug বসায় (news.category?.slug) — এটা topic-filter এর জন্য দরকারি,
+  // তাই এখানে video.category ব্যবহার করতে হবে, video.categorySlug না।
+  const articleUrl =
+    video.category && video.slug ? `/${video.category}/${video.slug}` : "#";
+
   return (
     <Link
-      to={`/news/${video.slug}`}
+      to={articleUrl}
       aria-label={video.title}
       className="
         group flex flex-col h-full overflow-hidden 

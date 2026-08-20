@@ -8,14 +8,16 @@ import {
   deleteNews,
   getVideoNews,
   getWriterStats,
-  getTopViewedNews, // ✅ NEW
+  getTopViewedNews,
+  approveNews,   // ✅ NEW
+  rejectNews,    // ✅ NEW
 } from '../controllers/newsController.js';
 
 import { incrementView } from '../controllers/newsView.controller.js';
 import { getTrending } from '../controllers/trending.controller.js';
 import { getNewsSectionLayout } from '../controllers/homeLayout.controller.js';
 
-import { protect, authorize } from '../middleware/authMiddleware.js';
+import { protect, authorize, optionalAuth } from '../middleware/authMiddleware.js'; // ✅ optionalAuth added
 import { viewRateLimiter } from '../middleware/rateLimiter.js';
 import multer from 'multer';
 
@@ -54,11 +56,28 @@ router.get(
   protect,
   authorize('admin', 'superadmin'),
   getTopViewedNews
-); // ✅ NEW — Admin Dashboard "Top Views News" panel (all-time top viewed published news)
+);
+
+// ✅ NEW — Review workflow: writer submit korle "review", admin/superadmin
+// accept korle "published", reject korle "draft"-এ ferot
+router.patch(
+  '/:id/approve',
+  protect,
+  authorize('admin', 'superadmin'),
+  approveNews
+);
+
+router.patch(
+  '/:id/reject',
+  protect,
+  authorize('admin', 'superadmin'),
+  rejectNews
+);
+
 router.post('/:id/view', viewRateLimiter, incrementView);
 
 router.route('/')
-  .get(getAllNews)
+  .get(optionalAuth, getAllNews) // ✅ optionalAuth added — role-based visibility
   .post(protect, authorize('writer', 'admin', 'superadmin'), createNews);
 
 router.route('/:identifier')

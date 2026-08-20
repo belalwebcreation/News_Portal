@@ -17,16 +17,40 @@ const FeaturedNews = ({ news }) => {
   if (!news) return null;
 
   const {
-    id,
     title,
+    slug,
     description,
     image,
     category = "বাংলাদেশ",
+    categorySlug,
     publishedAt,
     isBreaking = false,
+    readTime,
   } = news;
 
-  const categoryBadgeStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+  const categoryBadgeStyle =
+    CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+
+  /*
+   * ============================================================
+   * Article URL
+   * ============================================================
+   *
+   * IMPORTANT: `to` এখানে React Router-এর <Link>-এর জন্য —
+   * basename="/news" স্বয়ংক্রিয়ভাবে সামনে যোগ হয় (main.jsx-এ সেট করা)।
+   * তাই এখানে "/news" নিজে হাতে লেখা যাবে না, নাহলে ব্রাউজারে
+   * /news/news/... হয়ে যাবে।
+   *
+   * Browser-এ চূড়ান্ত URL যা দেখাবে: /news/technology/mern-stack-development-25
+   * কিন্তু `to` prop-এ শুধু: /technology/mern-stack-development-25
+   *
+   * App.jsx-এ কনফার্মড route: path="/:categorySlug/:slug" — শুধু এটাই আছে,
+   * কোনো standalone /:slug route নেই। তাই categorySlug ছাড়া কোনো
+   * ভ্যালিড লিংক বানানো সম্ভব না — সেক্ষেত্রে "#" রাখা হলো।
+   */
+
+  const articleUrl =
+    categorySlug && slug ? `/${categorySlug}/${slug}` : "#";
 
   return (
     <motion.article
@@ -34,15 +58,44 @@ const FeaturedNews = ({ news }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group flex flex-col justify-between pb-8 border-b border-neutral-200/60 dark:border-gray-800/60"
+      className="
+        group
+        flex
+        flex-col
+        justify-between
+        pb-8
+        border-b
+        border-neutral-200/60
+        dark:border-gray-800/60
+      "
     >
       <div>
-        {/* Aspect Ratio Image Container with Overlay and Hover Zoom */}
-        <div className="relative overflow-hidden rounded-2xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100 dark:border-gray-800">
+        {/* =====================================================
+            Image
+        ====================================================== */}
+
+        <div
+          className="
+            relative
+            overflow-hidden
+            rounded-2xl
+            bg-neutral-100
+            dark:bg-gray-800
+            border
+            border-neutral-100
+            dark:border-gray-800
+          "
+        >
           <Link
-            to={`/news/${id}`}
+            to={articleUrl}
             aria-label={title}
-            className="block relative aspect-[16/9] w-full overflow-hidden"
+            className="
+              block
+              relative
+              aspect-[16/9]
+              w-full
+              overflow-hidden
+            "
           >
             <img
               src={image}
@@ -50,31 +103,89 @@ const FeaturedNews = ({ news }) => {
               loading="lazy"
               decoding="async"
               className="
-                w-full 
-                h-full 
-                object-cover 
-                transition-all 
-                duration-700 
-                ease-out 
-                group-hover:scale-105 
+                w-full
+                h-full
+                object-cover
+                transition-all
+                duration-700
+                ease-out
+                group-hover:scale-105
                 group-hover:brightness-95
               "
             />
+
             {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
+            <div
+              className="
+                absolute
+                inset-0
+                bg-gradient-to-t
+                from-black/15
+                via-transparent
+                to-transparent
+              "
+            />
           </Link>
 
-          {/* Category or Breaking News Badge */}
-          <div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-2">
+          {/* ===================================================
+              Category / Breaking Badge
+          ==================================================== */}
+
+          <div
+            className="
+              absolute
+              top-3.5
+              left-3.5
+              z-10
+              flex
+              items-center
+              gap-2
+            "
+          >
             {isBreaking ? (
-              <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold tracking-wide px-3 py-1 rounded-lg shadow-sm animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+              <span
+                className="
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  bg-red-600
+                  text-white
+                  text-xs
+                  font-bold
+                  tracking-wide
+                  px-3
+                  py-1
+                  rounded-lg
+                  shadow-sm
+                  animate-pulse
+                "
+              >
+                <span
+                  className="
+                    w-1.5
+                    h-1.5
+                    rounded-full
+                    bg-white
+                    animate-ping
+                  "
+                />
+
                 জরুরি
               </span>
             ) : (
               category && (
                 <span
-                  className={`inline-block text-xs font-bold tracking-wide px-3 py-1 rounded-lg shadow-sm ${categoryBadgeStyle}`}
+                  className={`
+                    inline-block
+                    text-xs
+                    font-bold
+                    tracking-wide
+                    px-3
+                    py-1
+                    rounded-lg
+                    shadow-sm
+                    ${categoryBadgeStyle}
+                  `}
                 >
                   {category}
                 </span>
@@ -83,22 +194,29 @@ const FeaturedNews = ({ news }) => {
           </div>
         </div>
 
-        {/* Content Section */}
+        {/* =====================================================
+            Content
+        ====================================================== */}
+
         <div className="mt-5 flex flex-col">
-          {/* Main Title with Responsive Hierarchy & Line Clamp */}
-          <Link to={`/news/${id}`} aria-label={title}>
+          {/* Title */}
+
+          <Link
+            to={articleUrl}
+            aria-label={title}
+          >
             <h3
               className="
-                text-xl 
-                sm:text-2xl 
-                lg:text-3xl 
-                font-bold 
-                tracking-tight 
-                leading-snug 
-                text-neutral-900 
+                text-xl
+                sm:text-2xl
+                lg:text-3xl
+                font-bold
+                tracking-tight
+                leading-snug
+                text-neutral-900
                 dark:text-gray-100
-                transition-colors 
-                duration-300 
+                transition-colors
+                duration-300
                 group-hover:text-red-600
                 dark:group-hover:text-red-500
                 line-clamp-2
@@ -109,16 +227,17 @@ const FeaturedNews = ({ news }) => {
           </Link>
 
           {/* Description */}
+
           {description && (
             <p
               className="
-                mt-3 
-                text-sm 
-                sm:text-base 
-                leading-relaxed 
-                text-neutral-600 
+                mt-3
+                text-sm
+                sm:text-base
+                leading-relaxed
+                text-neutral-600
                 dark:text-gray-400
-                line-clamp-3 
+                line-clamp-3
                 font-normal
               "
             >
@@ -128,15 +247,37 @@ const FeaturedNews = ({ news }) => {
         </div>
       </div>
 
-      {/* Clean Editorial Metadata */}
-      <div className="mt-5 flex items-center justify-between text-xs sm:text-sm text-neutral-500 dark:text-gray-400 font-medium">
-        <div className="flex items-center space-x-2">
-          <span>{publishedAt || news.time || "সম্প্রতি"}</span>
+      {/* =======================================================
+          Editorial Metadata
+      ======================================================== */}
 
-          {news.readTime && (
+      <div
+        className="
+          mt-5
+          flex
+          items-center
+          justify-between
+          text-xs
+          sm:text-sm
+          text-neutral-500
+          dark:text-gray-400
+          font-medium
+        "
+      >
+        <div className="flex items-center space-x-2">
+          <span>
+            {publishedAt || news.time || "সম্প্রতি"}
+          </span>
+
+          {readTime && (
             <>
-              <span className="text-neutral-300 dark:text-gray-600">•</span>
-              <span>{news.readTime}</span>
+              <span className="text-neutral-300 dark:text-gray-600">
+                •
+              </span>
+
+              <span>
+                {readTime}
+              </span>
             </>
           )}
         </div>

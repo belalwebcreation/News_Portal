@@ -117,7 +117,7 @@ const RelatedArticles = ({ article }) => {
               className="group flex flex-col transition-transform duration-300 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               <Link
-                to={`/news/${item.slug}`}
+                to={`/${item.category?.slug}/${item.slug}`}
                 className="block overflow-hidden rounded-xl border border-ink/10 transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent group-hover:shadow-lg group-hover:shadow-ink/10 dark:border-paper/10 dark:group-hover:shadow-none dark:group-hover:ring-1 dark:group-hover:ring-paper/15"
               >
                 {image ? (
@@ -146,7 +146,7 @@ const RelatedArticles = ({ article }) => {
                 )}
 
                 <Link
-                  to={`/news/${item.slug}`}
+                  to={`/${item.category?.slug}/${item.slug}`}
                   className="mt-2 font-display text-lg font-medium leading-snug text-ink transition-colors hover:text-accent motion-reduce:transition-none dark:text-paper lg:text-base"
                 >
                   <span className="line-clamp-2">{item.title}</span>

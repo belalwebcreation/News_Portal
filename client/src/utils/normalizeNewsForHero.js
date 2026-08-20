@@ -12,12 +12,10 @@ export function normalizeNewsForHero(item) {
     id: item.slug || item._id,
     title: item.title || "",
     description: item.summary || "",
-    // News.js মডেলে status "published" হলেই publishedAt সেট হয় (pre-save hook) —
-    // সেটা না থাকলে (edge case) createdAt fallback হিসেবে ব্যবহার হবে।
     time: formatTimeAgoBn(item.publishedAt || item.createdAt),
-    // thumbnail আসলে { media: ObjectId } sub-schema, populate হওয়ার পর
-    // thumbnail.media একটা পূর্ণ Media document হয়ে যায় — তাই .media.url
     image: item.thumbnail?.media?.url || "",
+    category: item.category?.name || "",       // ✅ badge-এর জন্য (আগে সবসময় ডিফল্ট দেখাচ্ছিল)
+    categorySlug: item.category?.slug || "",    // ✅ নতুন — routing-এর জন্য দরকার
   };
 }
 

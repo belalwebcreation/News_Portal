@@ -9,7 +9,8 @@ import { FaRegUser } from "react-icons/fa";
 import { 
   MdOutlineArticle, 
   MdOutlinePostAdd, 
-  MdOutlineCategory 
+  MdOutlineCategory,
+  MdOutlinePendingActions, // ✅ NEW — Pending Review menu icon
 } from "react-icons/md";
 import {
   FiX,
@@ -32,6 +33,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { title: "Content Management", path: "/dashboard/admin/content-management", icon: <FiGrid size={20} /> },
     { title: "Category Management", path: "/dashboard/admin/categories", icon: <MdOutlineCategory size={20} /> },
     { title: "News Master List", path: "/dashboard/admin/news", icon: <MdOutlineArticle size={20} /> },
+    { title: "Pending Review", path: "/dashboard/admin/pending-review", icon: <MdOutlinePendingActions size={20} /> }, // ✅ NEW — writer-দের submit করা article approve/reject করার page
     { title: "User List", path: "/dashboard/admin/users", icon: <FaRegUser size={18} /> },
   ];
 

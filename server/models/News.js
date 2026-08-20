@@ -68,9 +68,22 @@ const newsSchema = new mongoose.Schema(
       ref: "User",
     },
 
+    reviewedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
+reviewNote: {
+  // Reject korার somoy admin/superadmin কেন reject korলো সেটা লিখতে পারবে
+  type: String,
+  default: "",
+  trim: true,
+},
+
     status: {
       type: String,
-      enum: ["draft", "published"],
+      enum: ["draft", "review", "published"],   // ✅ "review" added
       default: "draft",
     },
 
@@ -133,6 +146,8 @@ const newsSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+
 
 newsSchema.pre("save", function () {
   if (this.isModified("content")) {

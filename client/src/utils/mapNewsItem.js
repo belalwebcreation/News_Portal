@@ -11,6 +11,8 @@ export const mapNewsItem = (item) => {
     image: item.thumbnail?.media?.url || "/default-news-thumbnail.jpg",
     time: formatBanglaRelativeTime(item.publishedAt || item.createdAt),
     views: item.views ?? 0,
+    category: item.category?.name || "",       // ✅ badge + link দুটোর জন্যই লাগবে
+    categorySlug: item.category?.slug || "",    // ✅ routing-এর জন্য দরকার
   };
 };
 

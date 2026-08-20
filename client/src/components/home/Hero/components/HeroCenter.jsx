@@ -21,6 +21,7 @@ const HeroCenter = ({ news }) => {
     description,
     image,
     category = "আন্তর্জাতিক",
+    categorySlug,
     publishedAt,
     isBreaking = false,
   } = news;
@@ -40,7 +41,7 @@ const HeroCenter = ({ news }) => {
         {/* Image Container with Aspect Ratio, Subtle Overlay & Performance Attributes */}
         <div className="relative overflow-hidden rounded-2xl bg-neutral-100 dark:bg-gray-800 border border-neutral-100 dark:border-gray-800">
           <Link
-            to={`/news/${id}`}
+            to={`/${categorySlug}/${id}`}
             aria-label={title}
             className="block relative aspect-[16/9] w-full overflow-hidden"
           >
@@ -87,7 +88,7 @@ const HeroCenter = ({ news }) => {
         {/* Article Body Content */}
         <div className="mt-6 flex flex-col">
           {/* Main Title with Clean Typography & Strict Line Clamping */}
-          <Link to={`/news/${id}`} aria-label={title}>
+          <Link to={`/${categorySlug}/${id}`} aria-label={title}>
             <h1
               className="
                 text-2xl 

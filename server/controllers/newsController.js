@@ -66,6 +66,8 @@ export const createNews = async (req, res, next) => {
   try {
     const {
       title,
+      slug: providedSlug, // ✅ FIX: আগে destructure-ই করা হতো না, তাই
+      // frontend থেকে পাঠানো manual/auto slug সবসময় silently ignore হয়ে যেত।
       summary,
       content,
       thumbnail,
@@ -75,7 +77,13 @@ export const createNews = async (req, res, next) => {
       showInVideoSection, // ✅ NEW
     } = req.body;
 
-    const slug = await generateSeoSlug(title);
+    // ✅ FIX: client একটা non-empty slug পাঠালে সেটাকে normalize+unique করে
+    // ব্যবহার করা হবে। খালি থাকলে (বা না পাঠালে) আগের মতোই title থেকে
+    // auto-generate হবে — backward compatible।
+    const slug = providedSlug?.trim()
+      ? await generateSeoSlug(providedSlug.trim())
+      : await generateSeoSlug(title);
+
     const mediaId = typeof thumbnail === 'string' ? thumbnail : thumbnail?.media;
 
     // ✅ NEW: checkbox true হলেও body-তে আসলে video না থাকলে videoMeta null-ই থাকবে,
@@ -121,6 +129,8 @@ export const updateNews = async (req, res, next) => {
     const { id } = req.params;
     const {
       title,
+      slug: providedSlug, // ✅ FIX: আগে এখানেও slug destructure হতো না,
+      // তাই manual slug edit করলেও কখনো save হতো না।
       summary,
       content,
       thumbnail,
@@ -144,10 +154,24 @@ export const updateNews = async (req, res, next) => {
       });
     }
 
-    if (title && title !== news.title) {
+    const titleChanged = Boolean(title) && title !== news.title;
+
+    if (titleChanged) {
       news.title = title;
+    }
+
+    // ✅ FIX: slug resolution logic —
+    // ১) client একটা নতুন non-empty slug পাঠালে (পুরনোটার চেয়ে ভিন্ন হলে),
+    //    সেটাই normalize করে ব্যবহার হবে — manual slug এখন honor হয়।
+    // ২) client slug না পাঠালে কিন্তু title বদলেছে —
+    //    আগের behavior অনুযায়ী title থেকে auto slug বানানো হবে।
+    // ৩) কোনোটাই না হলে পুরনো slug অক্ষত থাকবে।
+    if (providedSlug?.trim() && providedSlug.trim() !== news.slug) {
+      news.slug = await generateSeoSlug(providedSlug.trim());
+    } else if (!providedSlug?.trim() && titleChanged) {
       news.slug = await generateSeoSlug(title);
     }
+
     if (summary !== undefined) news.summary = summary;
     if (content) news.content = content;
 
@@ -157,7 +181,20 @@ export const updateNews = async (req, res, next) => {
     }
 
     if (category) news.category = category;
-    if (status) news.status = status;
+        if (status) {
+      const isPrivilegedUser =
+        req.user.role === 'admin' || req.user.role === 'superadmin';
+
+      if (status === 'published' && !isPrivilegedUser) {
+        return res.status(403).json({
+          success: false,
+          message:
+            'শুধু Admin বা Superadmin আর্টিকেল Publish করতে পারবে। এর বদলে Review-এর জন্য Submit করুন।',
+        });
+      }
+
+      news.status = status;
+    }
     if (isFeatured !== undefined) news.isFeatured = isFeatured;
 
     // ✅ NEW: checkbox explicitly touch করলে re-extract করা হবে
@@ -241,8 +278,32 @@ export const getAllNews = async (req, res, next) => {
       query.author = req.query.author;
     }
 
-    if (req.query.search) {
+      if (req.query.search) {
       query.title = { $regex: req.query.search, $options: "i" };
+    }
+
+    // ✅ NEW: Visibility access control
+    // - Admin/Superadmin: যেকোনো status/author filter করতে পারবে
+    // - নিজের author id দিয়ে request করলে (Manage News / Pending list):
+    //   নিজের যেকোনো status-এর article দেখতে পারবে
+    // - বাকি সবাই (guest / অন্য কারো article চাওয়া non-privileged user):
+    //   শুধু published দেখতে পারবে — draft/review কখনো leak হবে না
+    const role = req.user?.role;
+    const isPrivileged = role === "admin" || role === "superadmin";
+    const isSelfAuthorRequest =
+      req.user &&
+      req.query.author &&
+      req.query.author === req.user._id.toString();
+
+    if (isPrivileged) {
+      if (req.query.status) query.status = req.query.status;
+      if (req.query.author) query.author = req.query.author;
+    } else if (isSelfAuthorRequest) {
+      query.author = req.user._id;
+      if (req.query.status) query.status = req.query.status;
+    } else {
+      query.status = "published";
+      if (req.query.author) query.author = req.query.author;
     }
 
     const total = await News.countDocuments(query);
@@ -480,6 +541,87 @@ export const deleteNews = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'News deleted successfully.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/**
+ * @desc Approve a submitted article (review -> published)
+ * @route PATCH /api/news/:id/approve
+ * @access Private (admin, superadmin)
+ */
+export const approveNews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const news = await News.findById(id);
+
+    if (!news) {
+      return res.status(404).json({ success: false, message: 'News article not found.' });
+    }
+
+    if (news.status !== 'review') {
+      return res.status(400).json({
+        success: false,
+        message: 'যে আর্টিকেল এখন Review-তে আছে, শুধু সেটাই Approve করা যাবে।',
+      });
+    }
+
+    news.status = 'published';
+    news.reviewedBy = req.user._id;
+    news.reviewNote = '';
+
+    await news.save();
+
+    if (news.showInVideoSection) {
+      await enforceVideoSectionLimit();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Article approved and published.',
+      data: news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc Reject a submitted article (review -> draft)
+ * @route PATCH /api/news/:id/reject
+ * @access Private (admin, superadmin)
+ */
+export const rejectNews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const news = await News.findById(id);
+
+    if (!news) {
+      return res.status(404).json({ success: false, message: 'News article not found.' });
+    }
+
+    if (news.status !== 'review') {
+      return res.status(400).json({
+        success: false,
+        message: 'যে আর্টিকেল এখন Review-তে আছে, শুধু সেটাই Reject করা যাবে।',
+      });
+    }
+
+    news.status = 'draft';
+    news.reviewedBy = req.user._id;
+    news.reviewNote = reason?.trim() || '';
+
+    await news.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Article sent back to draft.',
+      data: news,
     });
   } catch (error) {
     next(error);

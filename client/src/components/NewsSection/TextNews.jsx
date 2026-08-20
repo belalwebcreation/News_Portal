@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
 
 const TextNews = ({ news }) => {
+  // ⚠️ basename="/news" স্বয়ংক্রিয়ভাবে যোগ হয় — "/news" এখানে নিজে লেখা যাবে না।
+  // App.jsx-এ শুধু "/:categorySlug/:slug" route আছে — categorySlug না থাকলে
+  // ভ্যালিড লিংক বানানো সম্ভব না, তাই "#" ফলব্যাক।
+  const articleUrl =
+    news.categorySlug && news.slug ? `/${news.categorySlug}/${news.slug}` : "#";
+
   return (
     <Link
-      to={`/news/${news.id}`}
+      to={articleUrl}
       className="group block rounded-lg px-2 py-4 transition-colors duration-300 hover:bg-neutral-50 dark:hover:bg-gray-800/60"
     >
       <div className="flex items-start gap-3">

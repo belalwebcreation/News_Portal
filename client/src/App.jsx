@@ -101,6 +101,7 @@ import SiteSettings from "./dashboard/pages/admin/SiteSettings";
 import ContentManagement from "./dashboard/pages/ContentManagement";
 
 import CategoryManagement from "./features/category/CategoryManagement";
+import PendingReview from "./dashboard/pages/PendingReview";
 
 // ============================================================
 // WRITER / READER
@@ -213,6 +214,11 @@ const buildPayload = (
   return {
     title:
       articleData?.title || "",
+
+    // ✅ FIX: slug আগে এখানে পাঠানোই হতো না,
+    // তাই backend সবসময় title থেকে auto slug বানাতো।
+    slug:
+      articleData?.slug || "",
 
     summary:
       articleData?.excerpt || "",
@@ -401,10 +407,10 @@ function AppRoutes() {
         // ALWAYS publish here.
         // ----------------------------------------------------
 
-        const payload =
+                const payload =
           buildPayload(
             articleData,
-            "published"
+            articleData?.status || "published"
           );
 
         const articleId =
@@ -505,8 +511,17 @@ function AppRoutes() {
           element={<Profile />}
         />
 
+        {/*
+          ✅ FIX:
+          basename="/news" (main.jsx) আগে থেকেই সব URL-এর সামনে
+          "/news" জুড়ে দেয়। এখানে আগে path="/news/:slug" লেখা থাকায়
+          ব্রাউজারে /news/news/... হয়ে যাচ্ছিল।
+
+          এখন category slug + article slug দুটোর জন্যই জায়গা রাখা
+          হলো: /news/{categorySlug}/{slug}
+        */}
         <Route
-          path="/news/:slug"
+          path="/:categorySlug/:slug"
           element={<ArticleDetails />}
         />
 
@@ -673,6 +688,11 @@ function AppRoutes() {
             />
           </Route>
 
+                      <Route
+              path="admin/pending-review"
+              element={<PendingReview />}
+            />
+
           {/* ================================================= */}
           {/* SITE SETTINGS */}
           {/* ================================================= */}
@@ -716,7 +736,7 @@ function AppRoutes() {
             {/* ARTICLE EDITOR */}
             {/* --------------------------------------------- */}
 
-            <Route
+                        <Route
               path="writer/add-news/editor"
               element={
                 <ArticleEditorRoute
@@ -724,6 +744,10 @@ function AppRoutes() {
                     userInfo?.id ||
                     userInfo?._id ||
                     null
+                  }
+
+                  currentUserRole={
+                    userInfo?.role || null
                   }
 
                   uploadImage={

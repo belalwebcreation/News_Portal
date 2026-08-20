@@ -5,8 +5,14 @@ import { motion } from "framer-motion";
 
 import PlayButton from "./PlayButton";
 
-const VideoCard = memo(({ video, setPaused }) => {
+const VideoCard = memo(({ video, onMouseEnter, onMouseLeave }) => {
   if (!video) return null;
+
+  // ⚠️ useVideoSectionData.js-এর mapNewsToVideo() "category" ফিল্ডেই
+  // slug বসায় (topic-filter এর জন্য দরকার), তাই video.categorySlug না,
+  // video.category ব্যবহার করতে হবে।
+  const articleUrl =
+    video.category && video.slug ? `/${video.category}/${video.slug}` : "#";
 
   return (
     <motion.div
@@ -19,12 +25,12 @@ const VideoCard = memo(({ video, setPaused }) => {
         stiffness: 320,
         damping: 24,
       }}
-      onMouseEnter={() => setPaused?.(true)}
-      onMouseLeave={() => setPaused?.(false)}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className="h-full"
     >
       <Link
-        to={`/news/${video.slug}`}
+        to={articleUrl}
         aria-label={video.title}
         className="
           group

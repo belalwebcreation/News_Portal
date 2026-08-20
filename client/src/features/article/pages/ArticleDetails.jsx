@@ -54,7 +54,7 @@ const ArticleDetails = () => {
 
         setArticle(news);
 
-        document.title = `${news.title} | BelalWebCreation`;
+        document.title = `${news.title} | রয়েল বাংলা নিউজ`;
 
         window.scrollTo({
           top: 0,

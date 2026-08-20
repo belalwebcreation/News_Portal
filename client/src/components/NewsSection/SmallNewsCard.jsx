@@ -4,7 +4,12 @@ import { motion } from "framer-motion";
 const SmallNewsCard = ({ news }) => {
   if (!news) return null;
 
-  const { id, title, image, category, time, publishedAt } = news;
+  const { slug, title, image, category, categorySlug, time, publishedAt } = news;
+
+  // ⚠️ basename="/news" স্বয়ংক্রিয়ভাবে যোগ হয় — "/news" এখানে নিজে লেখা যাবে না।
+  // App.jsx-এ শুধু "/:categorySlug/:slug" route আছে — categorySlug না থাকলে
+  // ভ্যালিড লিংক বানানো সম্ভব না, তাই "#" ফলব্যাক।
+  const articleUrl = categorySlug && slug ? `/${categorySlug}/${slug}` : "#";
 
   return (
     <motion.article
@@ -15,7 +20,7 @@ const SmallNewsCard = ({ news }) => {
       className="group block"
     >
       <Link
-        to={`/news/${id}`}
+        to={articleUrl}
         aria-label={title}
         className="block focus:outline-none"
       >

@@ -8,13 +8,14 @@ const HeroSmallCard = ({ news }) => {
     title,
     image,
     category,
+    categorySlug,
     publishedAt,
   } = news;
 
   return (
     <article className="group">
       <Link
-        to={`/news/${id}`}
+        to={`/${categorySlug}/${id}`}
         aria-label={title}
         className="flex items-start gap-4 lg:gap-5 py-1"
       >

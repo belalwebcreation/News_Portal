@@ -17,11 +17,12 @@ const NewsCard = ({ news }) => {
   if (!news) return null;
 
   const {
-    id,
+    slug,
     title,
     description,
     image,
     category,
+    categorySlug,
     time,
     publishedAt,
     readTime,
@@ -30,6 +31,11 @@ const NewsCard = ({ news }) => {
   const categoryBadgeStyle = category
     ? CATEGORY_STYLES[category] || CATEGORY_STYLES.default
     : null;
+
+  // ⚠️ basename="/news" স্বয়ংক্রিয়ভাবে যোগ হয় — "/news" এখানে নিজে লেখা যাবে না।
+  // App.jsx-এ শুধু "/:categorySlug/:slug" route আছে, standalone "/:slug" নেই —
+  // categorySlug না থাকলে ভ্যালিড লিংক বানানো সম্ভব না, তাই "#" ফলব্যাক।
+  const articleUrl = categorySlug && slug ? `/${categorySlug}/${slug}` : "#";
 
   return (
     <motion.article
@@ -40,7 +46,7 @@ const NewsCard = ({ news }) => {
       className="group h-full flex flex-col justify-between"
     >
       <Link
-        to={`/news/${id}`}
+        to={articleUrl}
         aria-label={title}
         className="block flex-1 focus:outline-none"
       >

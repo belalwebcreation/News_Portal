@@ -124,3 +124,4 @@ export const deleteNewsService = async (id) => {
   const deletedArticle = await News.findByIdAndDelete(id);
   return deletedArticle;
 };
+

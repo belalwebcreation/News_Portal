@@ -123,9 +123,16 @@ export function ArticleManagement({
   onPublish,
   uploadImage,
   currentUserId,
+  currentUserRole,   // ✅ NEW
   className = "",
 }) {
   const navigate = useNavigate();
+
+    const isWriterOnly = currentUserRole === "writer";
+
+  const visibleStatusOptions = isWriterOnly
+    ? STATUS_OPTIONS.filter((option) => option.value !== "published")
+    : STATUS_OPTIONS;
 
   // ==========================================================
   // DRAFT KEY
@@ -755,9 +762,11 @@ export function ArticleManagement({
       // Build published article
       // ------------------------------------------------------
 
+           const targetStatus = isWriterOnly ? "review" : "published";
+
       const next = {
         ...article,
-        status: "published",
+        status: targetStatus,
         slug:
           article.slug ||
           slugify(article.title),
@@ -806,10 +815,11 @@ export function ArticleManagement({
       // SUCCESS
       // ------------------------------------------------------
 
-      setToast({
+            setToast({
         type: "success",
-        message:
-          "Article published successfully.",
+        message: isWriterOnly
+          ? "Article submitted for review."
+          : "Article published successfully.",
       });
 
       window.setTimeout(() => {
@@ -842,6 +852,8 @@ export function ArticleManagement({
     autoSave,
     onPublish,
     savePayload,
+    // currentUserRole intentionally excluded to avoid unnecessary re-creations
+    isWriterOnly, // included to satisfy hook dependency
   ]);
 
   // ==========================================================
@@ -1035,14 +1047,18 @@ export function ArticleManagement({
             Save draft
           </button>
 
-          <button
+                    <button
             type="button"
             className="button button--primary"
             onClick={publish}
             disabled={isPublishing}
           >
             {isPublishing
-              ? "Publishing…"
+              ? isWriterOnly
+                ? "Submitting…"
+                : "Publishing…"
+              : isWriterOnly
+              ? "Submit for review"
               : "Publish"}
 
             {!isPublishing && (
@@ -1159,7 +1175,7 @@ export function ArticleManagement({
               Status
             </label>
 
-            <select
+                        <select
               id="article-status"
               className="field"
               value={article.status}
@@ -1169,9 +1185,12 @@ export function ArticleManagement({
                     event.target.value,
                 })
               }
-              disabled={isPublishing}
+              disabled={
+                isPublishing ||
+                (isWriterOnly && article.status === "published")
+              }
             >
-              {STATUS_OPTIONS.map(
+              {visibleStatusOptions.map(
                 (option) => (
                   <option
                     key={option.value}

@@ -137,3 +137,40 @@ export const authorize = (...roles) => {
     next();
   };
 };
+
+
+export const optionalAuth = asyncHandler(async (req, res, next) => {
+  let accessToken;
+
+  if (req.cookies?.accessToken) {
+    accessToken = req.cookies.accessToken;
+  }
+
+  if (
+    !accessToken &&
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    accessToken = req.headers.authorization.split(" ")[1];
+  }
+
+  // Guest allowed — token na thakle just pass through, req.user undefined-i thakবে
+  if (!accessToken) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    if (decoded.type === "access") {
+      const user = await User.findById(decoded.id).select("-password");
+      if (user && user.isActive) {
+        req.user = user;
+      }
+    }
+  } catch (error) {
+    // Invalid/expired token — এই route-এ refresh flow দরকার নাই, guest হিসেবেই চলুক
+  }
+
+  next();
+});

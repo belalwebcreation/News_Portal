@@ -6,7 +6,7 @@ const HeroNewsCard = ({ news }) => {
 
       {/* Image */}
       <Link
-        to={`/news/${news.id}`}
+        to={`/${news.categorySlug}/${news.id}`}
         className="block overflow-hidden rounded-lg"
       >
         <img
@@ -25,7 +25,7 @@ const HeroNewsCard = ({ news }) => {
       {/* Content */}
       <div className="mt-4">
 
-        <Link to={`/news/${news.id}`}>
+        <Link to={`/${news.categorySlug}/${news.id}`}>
           <h2
             className="
               text-3xl

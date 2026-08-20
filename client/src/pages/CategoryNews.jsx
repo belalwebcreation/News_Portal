@@ -160,7 +160,17 @@ const FeaturedArticle = ({ article, categoryTitle, slug }) => {
 
   return (
     <div className="group relative rounded-3xl overflow-hidden bg-base-100 border border-base-200/80 shadow-xl hover:shadow-2xl hover:border-primary/30 transition-all duration-300">
-      <Link to={`/news/${article.slug}`} className="block">
+      {/*
+        ✅ FIX: আগে হার্ডকোডেড ছিল /news/${article.slug} — যেটা
+        basename="/news"-এর সাথে মিলে ডাবল "news" তৈরি করছিল, এবং
+        category slug কখনোই URL-এ যেত না।
+
+        এখন App.jsx-এর নতুন route "/:categorySlug/:slug" অনুযায়ী
+        category slug + article slug দুটোই পাঠানো হচ্ছে।
+        article.category populate করা থাকলে সেখান থেকে slug নেওয়া হবে,
+        নাহলে বর্তমান পেজের category slug fallback হিসেবে ব্যবহার হবে।
+      */}
+      <Link to={`/${article.category?.slug || slug}/${article.slug}`} className="block">
         <div className="grid grid-cols-1 lg:grid-cols-12">
           <div className="lg:col-span-8 relative overflow-hidden aspect-[16/9] lg:aspect-auto">
             <img
@@ -242,7 +252,8 @@ const FeaturedArticle = ({ article, categoryTitle, slug }) => {
 const ArticleCard = ({ item, categoryTitle, slug }) => {
   return (
     <Link
-      to={`/news/${item.slug}`}
+      // ✅ FIX: একই কারণে /news/${item.slug} থেকে category-aware path-এ পরিবর্তন
+      to={`/${item.category?.slug || slug}/${item.slug}`}
       className="group flex flex-col justify-between rounded-3xl bg-base-100 border border-base-200/80 p-4 shadow-sm hover:shadow-2xl hover:border-primary/30 transition-all duration-300 hover:-translate-y-1.5"
     >
       <div className="space-y-3">
@@ -324,7 +335,10 @@ const ArticleCard = ({ item, categoryTitle, slug }) => {
 /* ==========================================
    6. Sub-Component: TrendingWidget
    ========================================== */
-const TrendingWidget = ({ articles, categoryTitle }) => {
+// ✅ FIX: আগে এই কম্পোনেন্ট `slug` prop-ই নিতো না, তাই hardcode করা
+// /news/${topItem.slug} ছাড়া কোনো উপায় ছিল না। এখন slug prop যোগ
+// করে fallback হিসেবে ব্যবহার করা হচ্ছে (item.category?.slug না থাকলে)।
+const TrendingWidget = ({ articles, categoryTitle, slug }) => {
   if (!articles || articles.length === 0) return null;
 
   return (
@@ -340,7 +354,7 @@ const TrendingWidget = ({ articles, categoryTitle }) => {
         {articles.slice(0, 4).map((topItem, index) => (
           <Link
             key={topItem._id || topItem.slug}
-            to={`/news/${topItem.slug}`}
+            to={`/${topItem.category?.slug || slug}/${topItem.slug}`}
             className="group flex items-center gap-3 p-2 rounded-2xl hover:bg-base-200/50 transition-colors"
           >
             <div className="relative shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-base-200">
@@ -608,7 +622,13 @@ const CategoryNews = () => {
             {/* Right Column - Sticky Sidebar (4 Cols) */}
             <aside className="lg:col-span-4 space-y-6">
               <div className="sticky top-24 space-y-6">
-                <TrendingWidget articles={sortedNews} categoryTitle={categoryTitle} />
+                {/* ✅ FIX: slug prop এখন পাস করা হচ্ছে যাতে TrendingWidget
+                    এর ভেতরে category slug fallback হিসেবে ব্যবহার করতে পারে */}
+                <TrendingWidget
+                  articles={sortedNews}
+                  categoryTitle={categoryTitle}
+                  slug={slug}
+                />
                 <NewsletterWidget categoryTitle={categoryTitle} />
               </div>
             </aside>
