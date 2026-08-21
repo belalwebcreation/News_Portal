@@ -52,11 +52,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         path: "/dashboard/writer/add-news",
         icon: <MdOutlinePostAdd size={20} />,
       },
-      {
-        title: "Section Management",
-        path: "/dashboard/writer/section-management",
-        icon: <FiLayout size={20} />,
-      },
     ],
     reader: [
       {
@@ -92,13 +87,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 z-[55] lg:hidden"
         />
       )}
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-screen w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-lg dark:shadow-none transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-[60] h-screen w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-lg dark:shadow-none transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >

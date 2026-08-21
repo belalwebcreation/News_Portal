@@ -17,6 +17,14 @@ import {
 } from "./context/AuthContext";
 
 import {
+  SocketProvider,
+} from "./context/SocketContext"; // ✅ NEW
+
+import {
+  NotificationProvider,
+} from "./context/NotificationContext"; // ✅ NEW
+
+import {
   SiteSettingsProvider,
 } from "./context/SiteSettingsContext";
 
@@ -859,11 +867,15 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <SiteSettingsProvider>
-        <CategoryProvider>
-          <AppRoutes />
-        </CategoryProvider>
-      </SiteSettingsProvider>
+      <SocketProvider>
+        <NotificationProvider>
+          <SiteSettingsProvider>
+            <CategoryProvider>
+              <AppRoutes />
+            </CategoryProvider>
+          </SiteSettingsProvider>
+        </NotificationProvider>
+      </SocketProvider>
     </AuthProvider>
   );
 }

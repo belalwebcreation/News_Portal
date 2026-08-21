@@ -10,14 +10,16 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      // IMPORTANT: server.js mounts every backend route under "/news/api/...",
-      // e.g. app.use("/news/api/auth", authRoutes). The proxy key here must
-      // match that exact prefix, or local dev requests to "/news/api/..."
-      // won't be forwarded to the backend at all and will 404 (or fall
-      // through to Vite's own dev server / SPA handling instead).
       '/news/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
+      },
+      // ✅ NEW — Socket.io WebSocket upgrade dev-এ proxy করার জন্য।
+      // ws: true না দিলে dev-এ শুধু polling-এই আটকে থাকবে।
+      '/news/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
       },
     },
   },

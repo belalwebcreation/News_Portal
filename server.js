@@ -3,8 +3,12 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import http from "http";
 
 import categoryRoutes from "./server/routes/categoryRoutes.js";
+import notificationRoutes from "./server/routes/notificationRoutes.js"; // ✅ NEW
+import allowedOrigins from "./server/config/allowedOrigins.js"; // ✅ NEW
+import { initSocket } from "./server/socket/index.js"; // ✅ NEW
 
 // ===============================
 // Database & Models
@@ -132,12 +136,6 @@ app.use(cookieParser());
 //
 // We support both www and non-www production domains.
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://www.royalbangla.com",
-  "https://royalbangla.com",
-  process.env.CLIENT_URL,
-].filter(Boolean);
 
 app.use(
   cors({
@@ -254,6 +252,12 @@ app.use(
 app.use(
   "/news/api/users",
   userRoutes
+);
+
+// Notifications ✅ NEW
+app.use(
+  "/news/api/notifications",
+  notificationRoutes
 );
 
 // Public Profile
@@ -465,7 +469,21 @@ app.use(errorHandler);
 // Start Server
 // ============================================================
 
-app.listen(PORT, () => {
+// ============================================================
+// HTTP Server + Socket.io
+// ============================================================
+//
+// Socket.io কে raw http.Server-এর সাথে attach করতে হয় (শুধু Express
+// app-এর সাথে সরাসরি না), তাই app.listen() এর বদলে httpServer ব্যবহার
+// করা হচ্ছে। Passenger/cPanel-এর জন্য এটা transparent — এখনও একই
+// PORT-এ HTTP serve করছে, শুধু WebSocket upgrade handle করার সক্ষমতা
+// যোগ হলো।
+
+const httpServer = http.createServer(app);
+
+initSocket(httpServer);
+
+httpServer.listen(PORT, () => {
   console.log(
     `🚀 Server Running On http://localhost:${PORT}`
   );

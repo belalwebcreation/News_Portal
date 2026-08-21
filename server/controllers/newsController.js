@@ -6,6 +6,8 @@ import { generateSeoSlug } from '../utils/slugGenerator.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
 import { extractYoutubeVideo } from '../utils/extractYoutubeVideo.js';
 import { enforceVideoSectionLimit } from '../utils/enforceVideoSectionLimit.js'; // ✅ NEW
+import { createNotification } from '../utils/createNotification.js'; // ✅ NEW
+import { broadcastNewArticlePublished } from '../utils/broadcastNotification.js'; // ✅ NEW
 
 // ✅ NEW: author/updatedBy populate করার সময় সব controller-এ একই ফিল্ড-সেট
 // ব্যবহার করার জন্য এখানে একবার define করা হলো — এখন থেকে avatar/username
@@ -66,28 +68,21 @@ export const createNews = async (req, res, next) => {
   try {
     const {
       title,
-      slug: providedSlug, // ✅ FIX: আগে destructure-ই করা হতো না, তাই
-      // frontend থেকে পাঠানো manual/auto slug সবসময় silently ignore হয়ে যেত।
+      slug: providedSlug,
       summary,
       content,
       thumbnail,
       category,
       status,
       isFeatured,
-      showInVideoSection, // ✅ NEW
+      showInVideoSection,
     } = req.body;
 
-    // ✅ FIX: client একটা non-empty slug পাঠালে সেটাকে normalize+unique করে
-    // ব্যবহার করা হবে। খালি থাকলে (বা না পাঠালে) আগের মতোই title থেকে
-    // auto-generate হবে — backward compatible।
     const slug = providedSlug?.trim()
       ? await generateSeoSlug(providedSlug.trim())
       : await generateSeoSlug(title);
 
     const mediaId = typeof thumbnail === 'string' ? thumbnail : thumbnail?.media;
-
-    // ✅ NEW: checkbox true হলেও body-তে আসলে video না থাকলে videoMeta null-ই থাকবে,
-    // আর flag নিজে থেকেই false হয়ে যাবে — এমপ্টি entry কখনো Video Section-এ যাবে না
     const videoMeta = showInVideoSection ? extractYoutubeVideo(content) : null;
 
     const news = await News.create({
@@ -104,10 +99,13 @@ export const createNews = async (req, res, next) => {
       videoMeta,
     });
 
-    // ✅ NEW: এই article video-flagged হলে ৩০-এর cap enforce করা —
-    // সবচেয়ে পুরনো flagged article(গুলো) থেকে flag খুলে দেওয়া হবে প্রয়োজনে
     if (news.showInVideoSection) {
       await enforceVideoSectionLimit();
+    }
+
+    // ✅ NEW: সরাসরি published হিসেবে create হলে সবাইকে জানানো
+    if (news.status === 'published') {
+      await broadcastNewArticlePublished(news, req.user._id);
     }
 
     res.status(201).json({
@@ -129,21 +127,25 @@ export const updateNews = async (req, res, next) => {
     const { id } = req.params;
     const {
       title,
-      slug: providedSlug, // ✅ FIX: আগে এখানেও slug destructure হতো না,
-      // তাই manual slug edit করলেও কখনো save হতো না।
+      slug: providedSlug,
       summary,
       content,
       thumbnail,
       category,
       status,
       isFeatured,
-      showInVideoSection, // ✅ NEW
+      showInVideoSection,
     } = req.body;
 
     const news = await News.findById(id);
     if (!news) {
       return res.status(404).json({ success: false, message: 'News article not found.' });
     }
+
+    // ✅ NEW: save-এর আগেই পুরনো status মনে রাখা হচ্ছে — নাহলে already
+    // published একটা আর্টিকেল edit করলেও প্রতিবার সবাইকে notification
+    // চলে যাবে, যেটা spam হয়ে যাবে।
+    const previousStatus = news.status;
 
     const isOwner = news.author.toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
@@ -160,12 +162,6 @@ export const updateNews = async (req, res, next) => {
       news.title = title;
     }
 
-    // ✅ FIX: slug resolution logic —
-    // ১) client একটা নতুন non-empty slug পাঠালে (পুরনোটার চেয়ে ভিন্ন হলে),
-    //    সেটাই normalize করে ব্যবহার হবে — manual slug এখন honor হয়।
-    // ২) client slug না পাঠালে কিন্তু title বদলেছে —
-    //    আগের behavior অনুযায়ী title থেকে auto slug বানানো হবে।
-    // ৩) কোনোটাই না হলে পুরনো slug অক্ষত থাকবে।
     if (providedSlug?.trim() && providedSlug.trim() !== news.slug) {
       news.slug = await generateSeoSlug(providedSlug.trim());
     } else if (!providedSlug?.trim() && titleChanged) {
@@ -181,7 +177,7 @@ export const updateNews = async (req, res, next) => {
     }
 
     if (category) news.category = category;
-        if (status) {
+    if (status) {
       const isPrivilegedUser =
         req.user.role === 'admin' || req.user.role === 'superadmin';
 
@@ -197,14 +193,11 @@ export const updateNews = async (req, res, next) => {
     }
     if (isFeatured !== undefined) news.isFeatured = isFeatured;
 
-    // ✅ NEW: checkbox explicitly touch করলে re-extract করা হবে
     if (showInVideoSection !== undefined) {
       const videoMeta = showInVideoSection ? extractYoutubeVideo(news.content) : null;
       news.showInVideoSection = Boolean(showInVideoSection) && Boolean(videoMeta);
       news.videoMeta = videoMeta;
     } else if (content && news.showInVideoSection) {
-      // checkbox না ছুঁলেও body বদলে গেলে পুরনো videoId/thumbnail stale থেকে যেতে পারে,
-      // তাই flag অক্ষত রেখে videoMeta-টা re-sync করা হচ্ছে
       const videoMeta = extractYoutubeVideo(news.content);
       news.showInVideoSection = Boolean(videoMeta);
       news.videoMeta = videoMeta;
@@ -214,9 +207,14 @@ export const updateNews = async (req, res, next) => {
 
     await news.save();
 
-    // ✅ NEW: update-এর পরও flag true থাকলে cap enforce করা
     if (news.showInVideoSection) {
       await enforceVideoSectionLimit();
+    }
+
+    // ✅ NEW: draft/review থেকে সরাসরি published-এ transition হলেই শুধু
+    // broadcast হবে — আগে থেকে published থাকা আর্টিকেল edit করলে না
+    if (news.status === 'published' && previousStatus !== 'published') {
+      await broadcastNewArticlePublished(news, req.user._id);
     }
 
     res.status(200).json({
@@ -579,6 +577,20 @@ export const approveNews = async (req, res, next) => {
       await enforceVideoSectionLimit();
     }
 
+    // writer-কে personal notification — "তোমার আর্টিকেল approve হয়েছে"
+    await createNotification({
+      recipient: news.author,
+      sender: req.user._id,
+      type: 'article_approved',
+      title: 'আর্টিকেল Approve হয়েছে 🎉',
+      message: `আপনার "${news.title}" আর্টিকেলটি Approve হয়ে Publish হয়ে গেছে।`,
+      link: `/dashboard/writer/add-news/manage`,
+      relatedNews: news._id,
+    });
+
+    // ✅ NEW: বাকি সবাইকে — "নতুন আর্টিকেল প্রকাশিত হয়েছে"
+    await broadcastNewArticlePublished(news, req.user._id);
+
     res.status(200).json({
       success: true,
       message: 'Article approved and published.',
@@ -617,6 +629,19 @@ export const rejectNews = async (req, res, next) => {
     news.reviewNote = reason?.trim() || '';
 
     await news.save();
+
+    // ✅ NEW: নির্দিষ্ট writer-কে (news.author) notification পাঠানো
+    await createNotification({
+      recipient: news.author,
+      sender: req.user._id,
+      type: 'article_rejected',
+      title: 'আর্টিকেল Reject হয়েছে',
+      message: news.reviewNote
+        ? `আপনার "${news.title}" আর্টিকেলটি Reject করা হয়েছে। কারণ: ${news.reviewNote}`
+        : `আপনার "${news.title}" আর্টিকেলটি Reject করা হয়েছে।`,
+      link: `/dashboard/writer/add-news/editor?id=${news._id}`,
+      relatedNews: news._id,
+    });
 
     res.status(200).json({
       success: true,

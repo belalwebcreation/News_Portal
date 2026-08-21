@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useSiteSettings } from "../../context/SiteSettingsContext"; // 🔗 Sidebar.jsx / Logo.jsx এর মতোই same context, mobile logo এর জন্য
 
+import fallbackLogo from "../../assets/logo.png";
 import ProfileAvatar from "../../components/profile/ProfileAvatar"; // adjust path if your folder depth differs
+import NotificationDropdown from "../../components/notification/NotificationDropdown"; // ✅ path তোমার Header.jsx-এর অবস্থান অনুযায়ী adjust করো
 
 import {
   FiSearch,
-  FiBell,
   FiMessageSquare,
   FiLogOut,
   FiUser,
@@ -22,12 +24,17 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
   const navigate = useNavigate();
 
   const { userInfo, logoutUser } = useAuth();
+  const { settings, loading: settingsLoading } = useSiteSettings(); // 🔗 dynamic logo data (Sidebar-এর মতো)
   const user = userInfo;
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [profileOpen, setProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
+
+  // 🔗 Sidebar.jsx এর সাথে identical logic — mobile-এ drawer বন্ধ থাকলেও logo যেন হারিয়ে না যায়
+  const logoSrc = settings?.logo?.trim() ? settings.logo : fallbackLogo;
+  const logoVisible = settings?.logoVisible ?? true;
 
   const handleLogout = () => {
     setProfileOpen(false);
@@ -94,24 +101,46 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
       dark:border-slate-800
       shadow-sm
       z-50
-      px-4
+      px-3
+      sm:px-4
       lg:px-8
       flex
       items-center
       justify-between
+      gap-2
     "
     >
       {/* LEFT */}
-      <div className="flex items-center gap-4 lg:gap-6">
+      <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 min-w-0">
         {/* Mobile Menu */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
           aria-expanded={sidebarOpen}
-          className="lg:hidden w-10 h-10 rounded-xl bg-amber-900 text-white flex items-center justify-center"
+          className="lg:hidden shrink-0 w-10 h-10 rounded-xl bg-amber-900 text-white flex items-center justify-center"
         >
           <FiMenu size={20} />
         </button>
+
+        {/* Mobile Logo — sidebar drawer বন্ধ থাকলে (default state) এটাই একমাত্র branding, তাই lg breakpoint পর্যন্ত visible রাখা হলো */}
+        {settingsLoading ? (
+          <div className="lg:hidden shrink-0 w-24 h-7 rounded bg-gray-200 dark:bg-slate-700 animate-pulse" />
+        ) : (
+          logoVisible && (
+            <Link to="/" className="lg:hidden shrink-0 flex items-center">
+              <img
+                src={logoSrc}
+                alt="Portal Logo"
+                className="h-8 w-auto max-w-[110px] sm:max-w-[130px] object-contain select-none"
+                draggable={false}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = fallbackLogo;
+                }}
+              />
+            </Link>
+          )
+        )}
 
         {/* Desktop Search */}
         <div className="relative hidden md:block">
@@ -154,6 +183,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
         <button
           className="
           md:hidden
+          shrink-0
           w-10
           h-10
           rounded-xl
@@ -171,12 +201,12 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
         </button>
 
         {/* Greeting */}
-        <div className="hidden xl:block">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100">
+        <div className="hidden xl:block min-w-0">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100 truncate">
             {greeting}, {user?.name || "User"} 👋
           </h2>
 
-          <p className="text-sm text-gray-500 dark:text-slate-400">
+          <p className="text-sm text-gray-500 dark:text-slate-400 truncate">
             {currentTime.toLocaleDateString("en-US", {
               weekday: "long",
               day: "numeric",
@@ -192,11 +222,12 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
       </div>
 
       {/* RIGHT */}
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
         {/* Message */}
         <button
           className="
             relative
+            shrink-0
             w-10
             h-10
             lg:w-11
@@ -217,55 +248,23 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
         </button>
 
         {/* Notification */}
-        <button
-          className="
-            relative
-            w-10
-            h-10
-            lg:w-11
-            lg:h-11
-            rounded-xl
-            bg-slate-100
-            dark:bg-slate-800
-            hover:bg-amber-900
-            hover:text-white
-            transition-all
-            duration-300
-            flex
-            items-center
-            justify-center
-          "
-        >
-          <FiBell size={18} />
-
-          <span
-            className="
-              absolute
-              top-2
-              right-2
-              w-2
-              h-2
-              rounded-full
-              bg-red-500
-              ring-2
-              ring-white
-              dark:ring-slate-900
-              animate-pulse
-            "
-          />
-        </button>
+        <div className="relative shrink-0">
+          <NotificationDropdown />
+        </div>
 
         {/* Profile */}
-        <div className="relative" ref={profileRef}>
+        <div className="relative shrink-0" ref={profileRef}>
           <button
             onClick={() => setProfileOpen(!profileOpen)}
             aria-expanded={profileOpen}
             className="
               flex
               items-center
-              gap-3
+              gap-2
+              sm:gap-3
               rounded-xl
-              px-2
+              px-1.5
+              sm:px-2
               lg:px-3
               py-2
               hover:bg-slate-100
@@ -302,6 +301,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
                 right-0
                 mt-3
                 w-64
+                max-w-[calc(100vw-1.5rem)]
                 bg-white
                 dark:bg-slate-900
                 rounded-2xl
@@ -310,6 +310,7 @@ const Header = ({ sidebarOpen = false, setSidebarOpen = () => {} }) => {
                 dark:border-slate-800
                 shadow-2xl
                 overflow-hidden
+                z-50
               "
             >
               <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800">
